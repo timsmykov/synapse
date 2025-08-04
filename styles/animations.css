@@ -1,0 +1,842 @@
+/* ===== ANIMATION STYLES ===== */
+
+/* ===== KEYFRAME ANIMATIONS ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes networkExpand {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-network-expand {
+  animation: networkExpand 1s ease-out forwards;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+/* ===== SCROLL ANIMATION STATES ===== */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+[data-animate].animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-animate="slide-left"] {
+  transform: translateX(-30px);
+}
+
+[data-animate="slide-left"].animate-in {
+  transform: translateX(0);
+}
+
+[data-animate="slide-right"] {
+  transform: translateX(30px);
+}
+
+[data-animate="slide-right"].animate-in {
+  transform: translateX(0);
+}
+
+[data-animate="slide-up"] {
+  transform: translateY(30px);
+}
+
+[data-animate="slide-up"].animate-in {
+  transform: translateY(0);
+}
+
+[data-animate="scale-in"] {
+  transform: scale(0.9);
+}
+
+[data-animate="scale-in"].animate-in {
+  transform: scale(1);
+}
+
+/* ===== STAGGERED ANIMATIONS ===== */
+[data-animate-delay="100"] {
+  transition-delay: 0.1s;
+}
+
+[data-animate-delay="200"] {
+  transition-delay: 0.2s;
+}
+
+[data-animate-delay="300"] {
+  transition-delay: 0.3s;
+}
+
+[data-animate-delay="400"] {
+  transition-delay: 0.4s;
+}
+
+[data-animate-delay="500"] {
+  transition-delay: 0.5s;
+}
+
+[data-animate-delay="600"] {
+  transition-delay: 0.6s;
+}
+
+[data-animate-delay="700"] {
+  transition-delay: 0.7s;
+}
+
+[data-animate-delay="800"] {
+  transition-delay: 0.8s;
+}
+
+/* ===== STAGGERED CHILD ANIMATIONS ===== */
+[data-animate-child] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+[data-animate-child].animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== HOVER ANIMATIONS ===== */
+.hover-lift {
+  transition: transform var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-scale {
+  transition: transform var(--transition-base);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ===== LOADING STATES ===== */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ===== BUTTON ANIMATIONS ===== */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left var(--transition-base);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+/* ===== FORM ANIMATIONS ===== */
+.form__input {
+  position: relative;
+}
+
+.form__input:focus {
+  animation: inputFocus 0.3s ease-out;
+}
+
+@keyframes inputFocus {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== REDUCED MOTION OVERRIDES ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable all scroll-based animations */
+  [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  [data-animate-child] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  /* Disable all keyframe animations */
+  .animate-pulse,
+  .animate-fade-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-slide-in-up,
+  .animate-scale-in,
+  .animate-network-expand {
+    animation: none !important;
+  }
+  
+  /* Disable hover animations */
+  .hover-lift:hover,
+  .hover-scale:hover {
+    transform: none !important;
+  }
+  
+  /* Disable network animations */
+  .network__core-light,
+  .network__line,
+  .network__line::before,
+  .network__node,
+  .network__logo,
+  .network__label {
+    animation: none !important;
+  }
+  
+  /* Disable demonstration animations */
+  .demonstration__processing,
+  .demonstration__arrow--after,
+  .demonstration__typewriter-content::after {
+    animation: none !important;
+  }
+  
+  /* Disable form animations */
+  .form__input:focus {
+    animation: none !important;
+  }
+  
+  /* Disable loading animations */
+  .loading::after {
+    animation: none !important;
+  }
+  
+  /* Disable button animations */
+  .btn::before {
+    transition: none !important;
+  }
+  
+  .btn:hover::before {
+    left: -100% !important;
+  }
+}/* ===
+== NETWORK VISUALIZATION ANIMATIONS ===== */
+
+/* Network visualization container */
+.network-visualization {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+/* Central light source */
+.network__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.network__core-light {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--premium-gold) 0%, var(--accent-blue) 70%);
+  box-shadow: 
+    0 0 20px var(--premium-gold),
+    0 0 40px rgba(245, 158, 11, 0.3),
+    0 0 60px rgba(245, 158, 11, 0.1);
+  animation: coreLight 3s ease-in-out infinite;
+}
+
+@keyframes coreLight {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Connection lines and nodes */
+.network__connections {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.network__connection {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(var(--rotation, 0deg));
+}
+
+/* Individual connection positioning is handled by --rotation custom property */
+
+/* Connection lines */
+.network__line {
+  width: 170px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue) 0%,
+    rgba(59, 130, 246, 0.6) 50%,
+    rgba(59, 130, 246, 0.2) 100%
+  );
+  transform-origin: left center;
+  position: relative;
+  animation: connectionPulse 2s ease-in-out infinite;
+}
+
+.network__line::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: var(--premium-gold);
+  border-radius: 2px;
+  animation: energyFlow 3s ease-in-out infinite;
+}
+
+@keyframes connectionPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.05);
+  }
+}
+
+@keyframes energyFlow {
+  0% {
+    width: 0;
+    left: 0;
+  }
+  50% {
+    width: 30px;
+    left: 45%;
+  }
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+/* Connection nodes */
+.network__node {
+  position: absolute;
+  top: -24px;
+  right: -24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-dark);
+  border: 2px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: nodeGlow 2.5s ease-in-out infinite;
+  transform: rotate(calc(var(--rotation, 0deg) * -1));
+}
+
+
+@keyframes nodeGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Original pulse animation for non-rotated node */
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.9; }
+}
+
+/* Node labels */
+.network__label {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-xs);
+  color: var(--text-accent);
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  animation: labelFadeIn 1s ease-out 1.4s forwards;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Logo images */
+.network__logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: logoFadeIn 1s ease-out 1.2s forwards;
+  z-index: 2;
+}
+
+@keyframes logoFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes labelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Staggered animation delays for connections */
+.network__connection--1 .network__line::before {
+  animation-delay: 0s;
+}
+
+.network__connection--2 .network__line::before {
+  animation-delay: 0.6s;
+}
+
+.network__connection--3 .network__line::before {
+  animation-delay: 1.2s;
+}
+
+.network__connection--4 .network__line::before {
+  animation-delay: 1.8s;
+}
+
+.network__connection--5 .network__line::before {
+  animation-delay: 2.4s;
+}
+
+.network__connection--6 .network__line::before {
+  animation-delay: 3.0s;
+}
+
+.network__connection--7 .network__line::before {
+  animation-delay: 3.6s;
+}
+
+.network__connection--8 .network__line::before {
+  animation-delay: 4.2s;
+}
+
+/* Responsive network visualization */
+@media (max-width: 767px) {
+  .network-visualization {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .network__line {
+    width: 120px;
+  }
+  
+  .network__node {
+    width: 32px;
+    height: 32px;
+    top: -16px;
+    right: -16px;
+  }
+  
+  .network__logo {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .network__label {
+    font-size: 10px;
+    top: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .network-visualization {
+    width: 500px;
+    height: 500px;
+  }
+  
+  .network__line {
+    width: 220px;
+  }
+  
+  .network__core-light {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .network__node {
+    width: 48px;
+    height: 48px;
+    top: -24px;
+    right: -24px;
+  }
+  
+  .network__logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .network__label {
+    font-size: var(--text-sm);
+    top: 55px;
+  }
+}
+
+/* Enhanced animation on scroll */
+.hero__visual[data-animate].animate-in .network-visualization {
+  animation: networkExpand 1.2s ease-out forwards;
+}
+
+.hero__visual[data-animate].animate-in .network__connection {
+  animation: connectionAppear 0.8s ease-out forwards;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--1 {
+  animation-delay: 0.2s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--2 {
+  animation-delay: 0.4s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--3 {
+  animation-delay: 0.6s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--4 {
+  animation-delay: 0.8s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--5 {
+  animation-delay: 1.0s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--6 {
+  animation-delay: 1.2s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--7 {
+  animation-delay: 1.4s;
+}
+
+.hero__visual[data-animate].animate-in .network__connection--8 {
+  animation-delay: 1.6s;
+}
+
+@keyframes connectionAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) scale(1);
+  }
+}
+
+/* Set rotation custom properties for each connection */
+.network__connection--1 {
+  --rotation: 0deg;
+}
+
+.network__connection--2 {
+  --rotation: 45deg;
+}
+
+.network__connection--3 {
+  --rotation: 90deg;
+}
+
+.network__connection--4 {
+  --rotation: 135deg;
+}
+
+.network__connection--5 {
+  --rotation: 180deg;
+}
+
+.network__connection--6 {
+  --rotation: 225deg;
+}
+
+.network__connection--7 {
+  --rotation: 270deg;
+}
+
+.network__connection--8 {
+  --rotation: 315deg;
+}
+
+/* ===== DEMONSTRATION SECTION ANIMATIONS ===== */
+
+/* Panel hover animations */
+.demonstration__panel {
+  transition: all var(--transition-base);
+}
+
+.demonstration__panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Processing animation */
+@keyframes processingPulse {
+  0%, 100% {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    border-color: var(--premium-gold);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+.demonstration__processing {
+  animation: processingPulse 2s ease-in-out infinite;
+}
+
+/* Tag animations are handled via CSS transitions in components.css */
+
+/* Typewriter cursor animation */
+@keyframes typewriterCursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.demonstration__typewriter-content::after {
+  content: '|';
+  color: var(--premium-gold);
+  animation: typewriterCursor 1s infinite;
+  margin-left: 2px;
+}
+
+.demonstration__typewriter-content.typing-complete::after {
+  display: none;
+}
+
+/* Arrow pulse animation */
+@keyframes arrowPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 15px rgba(245, 158, 11, 0);
+  }
+}
+
+.demonstration__arrow--after {
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+
+/* Panel content stagger animation */
+.demonstration__panel-content > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.demonstration__panel.animate-in .demonstration__panel-content > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Enhanced shimmer effect for processing */
+@keyframes processingShimmer {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.demonstration__processing::before {
+  animation: processingShimmer 2s infinite;
+}

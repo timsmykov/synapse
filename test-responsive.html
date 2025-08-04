@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Test</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        .test-container {
+            padding: 2rem;
+            background: var(--dark-background);
+            color: var(--text-primary);
+        }
+        .breakpoint-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            z-index: 1000;
+        }
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--surface-dark);
+            border-radius: var(--radius-lg);
+        }
+        .test-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .test-item {
+            background: var(--dark-background);
+            padding: 1rem;
+            border-radius: var(--radius-base);
+            text-align: center;
+        }
+        .touch-target-test {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="breakpoint-indicator" id="breakpoint">
+        Current: <span id="current-breakpoint">Unknown</span>
+    </div>
+    
+    <div class="test-container">
+        <h1 class="heading--hero">Responsive Design Test</h1>
+        
+        <!-- Typography Test -->
+        <div class="test-section">
+            <h2 class="heading--section">Typography Scaling Test</h2>
+            <h3 class="heading--subsection">Subsection Heading</h3>
+            <h4 class="heading--card">Card Heading</h4>
+            <p class="text--large">Large text that should scale fluidly across breakpoints.</p>
+            <p class="text--base">Base text with responsive sizing using clamp functions.</p>
+            <p class="text--small">Small text that maintains readability on all devices.</p>
+        </div>
+        
+        <!-- Grid System Test -->
+        <div class="test-section">
+            <h2 class="heading--section">Grid System Test</h2>
+            
+            <h3>2-Column Grid</h3>
+            <div class="grid grid--2-col test-grid">
+                <div class="test-item">Item 1</div>
+                <div class="test-item">Item 2</div>
+            </div>
+            
+            <h3>3-Column Grid</h3>
+            <div class="grid grid--3-col test-grid">
+                <div class="test-item">Item 1</div>
+                <div class="test-item">Item 2</div>
+                <div class="test-item">Item 3</div>
+            </div>
+            
+            <h3>4-Column Grid</h3>
+            <div class="grid grid--4-col test-grid">
+                <div class="test-item">Item 1</div>
+                <div class="test-item">Item 2</div>
+                <div class="test-item">Item 3</div>
+                <div class="test-item">Item 4</div>
+            </div>
+        </div>
+        
+        <!-- Touch Target Test -->
+        <div class="test-section">
+            <h2 class="heading--section">Touch Target Test</h2>
+            <p>All interactive elements should meet minimum 44px touch target requirements:</p>
+            
+            <div class="touch-target-test">
+                <button class="btn btn--primary">Primary Button</button>
+                <button class="btn btn--secondary">Secondary Button</button>
+                <button class="btn btn--small">Small Button</button>
+                <button class="btn btn--large">Large Button</button>
+            </div>
+            
+            <div class="form__group" style="margin-top: 1rem;">
+                <input type="email" class="form__input" placeholder="Test input field">
+            </div>
+            
+            <div class="form__group">
+                <input type="email" class="form__input form__input--large" placeholder="Large input field">
+            </div>
+        </div>
+        
+        <!-- Form Layout Test -->
+        <div class="test-section">
+            <h2 class="heading--section">Form Layout Test</h2>
+            
+            <form class="hero__form">
+                <div class="form__group">
+                    <input type="email" class="form__input" placeholder="Hero form input">
+                </div>
+                <button type="submit" class="btn btn--primary">Submit</button>
+            </form>
+            
+            <form class="cta__form" style="margin-top: 2rem;">
+                <div class="form__group">
+                    <input type="email" class="form__input" placeholder="CTA form input">
+                </div>
+                <button type="submit" class="btn btn--primary">Request Invitation</button>
+            </form>
+        </div>
+        
+        <!-- Container Test -->
+        <div class="test-section">
+            <h2 class="heading--section">Container & Spacing Test</h2>
+            <div class="container">
+                <p>This content is within a responsive container with fluid padding.</p>
+                <div class="content">
+                    <p>This content uses optimal reading width (65ch) with responsive adjustments.</p>
+                </div>
+                <div class="content--narrow">
+                    <p>This is narrow content (50ch) for better readability of short text.</p>
+                </div>
+                <div class="content--wide">
+                    <p>This is wide content (80ch) for content that benefits from more horizontal space.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="test-breakpoints.js"></script>
+    <script src="validate-responsive.js"></script>
+    <script src="validate-css.js"></script>
+    <script>
+        function updateBreakpointIndicator() {
+            const width = window.innerWidth;
+            let breakpoint = '';
+            
+            if (width < 320) {
+                breakpoint = 'Extra Small (<320px)';
+            } else if (width < 768) {
+                breakpoint = 'Mobile (320px-767px)';
+            } else if (width < 1024) {
+                breakpoint = 'Tablet (768px-1023px)';
+            } else if (width < 1440) {
+                breakpoint = 'Desktop (1024px-1439px)';
+            } else {
+                breakpoint = 'Large Desktop (1440px+)';
+            }
+            
+            document.getElementById('current-breakpoint').textContent = `${breakpoint} - ${width}px`;
+        }
+        
+        // Update on load and resize
+        updateBreakpointIndicator();
+        window.addEventListener('resize', updateBreakpointIndicator);
+        
+        // Test touch feedback on mobile
+        document.querySelectorAll('.btn, .form__input').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Add test buttons for manual testing
+        document.addEventListener('DOMContentLoaded', function() {
+            const testSection = document.createElement('div');
+            testSection.className = 'test-section';
+            testSection.innerHTML = `
+                <h2 class="heading--section">Responsive Testing Controls</h2>
+                <div class="touch-target-test">
+                    <button onclick="testResponsive.generateReport()" class="btn btn--primary">Generate Test Report</button>
+                    <button onclick="testResponsive.testTouchTargets()" class="btn btn--secondary">Test Touch Targets</button>
+                    <button onclick="testResponsive.testTypography()" class="btn btn--ghost">Test Typography</button>
+                    <button onclick="validateResponsive()" class="btn btn--primary" style="background: var(--premium-gold);">Validate All Requirements</button>
+                    <button onclick="validateCSS()" class="btn btn--secondary">Validate CSS</button>
+                </div>
+                <p style="margin-top: 1rem; font-size: var(--text-sm); color: var(--text-accent);">
+                    Open browser console to see detailed test results.
+                </p>
+            `;
+            document.querySelector('.test-container').appendChild(testSection);
+        });
+    </script>
+</body>
+</html>

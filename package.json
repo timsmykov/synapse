@@ -1,0 +1,97 @@
+{
+  "name": "synapse-landing-page",
+  "version": "1.0.0",
+  "description": "Synapse Landing Page - The Personalization Frontier",
+  "main": "index.html",
+  "scripts": {
+    "test": "node run-tests.js",
+    "test:unit": "node run-tests.js --unit",
+    "test:browser": "echo 'Open test-runner.html in browsers for compatibility testing'",
+    "test:responsive": "node run-tests.js --responsive",
+    "test:accessibility": "node run-tests.js --accessibility",
+    "test:all": "node run-tests.js --all",
+    "test:email": "node test-email-validation.js",
+    "test:animations": "node test-animations.js",
+    "test:watch": "nodemon --watch . --ext js,html,css --exec 'npm test'",
+    "validate:css": "node validate-css.js",
+    "validate:responsive": "echo 'Open test-responsive.html for responsive validation'",
+    "validate:accessibility": "echo 'Open accessibility-checklist.md for manual validation'",
+    "serve": "python3 -m http.server 8000 || python -m SimpleHTTPServer 8000",
+    "dev": "npm run serve"
+  },
+  "keywords": [
+    "landing-page",
+    "ai",
+    "personalization",
+    "responsive",
+    "accessibility",
+    "testing"
+  ],
+  "author": "Synapse Team",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/synapse/landing-page.git"
+  },
+  "bugs": {
+    "url": "https://github.com/synapse/landing-page/issues"
+  },
+  "homepage": "https://synapse.ai",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "testEnvironments": {
+    "browsers": [
+      "Chrome >= 90",
+      "Firefox >= 88",
+      "Safari >= 14",
+      "Edge >= 90"
+    ],
+    "devices": [
+      "Desktop (1440px+)",
+      "Laptop (1024px-1439px)",
+      "Tablet (768px-1023px)",
+      "Mobile (320px-767px)"
+    ]
+  },
+  "testing": {
+    "unit": {
+      "framework": "custom",
+      "files": [
+        "test-email-validation.js",
+        "test-animations.js"
+      ]
+    },
+    "integration": {
+      "files": [
+        "test-suite.js",
+        "test-browser-compatibility.js"
+      ]
+    },
+    "e2e": {
+      "files": [
+        "test-runner.html",
+        "test-responsive.html",
+        "test-forms.html"
+      ]
+    },
+    "accessibility": {
+      "checklist": "accessibility-checklist.md",
+      "tools": [
+        "axe-core",
+        "WAVE",
+        "Lighthouse",
+        "Pa11y"
+      ]
+    }
+  }
+}

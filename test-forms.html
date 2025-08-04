@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Form Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-summary {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Email Form Validation Tests</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+        <div id="test-summary" class="test-summary"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Form Test</h2>
+        <p>Test the actual form functionality:</p>
+        <form id="test-form" style="display: flex; gap: 10px; margin: 20px 0;">
+            <input type="email" id="test-email" placeholder="Enter test email" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Submit</button>
+            <div class="form__error" style="color: red; font-size: 14px;"></div>
+        </form>
+        <div id="manual-test-results"></div>
+    </div>
+
+    <!-- Include the forms.js file -->
+    <script src="scripts/forms.js"></script>
+    
+    <script>
+        // Unit Tests for Email Validation
+        class EmailValidationTests {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+            }
+
+            // Test runner
+            runTests() {
+                console.log('Running Email Validation Tests...');
+                
+                // Test email validation function
+                this.testEmailValidation();
+                
+                // Test form utilities
+                this.testFormUtils();
+                
+                // Test EmailCapture class methods
+                this.testEmailCaptureClass();
+                
+                // Display results
+                this.displayResults();
+            }
+
+            // Test the email validation function
+            testEmailValidation() {
+                const testCases = [
+                    // Valid emails
+                    { email: 'test@example.com', expected: true, description: 'Basic valid email' },
+                    { email: 'user.name@domain.co.uk', expected: true, description: 'Email with dots and subdomain' },
+                    { email: 'user+tag@example.org', expected: true, description: 'Email with plus sign' },
+                    { email: 'user_name@example-domain.com', expected: true, description: 'Email with underscore and hyphen' },
+                    { email: 'test123@example123.com', expected: true, description: 'Email with numbers' },
+                    { email: 'a@b.co', expected: true, description: 'Minimal valid email' },
+                    
+                    // Invalid emails
+                    { email: '', expected: false, description: 'Empty string' },
+                    { email: 'invalid', expected: false, description: 'No @ symbol' },
+                    { email: '@example.com', expected: false, description: 'Missing local part' },
+                    { email: 'test@', expected: false, description: 'Missing domain' },
+                    { email: 'test@.com', expected: false, description: 'Domain starts with dot' },
+                    { email: 'test@example.', expected: false, description: 'Domain ends with dot' },
+                    { email: 'test..test@example.com', expected: false, description: 'Double dots in local part' },
+                    { email: 'test@example..com', expected: false, description: 'Double dots in domain' },
+                    { email: 'test@example', expected: false, description: 'Missing TLD' },
+                    { email: 'test@example.c', expected: false, description: 'TLD too short' },
+                    { email: 'test space@example.com', expected: false, description: 'Space in local part' },
+                    { email: 'test@exam ple.com', expected: false, description: 'Space in domain' }
+                ];
+
+                // Create a temporary EmailCapture instance for testing
+                const tempForm = document.createElement('form');
+                const tempInput = document.createElement('input');
+                tempInput.type = 'email';
+                const tempButton = document.createElement('button');
+                tempButton.type = 'submit';
+                const tempError = document.createElement('div');
+                tempError.className = 'form__error';
+                
+                tempForm.appendChild(tempInput);
+                tempForm.appendChild(tempButton);
+                tempForm.appendChild(tempError);
+                
+                const emailCapture = new EmailCapture(tempForm);
+
+                testCases.forEach(testCase => {
+                    const result = emailCapture.isValidEmail(testCase.email);
+                    this.addTest(
+                        `Email validation: ${testCase.description}`,
+                        result === testCase.expected,
+                        `Expected ${testCase.expected} for "${testCase.email}", got ${result}`
+                    );
+                });
+            }
+
+            // Test FormUtils functions
+            testFormUtils() {
+                // Test sanitizeInput
+                const testInput = '<script>alert("xss")</script>test@example.com';
+                const sanitized = FormUtils.sanitizeInput(testInput);
+                this.addTest(
+                    'FormUtils.sanitizeInput should escape HTML',
+                    !sanitized.includes('<script>') && sanitized.includes('test@example.com'),
+                    `Input: ${testInput}, Output: ${sanitized}`
+                );
+
+                // Test formatEmail
+                const testEmail = '  TEST@EXAMPLE.COM  ';
+                const formatted = FormUtils.formatEmail(testEmail);
+                this.addTest(
+                    'FormUtils.formatEmail should lowercase and trim',
+                    formatted === 'test@example.com',
+                    `Input: "${testEmail}", Output: "${formatted}"`
+                );
+
+                // Test isValidDomain
+                const validDomain = FormUtils.isValidDomain('test@example.com');
+                const invalidDomain = FormUtils.isValidDomain('test@invalid');
+                this.addTest(
+                    'FormUtils.isValidDomain should validate domains',
+                    validDomain === true && invalidDomain === false,
+                    `Valid domain: ${validDomain}, Invalid domain: ${invalidDomain}`
+                );
+
+                // Test debounce function
+                let debounceCounter = 0;
+                const debouncedFn = FormUtils.debounce(() => debounceCounter++, 100);
+                
+                // Call multiple times quickly
+                debouncedFn();
+                debouncedFn();
+                debouncedFn();
+                
+                // Should only execute once after delay
+                setTimeout(() => {
+                    this.addTest(
+                        'FormUtils.debounce should limit function calls',
+                        debounceCounter === 1,
+                        `Expected 1 call, got ${debounceCounter}`
+                    );
+                    this.displayResults();
+                }, 150);
+            }
+
+            // Test EmailCapture class methods
+            testEmailCaptureClass() {
+                // Create test form
+                const testForm = document.createElement('form');
+                testForm.innerHTML = `
+                    <input type="email" name="email" class="form__input">
+                    <button type="submit" class="btn">Submit</button>
+                    <div class="form__error"></div>
+                `;
+                document.body.appendChild(testForm);
+
+                const emailCapture = new EmailCapture(testForm);
+
+                // Test input validation
+                emailCapture.input.value = 'invalid-email';
+                const isValid = emailCapture.validateInput();
+                this.addTest(
+                    'EmailCapture.validateInput should return false for invalid email',
+                    isValid === false,
+                    `Expected false, got ${isValid}`
+                );
+
+                // Test error display
+                emailCapture.showError('Test error message');
+                const hasErrorClass = emailCapture.input.classList.contains('error');
+                const errorText = emailCapture.errorElement.textContent;
+                this.addTest(
+                    'EmailCapture.showError should add error class and message',
+                    hasErrorClass && errorText === 'Test error message',
+                    `Has error class: ${hasErrorClass}, Error text: "${errorText}"`
+                );
+
+                // Test error clearing
+                emailCapture.clearError();
+                const errorCleared = !emailCapture.input.classList.contains('error') && 
+                                   emailCapture.errorElement.textContent === '';
+                this.addTest(
+                    'EmailCapture.clearError should remove error class and message',
+                    errorCleared,
+                    `Error cleared: ${errorCleared}`
+                );
+
+                // Test loading state
+                emailCapture.setLoadingState(true);
+                const isLoading = emailCapture.button.disabled && 
+                                emailCapture.button.classList.contains('loading');
+                this.addTest(
+                    'EmailCapture.setLoadingState(true) should disable button and add loading class',
+                    isLoading,
+                    `Button disabled: ${emailCapture.button.disabled}, Has loading class: ${emailCapture.button.classList.contains('loading')}`
+                );
+
+                // Test loading state removal
+                emailCapture.setLoadingState(false);
+                const notLoading = !emailCapture.button.disabled && 
+                                 !emailCapture.button.classList.contains('loading');
+                this.addTest(
+                    'EmailCapture.setLoadingState(false) should enable button and remove loading class',
+                    notLoading,
+                    `Button enabled: ${!emailCapture.button.disabled}, No loading class: ${!emailCapture.button.classList.contains('loading')}`
+                );
+
+                // Clean up
+                document.body.removeChild(testForm);
+            }
+
+            // Add a test result
+            addTest(name, passed, details) {
+                this.tests.push({ name, passed, details });
+                if (passed) {
+                    this.passed++;
+                } else {
+                    this.failed++;
+                }
+            }
+
+            // Display test results
+            displayResults() {
+                const resultsContainer = document.getElementById('test-results');
+                const summaryContainer = document.getElementById('test-summary');
+                
+                resultsContainer.innerHTML = '';
+                
+                this.tests.forEach(test => {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = `test-result ${test.passed ? 'test-pass' : 'test-fail'}`;
+                    testDiv.innerHTML = `
+                        <strong>${test.passed ? '✓' : '✗'} ${test.name}</strong>
+                        <br><small>${test.details}</small>
+                    `;
+                    resultsContainer.appendChild(testDiv);
+                });
+
+                const total = this.passed + this.failed;
+                const percentage = total > 0 ? Math.round((this.passed / total) * 100) : 0;
+                
+                summaryContainer.innerHTML = `
+                    Tests: ${total} | Passed: ${this.passed} | Failed: ${this.failed} | Success Rate: ${percentage}%
+                `;
+                summaryContainer.style.color = this.failed === 0 ? '#155724' : '#721c24';
+            }
+        }
+
+        // Manual form testing
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('test-email').value;
+            const resultsDiv = document.getElementById('manual-test-results');
+            
+            // Create temporary EmailCapture for testing
+            const emailCapture = new EmailCapture(this);
+            
+            resultsDiv.innerHTML = `
+                <h3>Manual Test Results:</h3>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Valid:</strong> ${emailCapture.isValidEmail(email)}</p>
+                <p><strong>Sanitized:</strong> ${FormUtils.sanitizeInput(email)}</p>
+                <p><strong>Formatted:</strong> ${FormUtils.formatEmail(email)}</p>
+                <p><strong>Valid Domain:</strong> ${FormUtils.isValidDomain(email)}</p>
+            `;
+        });
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const testRunner = new EmailValidationTests();
+            testRunner.runTests();
+        });
+    </script>
+</body>
+</html>

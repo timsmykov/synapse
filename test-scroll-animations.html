@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Animations Test</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+
+        .section {
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .section:nth-child(odd) {
+            background: #f8fafc;
+        }
+
+        .section:nth-child(even) {
+            background: #1e293b;
+            color: white;
+        }
+
+        /* Animation styles */
+        [data-animate] {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        [data-animate].animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        [data-animate="slide-left"] {
+            transform: translateX(-30px);
+        }
+
+        [data-animate="slide-left"].animate-in {
+            transform: translateX(0);
+        }
+
+        [data-animate="slide-right"] {
+            transform: translateX(30px);
+        }
+
+        [data-animate="slide-right"].animate-in {
+            transform: translateX(0);
+        }
+
+        [data-animate="scale-in"] {
+            transform: scale(0.9);
+        }
+
+        [data-animate="scale-in"].animate-in {
+            transform: scale(1);
+        }
+
+        /* Staggered delays */
+        [data-animate-delay="200"] {
+            transition-delay: 0.2s;
+        }
+
+        [data-animate-delay="400"] {
+            transition-delay: 0.4s;
+        }
+
+        [data-animate-delay="600"] {
+            transition-delay: 0.6s;
+        }
+
+        /* Child animations */
+        [data-animate-child] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        [data-animate-child].animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #3b82f6;
+            transform-origin: left;
+            transform: scaleX(0);
+            transition: transform 0.1s ease-out;
+            z-index: 1000;
+        }
+
+        .section-indicator {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .section-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .section-dot.active {
+            background: #3b82f6;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar" data-scroll-progress></div>
+
+    <!-- Section indicators -->
+    <div class="section-indicator">
+        <div class="section-dot active" data-section="0"></div>
+        <div class="section-dot" data-section="1"></div>
+        <div class="section-dot" data-section="2"></div>
+        <div class="section-dot" data-section="3"></div>
+        <div class="section-dot" data-section="4"></div>
+    </div>
+
+    <!-- Test sections -->
+    <section class="section" id="section-1">
+        <div class="test-container">
+            <h1 data-animate="fade-in">Scroll Animation Test</h1>
+            <p data-animate="fade-in" data-animate-delay="200">
+                This page tests the ScrollAnimations class functionality.
+            </p>
+            <button data-animate="scale-in" data-animate-delay="400" onclick="scrollToSection('section-2')">
+                Scroll to Next Section
+            </button>
+        </div>
+    </section>
+
+    <section class="section" id="section-2">
+        <div class="test-container">
+            <h2 data-animate="slide-left">Slide Animations</h2>
+            <div class="test-grid" data-animate="fade-in" data-animate-stagger="150">
+                <div class="test-card" data-animate-child>Card 1</div>
+                <div class="test-card" data-animate-child>Card 2</div>
+                <div class="test-card" data-animate-child>Card 3</div>
+                <div class="test-card" data-animate-child>Card 4</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="section-3">
+        <div class="test-container">
+            <h2 data-animate="slide-right">Right Slide Animation</h2>
+            <p data-animate="fade-in" data-animate-delay="200">
+                This section demonstrates slide-right animations with staggered timing.
+            </p>
+            <div data-animate="scale-in" data-animate-delay="400">
+                <p>Scale animation with delay</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="section-4">
+        <div class="test-container">
+            <h2 data-animate="fade-in">State Management Test</h2>
+            <p data-animate="fade-in" data-animate-delay="200">
+                Check the console to see animation state updates.
+            </p>
+            <button data-animate="scale-in" data-animate-delay="400" onclick="logAnimationState()">
+                Log Animation State
+            </button>
+        </div>
+    </section>
+
+    <section class="section" id="section-5">
+        <div class="test-container">
+            <h2 data-animate="fade-in">Final Section</h2>
+            <p data-animate="fade-in" data-animate-delay="200">
+                Scroll progress should be at 100% when this section is fully visible.
+            </p>
+            <button data-animate="scale-in" data-animate-delay="400" onclick="resetAnimations()">
+                Reset All Animations
+            </button>
+        </div>
+    </section>
+
+    <!-- Load the ScrollAnimations class -->
+    <script src="scripts/animations.js"></script>
+    
+    <script>
+        // Initialize scroll animations
+        let scrollAnimations;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            scrollAnimations = new ScrollAnimations();
+            
+            // Listen for custom events
+            document.addEventListener('scrollProgress', (e) => {
+                console.log('Scroll progress:', e.detail.progress);
+            });
+            
+            document.addEventListener('sectionChange', (e) => {
+                console.log('Section changed:', e.detail.id, 'Index:', e.detail.index);
+                updateSectionIndicators(e.detail.index);
+            });
+            
+            document.addEventListener('scrollEnd', (e) => {
+                console.log('Scroll ended at section:', e.detail.currentSection);
+            });
+        });
+        
+        // Helper functions for testing
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section && scrollAnimations) {
+                scrollAnimations.smoothScrollTo(section);
+            }
+        }
+        
+        function logAnimationState() {
+            if (scrollAnimations) {
+                const state = scrollAnimations.getAnimationState();
+                console.log('Current animation state:', state);
+            }
+        }
+        
+        function resetAnimations() {
+            if (scrollAnimations) {
+                scrollAnimations.resetAnimations();
+                console.log('Animations reset');
+            }
+        }
+        
+        function updateSectionIndicators(activeIndex) {
+            const dots = document.querySelectorAll('.section-dot');
+            dots.forEach((dot, index) => {
+                if (index === activeIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // Test manual animation triggering
+        function triggerTestAnimation() {
+            if (scrollAnimations) {
+                scrollAnimations.triggerAnimation('.test-card', 'fade-in', 200);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse Landing Page - Test Runner</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        .test-runner {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--surface-dark);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--dark-background);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .test-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .test-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-summary-card {
+            padding: 1rem;
+            background: var(--surface-dark);
+            border-radius: var(--radius-base);
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .test-summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--accent-blue);
+        }
+        
+        .test-summary-card .score {
+            font-size: var(--text-2xl);
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .test-summary-card .score.pass {
+            color: #10B981;
+        }
+        
+        .test-summary-card .score.fail {
+            color: #EF4444;
+        }
+        
+        .test-summary-card .score.partial {
+            color: #F59E0B;
+        }
+        
+        .test-log {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .test-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        
+        .test-status.running {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .test-status.passed {
+            background: #10B981;
+            color: white;
+        }
+        
+        .test-status.failed {
+            background: #EF4444;
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-blue);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .test-details {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--accent-blue);
+        }
+        
+        .test-details h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--accent-blue);
+        }
+        
+        .test-details ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .test-details li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .test-runner {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .test-controls {
+                flex-direction: column;
+            }
+            
+            .test-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-runner">
+        <header>
+            <h1 class="heading--hero">Synapse Landing Page Test Suite</h1>
+            <p class="text--large">Comprehensive testing for unit tests, browser compatibility, responsive design, and accessibility.</p>
+        </header>
+
+        <div class="test-controls">
+            <button id="run-all-tests" class="btn btn--primary">Run All Tests</button>
+            <button id="run-unit-tests" class="btn btn--secondary">Unit Tests</button>
+            <button id="run-browser-tests" class="btn btn--secondary">Browser Compatibility</button>
+            <button id="run-responsive-tests" class="btn btn--secondary">Responsive Design</button>
+            <button id="run-accessibility-tests" class="btn btn--secondary">Accessibility</button>
+            <button id="clear-results" class="btn btn--ghost">Clear Results</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="test-progress"></div>
+        </div>
+
+        <div class="test-summary" id="test-summary">
+            <div class="test-summary-card">
+                <h3>Unit Tests</h3>
+                <div class="score" id="unit-score">-/-</div>
+                <div class="status" id="unit-status">Not Run</div>
+            </div>
+            <div class="test-summary-card">
+                <h3>Browser Compatibility</h3>
+                <div class="score" id="browser-score">-/-</div>
+                <div class="status" id="browser-status">Not Run</div>
+            </div>
+            <div class="test-summary-card">
+                <h3>Responsive Design</h3>
+                <div class="score" id="responsive-score">-/-</div>
+                <div class="status" id="responsive-status">Not Run</div>
+            </div>
+            <div class="test-summary-card">
+                <h3>Accessibility</h3>
+                <div class="score" id="accessibility-score">-/-</div>
+                <div class="status" id="accessibility-status">Not Run</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="heading--section">Test Results <span class="test-status" id="overall-status">Ready</span></h2>
+            <div class="test-log" id="test-log">Ready to run tests. Click "Run All Tests" to begin comprehensive testing.</div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="heading--section">Test Details</h2>
+            <div class="test-details">
+                <h4>What gets tested:</h4>
+                <ul>
+                    <li><strong>Unit Tests:</strong> Email validation, form utilities, animation functions, error handling</li>
+                    <li><strong>Browser Compatibility:</strong> JavaScript features, Web APIs, CSS support across Chrome, Firefox, Safari, Edge</li>
+                    <li><strong>Responsive Design:</strong> Breakpoint behavior, touch targets, fluid typography, layout adaptation</li>
+                    <li><strong>Accessibility:</strong> ARIA attributes, keyboard navigation, color contrast, screen reader compatibility</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="heading--section">Browser Information</h2>
+            <div id="browser-info" class="test-results">
+                <div>Loading browser information...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="heading--section">Manual Testing</h2>
+            <div class="test-controls">
+                <button id="test-email-validation" class="btn btn--secondary">Test Email Validation</button>
+                <button id="test-animations" class="btn btn--secondary">Test Animations</button>
+                <button id="test-responsive" class="btn btn--secondary">Test Responsive</button>
+                <button id="validate-accessibility" class="btn btn--secondary">Validate Accessibility</button>
+            </div>
+            <div id="manual-test-results" class="test-results hidden"></div>
+        </div>
+    </div>
+
+    <!-- Include all necessary scripts -->
+    <script src="scripts/forms.js"></script>
+    <script src="scripts/animations.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Include test files -->
+    <script src="test-suite.js"></script>
+    <script src="test-browser-compatibility.js"></script>
+    <script src="test-breakpoints.js"></script>
+    <script src="validate-responsive.js"></script>
+    <script src="validate-css.js"></script>
+
+    <script>
+        class TestRunner {
+            constructor() {
+                this.testLog = document.getElementById('test-log');
+                this.progressBar = document.getElementById('test-progress');
+                this.overallStatus = document.getElementById('overall-status');
+                this.results = {
+                    unit: null,
+                    browser: null,
+                    responsive: null,
+                    accessibility: null
+                };
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.displayBrowserInfo();
+                this.log('Test runner initialized. Ready to run tests.');
+            }
+
+            setupEventListeners() {
+                document.getElementById('run-all-tests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('run-unit-tests').addEventListener('click', () => this.runUnitTests());
+                document.getElementById('run-browser-tests').addEventListener('click', () => this.runBrowserTests());
+                document.getElementById('run-responsive-tests').addEventListener('click', () => this.runResponsiveTests());
+                document.getElementById('run-accessibility-tests').addEventListener('click', () => this.runAccessibilityTests());
+                document.getElementById('clear-results').addEventListener('click', () => this.clearResults());
+
+                // Manual testing buttons
+                document.getElementById('test-email-validation').addEventListener('click', () => this.testEmailValidation());
+                document.getElementById('test-animations').addEventListener('click', () => this.testAnimations());
+                document.getElementById('test-responsive').addEventListener('click', () => this.testResponsive());
+                document.getElementById('validate-accessibility').addEventListener('click', () => this.validateAccessibility());
+            }
+
+            async runAllTests() {
+                this.log('🚀 Starting comprehensive test suite...');
+                this.setOverallStatus('running');
+                this.updateProgress(0);
+
+                try {
+                    await this.runUnitTests();
+                    this.updateProgress(25);
+
+                    await this.runBrowserTests();
+                    this.updateProgress(50);
+
+                    await this.runResponsiveTests();
+                    this.updateProgress(75);
+
+                    await this.runAccessibilityTests();
+                    this.updateProgress(100);
+
+                    this.generateFinalReport();
+                    this.setOverallStatus('passed');
+                } catch (error) {
+                    this.log(`❌ Test suite failed: ${error.message}`);
+                    this.setOverallStatus('failed');
+                }
+            }
+
+            async runUnitTests() {
+                this.log('\n📋 Running Unit Tests...');
+                this.updateTestStatus('unit', 'running');
+
+                try {
+                    const testSuite = new TestSuite();
+                    
+                    // Capture console output
+                    const originalLog = console.log;
+                    let testOutput = '';
+                    console.log = (...args) => {
+                        testOutput += args.join(' ') + '\n';
+                        originalLog(...args);
+                    };
+
+                    await testSuite.runUnitTests();
+                    
+                    // Restore console.log
+                    console.log = originalLog;
+
+                    const passed = testSuite.results.unit.passed;
+                    const total = passed + testSuite.results.unit.failed;
+                    
+                    this.results.unit = { passed, total, details: testSuite.results.unit };
+                    this.updateTestStatus('unit', passed === total ? 'passed' : 'failed');
+                    this.updateTestScore('unit', passed, total);
+                    
+                    this.log(`Unit Tests: ${passed}/${total} passed`);
+                } catch (error) {
+                    this.log(`❌ Unit tests failed: ${error.message}`);
+                    this.updateTestStatus('unit', 'failed');
+                }
+            }
+
+            async runBrowserTests() {
+                this.log('\n🌐 Running Browser Compatibility Tests...');
+                this.updateTestStatus('browser', 'running');
+
+                try {
+                    const browserTester = new BrowserCompatibilityTester();
+                    const results = browserTester.results;
+                    
+                    const jsSupported = results.features.filter(f => f.supported).length;
+                    const jsTotal = results.features.length;
+                    const apiSupported = results.apis.filter(a => a.supported).length;
+                    const apiTotal = results.apis.length;
+                    const cssSupported = results.css.filter(c => c.supported).length;
+                    const cssTotal = results.css.length;
+                    
+                    const totalSupported = jsSupported + apiSupported + cssSupported;
+                    const totalFeatures = jsTotal + apiTotal + cssTotal;
+                    
+                    this.results.browser = { 
+                        passed: totalSupported, 
+                        total: totalFeatures, 
+                        details: results 
+                    };
+                    
+                    const criticalIssues = results.issues.filter(i => i.type === 'critical').length;
+                    this.updateTestStatus('browser', criticalIssues === 0 ? 'passed' : 'failed');
+                    this.updateTestScore('browser', totalSupported, totalFeatures);
+                    
+                    this.log(`Browser Compatibility: ${totalSupported}/${totalFeatures} features supported`);
+                    if (criticalIssues > 0) {
+                        this.log(`⚠️  ${criticalIssues} critical compatibility issues found`);
+                    }
+                } catch (error) {
+                    this.log(`❌ Browser tests failed: ${error.message}`);
+                    this.updateTestStatus('browser', 'failed');
+                }
+            }
+
+            async runResponsiveTests() {
+                this.log('\n📱 Running Responsive Design Tests...');
+                this.updateTestStatus('responsive', 'running');
+
+                try {
+                    if (typeof window.responsiveValidation !== 'undefined') {
+                        const results = window.responsiveValidation.runAllTests();
+                        
+                        let totalPassed = 0;
+                        let totalTests = 0;
+                        
+                        Object.values(results.individual).forEach(result => {
+                            if (result.passed) totalPassed++;
+                            totalTests++;
+                        });
+                        
+                        this.results.responsive = { 
+                            passed: totalPassed, 
+                            total: totalTests, 
+                            details: results 
+                        };
+                        
+                        this.updateTestStatus('responsive', results.overall.passed ? 'passed' : 'failed');
+                        this.updateTestScore('responsive', totalPassed, totalTests);
+                        
+                        this.log(`Responsive Design: ${results.overall.score} tests passed`);
+                    } else {
+                        // Fallback responsive testing
+                        this.log('Running basic responsive tests...');
+                        const basicTests = this.runBasicResponsiveTests();
+                        this.results.responsive = basicTests;
+                        this.updateTestStatus('responsive', basicTests.passed === basicTests.total ? 'passed' : 'failed');
+                        this.updateTestScore('responsive', basicTests.passed, basicTests.total);
+                    }
+                } catch (error) {
+                    this.log(`❌ Responsive tests failed: ${error.message}`);
+                    this.updateTestStatus('responsive', 'failed');
+                }
+            }
+
+            async runAccessibilityTests() {
+                this.log('\n♿ Running Accessibility Tests...');
+                this.updateTestStatus('accessibility', 'running');
+
+                try {
+                    const a11yTests = this.runBasicAccessibilityTests();
+                    
+                    this.results.accessibility = a11yTests;
+                    this.updateTestStatus('accessibility', a11yTests.passed === a11yTests.total ? 'passed' : 'failed');
+                    this.updateTestScore('accessibility', a11yTests.passed, a11yTests.total);
+                    
+                    this.log(`Accessibility: ${a11yTests.passed}/${a11yTests.total} tests passed`);
+                } catch (error) {
+                    this.log(`❌ Accessibility tests failed: ${error.message}`);
+                    this.updateTestStatus('accessibility', 'failed');
+                }
+            }
+
+            runBasicResponsiveTests() {
+                let passed = 0;
+                let total = 0;
+
+                // Test viewport meta tag
+                const viewportMeta = document.querySelector('meta[name="viewport"]');
+                total++;
+                if (viewportMeta) {
+                    passed++;
+                    this.log('✅ Viewport meta tag present');
+                } else {
+                    this.log('❌ Viewport meta tag missing');
+                }
+
+                // Test responsive images
+                const images = document.querySelectorAll('img');
+                total++;
+                const responsiveImages = Array.from(images).every(img => 
+                    img.style.maxWidth === '100%' || 
+                    getComputedStyle(img).maxWidth === '100%'
+                );
+                if (responsiveImages) {
+                    passed++;
+                    this.log('✅ Images are responsive');
+                } else {
+                    this.log('❌ Some images may not be responsive');
+                }
+
+                // Test touch targets
+                const interactiveElements = document.querySelectorAll('button, input, a');
+                total++;
+                let touchTargetsPassed = true;
+                interactiveElements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.height < 44 || rect.width < 44) {
+                        touchTargetsPassed = false;
+                    }
+                });
+                if (touchTargetsPassed) {
+                    passed++;
+                    this.log('✅ Touch targets meet minimum size');
+                } else {
+                    this.log('❌ Some touch targets are too small');
+                }
+
+                return { passed, total };
+            }
+
+            runBasicAccessibilityTests() {
+                let passed = 0;
+                let total = 0;
+
+                // Test for alt text on images
+                const images = document.querySelectorAll('img');
+                total++;
+                const imagesWithAlt = Array.from(images).every(img => img.hasAttribute('alt'));
+                if (imagesWithAlt) {
+                    passed++;
+                    this.log('✅ All images have alt text');
+                } else {
+                    this.log('❌ Some images missing alt text');
+                }
+
+                // Test for form labels
+                const inputs = document.querySelectorAll('input');
+                total++;
+                const inputsWithLabels = Array.from(inputs).every(input => 
+                    input.labels && input.labels.length > 0 ||
+                    input.getAttribute('aria-label') ||
+                    input.getAttribute('placeholder')
+                );
+                if (inputsWithLabels) {
+                    passed++;
+                    this.log('✅ All inputs have labels');
+                } else {
+                    this.log('❌ Some inputs missing labels');
+                }
+
+                // Test heading hierarchy
+                const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                total++;
+                const h1Count = document.querySelectorAll('h1').length;
+                if (h1Count === 1) {
+                    passed++;
+                    this.log('✅ Single H1 element present');
+                } else {
+                    this.log(`❌ Found ${h1Count} H1 elements (should be 1)`);
+                }
+
+                // Test for semantic landmarks
+                const landmarks = document.querySelectorAll('header, nav, main, section, footer');
+                total++;
+                if (landmarks.length > 0) {
+                    passed++;
+                    this.log('✅ Semantic landmarks present');
+                } else {
+                    this.log('❌ No semantic landmarks found');
+                }
+
+                return { passed, total };
+            }
+
+            generateFinalReport() {
+                this.log('\n' + '='.repeat(50));
+                this.log('📊 FINAL TEST REPORT');
+                this.log('='.repeat(50));
+
+                let totalPassed = 0;
+                let totalTests = 0;
+
+                Object.entries(this.results).forEach(([category, result]) => {
+                    if (result) {
+                        totalPassed += result.passed;
+                        totalTests += result.total;
+                        const percentage = Math.round((result.passed / result.total) * 100);
+                        this.log(`${category.charAt(0).toUpperCase() + category.slice(1)}: ${result.passed}/${result.total} (${percentage}%)`);
+                    }
+                });
+
+                const overallPercentage = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+                this.log(`\nOVERALL: ${totalPassed}/${totalTests} (${overallPercentage}%)`);
+                
+                if (overallPercentage >= 90) {
+                    this.log('🎉 Excellent! Landing page passes comprehensive testing.');
+                } else if (overallPercentage >= 75) {
+                    this.log('✅ Good! Minor issues to address.');
+                } else if (overallPercentage >= 50) {
+                    this.log('⚠️  Needs improvement. Several issues to fix.');
+                } else {
+                    this.log('❌ Significant issues found. Major fixes needed.');
+                }
+
+                this.log('='.repeat(50));
+            }
+
+            // Manual testing methods
+            testEmailValidation() {
+                this.showManualResults();
+                const manualResults = document.getElementById('manual-test-results');
+                
+                const testEmails = [
+                    'test@example.com',
+                    'invalid-email',
+                    'user@domain.co.uk',
+                    '@missing-local.com',
+                    'missing-at-sign.com'
+                ];
+
+                let output = 'Email Validation Test Results:\n\n';
+                
+                // Create temporary EmailCapture for testing
+                const tempForm = document.createElement('form');
+                const tempInput = document.createElement('input');
+                tempInput.type = 'email';
+                tempForm.appendChild(tempInput);
+                
+                const emailCapture = new EmailCapture(tempForm);
+                
+                testEmails.forEach(email => {
+                    const isValid = emailCapture.isValidEmail(email);
+                    output += `${email}: ${isValid ? '✅ Valid' : '❌ Invalid'}\n`;
+                });
+
+                manualResults.textContent = output;
+            }
+
+            testAnimations() {
+                this.showManualResults();
+                const manualResults = document.getElementById('manual-test-results');
+                
+                let output = 'Animation Test Results:\n\n';
+                
+                // Test scroll animations
+                if (typeof ScrollAnimations !== 'undefined') {
+                    output += '✅ ScrollAnimations class available\n';
+                    
+                    // Test animation state
+                    if (window.scrollAnimations) {
+                        const state = window.scrollAnimations.getAnimationState();
+                        output += `Current scroll progress: ${Math.round(state.scrollProgress * 100)}%\n`;
+                        output += `Sections visible: ${state.sectionsVisible.length}\n`;
+                    }
+                } else {
+                    output += '❌ ScrollAnimations class not available\n';
+                }
+
+                // Test reduced motion
+                const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                output += `Reduced motion preference: ${reducedMotion ? 'Enabled' : 'Disabled'}\n`;
+
+                manualResults.textContent = output;
+            }
+
+            testResponsive() {
+                this.showManualResults();
+                const manualResults = document.getElementById('manual-test-results');
+                
+                let output = 'Responsive Design Test Results:\n\n';
+                
+                output += `Viewport: ${window.innerWidth}x${window.innerHeight}\n`;
+                output += `Screen: ${screen.width}x${screen.height}\n`;
+                
+                // Determine current breakpoint
+                const width = window.innerWidth;
+                let breakpoint = '';
+                if (width < 768) breakpoint = 'Mobile';
+                else if (width < 1024) breakpoint = 'Tablet';
+                else if (width < 1440) breakpoint = 'Desktop';
+                else breakpoint = 'Large Desktop';
+                
+                output += `Current breakpoint: ${breakpoint}\n\n`;
+                
+                // Test touch targets
+                const buttons = document.querySelectorAll('button');
+                let touchTargetIssues = 0;
+                buttons.forEach(button => {
+                    const rect = button.getBoundingClientRect();
+                    if (rect.height < 44 || rect.width < 44) {
+                        touchTargetIssues++;
+                    }
+                });
+                
+                output += `Touch target issues: ${touchTargetIssues}/${buttons.length} buttons\n`;
+
+                manualResults.textContent = output;
+            }
+
+            validateAccessibility() {
+                this.showManualResults();
+                const manualResults = document.getElementById('manual-test-results');
+                
+                let output = 'Accessibility Validation Results:\n\n';
+                
+                // Check images
+                const images = document.querySelectorAll('img');
+                const imagesWithoutAlt = Array.from(images).filter(img => !img.hasAttribute('alt'));
+                output += `Images without alt text: ${imagesWithoutAlt.length}/${images.length}\n`;
+                
+                // Check headings
+                const h1Count = document.querySelectorAll('h1').length;
+                output += `H1 elements: ${h1Count} (should be 1)\n`;
+                
+                // Check form labels
+                const inputs = document.querySelectorAll('input');
+                const unlabeledInputs = Array.from(inputs).filter(input => 
+                    !(input.labels && input.labels.length > 0) &&
+                    !input.getAttribute('aria-label') &&
+                    !input.getAttribute('placeholder')
+                );
+                output += `Unlabeled inputs: ${unlabeledInputs.length}/${inputs.length}\n`;
+                
+                // Check landmarks
+                const landmarks = document.querySelectorAll('header, nav, main, section, footer');
+                output += `Semantic landmarks: ${landmarks.length}\n`;
+
+                manualResults.textContent = output;
+            }
+
+            showManualResults() {
+                document.getElementById('manual-test-results').classList.remove('hidden');
+            }
+
+            // UI Helper methods
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.testLog.textContent += `[${timestamp}] ${message}\n`;
+                this.testLog.scrollTop = this.testLog.scrollHeight;
+            }
+
+            updateProgress(percentage) {
+                this.progressBar.style.width = `${percentage}%`;
+            }
+
+            setOverallStatus(status) {
+                this.overallStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                this.overallStatus.className = `test-status ${status}`;
+            }
+
+            updateTestStatus(category, status) {
+                const statusElement = document.getElementById(`${category}-status`);
+                statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+
+            updateTestScore(category, passed, total) {
+                const scoreElement = document.getElementById(`${category}-score`);
+                scoreElement.textContent = `${passed}/${total}`;
+                
+                const percentage = total > 0 ? passed / total : 0;
+                if (percentage === 1) {
+                    scoreElement.className = 'score pass';
+                } else if (percentage >= 0.8) {
+                    scoreElement.className = 'score partial';
+                } else {
+                    scoreElement.className = 'score fail';
+                }
+            }
+
+            clearResults() {
+                this.testLog.textContent = 'Results cleared. Ready to run tests.';
+                this.updateProgress(0);
+                this.setOverallStatus('ready');
+                
+                // Reset all test statuses
+                ['unit', 'browser', 'responsive', 'accessibility'].forEach(category => {
+                    this.updateTestStatus(category, 'not run');
+                    document.getElementById(`${category}-score`).textContent = '-/-';
+                    document.getElementById(`${category}-score`).className = 'score';
+                });
+                
+                // Hide manual results
+                document.getElementById('manual-test-results').classList.add('hidden');
+                
+                // Reset results
+                this.results = {
+                    unit: null,
+                    browser: null,
+                    responsive: null,
+                    accessibility: null
+                };
+            }
+
+            displayBrowserInfo() {
+                const browserInfo = document.getElementById('browser-info');
+                const info = `
+Browser: ${navigator.userAgent}
+Platform: ${navigator.platform}
+Language: ${navigator.language}
+Screen: ${screen.width}x${screen.height}
+Viewport: ${window.innerWidth}x${window.innerHeight}
+Color Depth: ${screen.colorDepth}
+Pixel Ratio: ${window.devicePixelRatio}
+Online: ${navigator.onLine}
+Cookies Enabled: ${navigator.cookieEnabled}
+                `.trim();
+                
+                browserInfo.textContent = info;
+            }
+        }
+
+        // Initialize test runner when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.testRunner = new TestRunner();
+        });
+    </script>
+</body>
+</html>

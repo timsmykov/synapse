@@ -1,0 +1,1859 @@
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+  /* Elegant Premium Color Palette */
+  --primary-blue: #1E40AF;        /* Deep, sophisticated blue */
+  --secondary-blue: #1E3A8A;      /* Rich navy for depth */
+  --accent-blue: #3B82F6;         /* Vibrant accent for CTAs */
+  --light-blue: #DBEAFE;          /* Subtle background tint */
+  --premium-gold: #F59E0B;        /* Luxury accent for highlights */
+  --dark-background: #0F172A;     /* Rich dark slate */
+  --surface-dark: #1E293B;        /* Elevated surface color */
+  --text-primary: #F8FAFC;        /* Pure white for headers */
+  --text-secondary: #CBD5E1;      /* Elegant light gray */
+  --text-accent: #94A3B8;         /* Muted accent text */
+  --border-subtle: #334155;       /* Refined border color */
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+  --gradient-accent: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  
+  /* Typography System */
+  --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  
+  /* Type Scale */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+  
+  /* Spacing Scale */
+  --space-xs: 0.25rem;     /* 4px */
+  --space-sm: 0.5rem;      /* 8px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 3rem;       /* 48px */
+  --space-3xl: 4rem;       /* 64px */
+  --space-4xl: 6rem;       /* 96px */
+  
+  /* Layout */
+  --container-max-width: 1200px;
+  --container-padding: var(--space-md);
+  
+  /* Breakpoints (for reference in media queries) */
+  --breakpoint-sm: 320px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1440px;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease-out;
+  --transition-base: 0.3s ease-out;
+  --transition-slow: 0.5s ease-out;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-base: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ===== RESET AND BASE STYLES ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background-color: var(--dark-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accent-blue);
+  color: var(--text-primary);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  z-index: 1000;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Show visually hidden content when focused (for skip links) */
+.visually-hidden:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+  background: var(--accent-blue) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  z-index: 1000 !important;
+}
+
+/* Enhanced focus indicators for better accessibility */
+*:focus {
+  outline: 3px solid var(--accent-blue);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--text-primary);
+}
+
+/* High contrast focus for interactive elements */
+.btn:focus,
+.form__input:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus,
+[tabindex]:focus {
+  outline: 3px solid var(--premium-gold);
+  outline-offset: 3px;
+  box-shadow: 
+    0 0 0 1px var(--dark-background),
+    0 0 0 5px var(--accent-blue);
+  position: relative;
+  z-index: 10;
+}
+
+/* Focus-visible for modern browsers */
+*:focus-visible {
+  outline: 3px solid var(--premium-gold);
+  outline-offset: 3px;
+  box-shadow: 
+    0 0 0 1px var(--dark-background),
+    0 0 0 5px var(--accent-blue);
+}
+
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ===== TYPOGRAPHY SYSTEM ===== */
+
+/* Base typography with fluid scaling */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+  font-family: var(--font-primary);
+}
+
+/* Heading scale with fluid typography */
+.heading {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+}
+
+.heading--hero {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--space-lg);
+}
+
+.heading--section {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--space-2xl);
+}
+
+.heading--subsection {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: var(--space-lg);
+}
+
+.heading--card {
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: var(--space-md);
+}
+
+/* Legacy heading support */
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.3;
+}
+
+h4 {
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+  line-height: 1.3;
+}
+
+h5 {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  line-height: 1.4;
+}
+
+h6 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  line-height: 1.4;
+}
+
+/* Body text with responsive sizing */
+.text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+.text--large {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.text--base {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.6;
+}
+
+.text--small {
+  font-size: clamp(0.875rem, 1.2vw, 1rem);
+  line-height: 1.6;
+}
+
+.text--primary {
+  color: var(--text-primary);
+}
+
+.text--secondary {
+  color: var(--text-secondary);
+}
+
+.text--accent {
+  color: var(--text-accent);
+}
+
+.text--center {
+  text-align: center;
+}
+
+.text--left {
+  text-align: left;
+}
+
+.text--right {
+  text-align: right;
+}
+
+/* Paragraph styling */
+p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+}
+
+.lead {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Text utilities */
+.font-weight--light { font-weight: 300; }
+.font-weight--normal { font-weight: 400; }
+.font-weight--medium { font-weight: 500; }
+.font-weight--semibold { font-weight: 600; }
+.font-weight--bold { font-weight: 700; }
+
+.font-style--italic { font-style: italic; }
+.font-style--normal { font-style: normal; }
+
+.text-decoration--none { text-decoration: none; }
+.text-decoration--underline { text-decoration: underline; }
+
+/* Line height utilities */
+.line-height--tight { line-height: 1.2; }
+.line-height--normal { line-height: 1.5; }
+.line-height--relaxed { line-height: 1.6; }
+.line-height--loose { line-height: 1.8; }
+
+/* ===== LAYOUT SYSTEM ===== */
+
+/* Base container with responsive padding */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  width: 100%;
+}
+
+/* Grid system - Mobile first approach */
+.grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.grid--1-col {
+  grid-template-columns: 1fr;
+}
+
+.grid--2-col {
+  grid-template-columns: 1fr;
+}
+
+.grid--3-col {
+  grid-template-columns: 1fr;
+}
+
+.grid--4-col {
+  grid-template-columns: 1fr;
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex--column {
+  flex-direction: column;
+}
+
+.flex--row {
+  flex-direction: row;
+}
+
+.flex--wrap {
+  flex-wrap: wrap;
+}
+
+.flex--center {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex--between {
+  justify-content: space-between;
+}
+
+.flex--around {
+  justify-content: space-around;
+}
+
+.flex--start {
+  align-items: flex-start;
+}
+
+.flex--end {
+  align-items: flex-end;
+}
+
+/* Section spacing with responsive adjustments */
+.section {
+  padding: var(--space-3xl) 0;
+}
+
+.section--hero {
+  min-height: 100vh;
+  padding: 0;
+}
+
+.section--large {
+  padding: var(--space-4xl) 0;
+}
+
+.section--small {
+  padding: var(--space-2xl) 0;
+}
+
+/* Content width constraints */
+.content {
+  max-width: 65ch; /* Optimal reading width */
+  margin: 0 auto;
+}
+
+.content--wide {
+  max-width: 80ch;
+}
+
+.content--narrow {
+  max-width: 50ch;
+}
+
+/* Responsive spacing utilities */
+.spacing--xs { margin-bottom: var(--space-xs); }
+.spacing--sm { margin-bottom: var(--space-sm); }
+.spacing--md { margin-bottom: var(--space-md); }
+.spacing--lg { margin-bottom: var(--space-lg); }
+.spacing--xl { margin-bottom: var(--space-xl); }
+.spacing--2xl { margin-bottom: var(--space-2xl); }
+.spacing--3xl { margin-bottom: var(--space-3xl); }
+.spacing--4xl { margin-bottom: var(--space-4xl); }
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Mobile-first optimizations (320px+) */
+@media (min-width: 320px) {
+  :root {
+    /* Enhanced mobile typography */
+    --text-xs: clamp(0.75rem, 3.5vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 4vw, 1rem);
+    --text-base: clamp(1rem, 4.5vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 5vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 5.5vw, 1.375rem);
+    
+    /* Mobile-optimized spacing */
+    --container-padding: clamp(1rem, 5vw, 1.5rem);
+    --space-touch-target: 44px; /* Minimum touch target size */
+  }
+  
+  /* Enhanced touch targets for mobile */
+  .btn,
+  .form__input,
+  button,
+  input[type="submit"],
+  input[type="button"],
+  [role="button"] {
+    min-height: var(--space-touch-target);
+    min-width: var(--space-touch-target);
+  }
+  
+  /* Mobile-specific touch interactions */
+  .btn:active,
+  .form__input:active,
+  button:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+  }
+  
+  /* Improved mobile tap targets */
+  .hero__form .btn {
+    padding: var(--space-lg) var(--space-xl);
+    font-size: clamp(1rem, 4.5vw, 1.125rem);
+    min-height: 48px;
+  }
+  
+  .hero__form .form__input {
+    padding: var(--space-lg);
+    font-size: clamp(1rem, 4.5vw, 1.125rem);
+    min-height: 48px;
+  }
+  
+  /* Mobile-optimized section spacing */
+  .section {
+    padding: clamp(2rem, 8vw, 3rem) 0;
+  }
+  
+  .section--hero {
+    padding: clamp(1rem, 4vw, 2rem) 0;
+  }
+  
+  /* Mobile typography improvements */
+  .heading--hero {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    line-height: 1.1;
+    margin-bottom: clamp(1rem, 4vw, 1.5rem);
+  }
+  
+  .heading--section {
+    font-size: clamp(1.5rem, 6vw, 1.875rem);
+    margin-bottom: clamp(1.5rem, 6vw, 2rem);
+  }
+  
+  /* Mobile-first grid adjustments */
+  .grid {
+    gap: clamp(1rem, 4vw, 1.5rem);
+  }
+  
+  /* Mobile navigation and interaction improvements */
+  .hero__visual {
+    height: clamp(120px, 20vh, 200px);
+    margin: clamp(1.5rem, 6vw, 2rem) 0;
+  }
+}
+
+/* Small mobile devices (up to 480px) */
+@media (max-width: 480px) {
+  :root {
+    --container-padding: 1rem;
+  }
+  
+  /* Extra small mobile optimizations */
+  .hero__form {
+    gap: var(--space-md);
+  }
+  
+  .hero__form .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .cta__form {
+    gap: var(--space-md);
+  }
+  
+  .cta__form .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Improved readability on small screens */
+  .comparison-table__cell {
+    padding: var(--space-sm) var(--space-xs);
+    font-size: var(--text-xs);
+  }
+  
+  .demonstration__panels {
+    gap: var(--space-lg);
+  }
+}
+
+/* Tablet and up (768px+) */
+@media (min-width: 768px) {
+  :root {
+    /* Enhanced tablet typography scaling */
+    --text-xs: clamp(0.75rem, 2vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 2.2vw, 1rem);
+    --text-base: clamp(1rem, 2.5vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 2.8vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 3vw, 1.375rem);
+    --text-2xl: clamp(1.5rem, 3.5vw, 1.75rem);
+    --text-3xl: clamp(1.875rem, 4vw, 2.25rem);
+    --text-4xl: clamp(2.25rem, 4.5vw, 2.75rem);
+    --text-5xl: clamp(3rem, 5vw, 3.75rem);
+    
+    /* Tablet spacing optimizations */
+    --container-padding: clamp(1.5rem, 4vw, 2rem);
+    --space-4xl: clamp(4rem, 8vw, 6rem);
+  }
+  
+  /* Tablet-specific layout improvements */
+  .container {
+    --container-padding: var(--space-lg);
+  }
+  
+  /* Enhanced grid system for tablet */
+  .grid--2-col {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  
+  .grid--3-col {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 2rem);
+  }
+  
+  .grid--4-col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+  
+  /* Tablet section spacing */
+  .section {
+    padding: clamp(3rem, 8vw, 5rem) 0;
+  }
+  
+  .section--large {
+    padding: clamp(4rem, 10vw, 7rem) 0;
+  }
+  
+  /* Tablet-specific touch targets */
+  .btn {
+    min-height: 48px;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+  }
+  
+  .form__input {
+    min-height: 48px;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+  }
+  
+  /* Tablet typography enhancements */
+  .heading--hero {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    margin-bottom: clamp(1.5rem, 4vw, 2rem);
+  }
+  
+  .heading--section {
+    font-size: clamp(1.875rem, 4vw, 2.5rem);
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+  
+  /* Tablet visual improvements */
+  .hero__visual {
+    height: clamp(200px, 25vh, 300px);
+    margin: clamp(2rem, 6vw, 3rem) 0;
+  }
+  
+  /* Flex utilities for tablet */
+  .flex--tablet-row {
+    flex-direction: row;
+  }
+  
+  .flex--tablet-column {
+    flex-direction: column;
+  }
+  
+  /* Tablet-specific form layouts */
+  .hero__form {
+    flex-direction: row;
+    max-width: clamp(400px, 60vw, 600px);
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+  
+  .cta__form {
+    flex-direction: row;
+    max-width: clamp(500px, 70vw, 800px);
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+}
+
+/* Desktop and up (1024px+) */
+@media (min-width: 1024px) {
+  :root {
+    /* Desktop typography with refined scaling */
+    --text-xs: clamp(0.75rem, 1.5vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 1.8vw, 1rem);
+    --text-base: clamp(1rem, 2vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 2.2vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 2.5vw, 1.375rem);
+    --text-2xl: clamp(1.5rem, 3vw, 1.75rem);
+    --text-3xl: clamp(1.875rem, 3.5vw, 2.25rem);
+    --text-4xl: clamp(2.25rem, 4vw, 3rem);
+    --text-5xl: clamp(3rem, 5vw, 4rem);
+    
+    /* Desktop spacing optimizations */
+    --container-padding: clamp(2rem, 5vw, 3rem);
+    --space-4xl: clamp(5rem, 10vw, 8rem);
+  }
+  
+  /* Desktop container improvements */
+  .container {
+    --container-padding: var(--space-xl);
+    max-width: clamp(1000px, 90vw, 1200px);
+  }
+  
+  /* Enhanced desktop grid system */
+  .grid--2-col {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  
+  .grid--3-col {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  
+  .grid--4-col {
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+  
+  /* Advanced desktop grid layouts */
+  .grid--sidebar {
+    grid-template-columns: 1fr 3fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  
+  .grid--feature {
+    grid-template-columns: 2fr 1fr;
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+  
+  .grid--asymmetric {
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  
+  /* Desktop section spacing */
+  .section {
+    padding: clamp(4rem, 10vw, 6rem) 0;
+  }
+  
+  .section--large {
+    padding: clamp(6rem, 12vw, 10rem) 0;
+  }
+  
+  .section--hero {
+    padding: clamp(2rem, 6vw, 4rem) 0;
+  }
+  
+  /* Desktop typography enhancements */
+  .heading--hero {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+  }
+  
+  .heading--section {
+    font-size: clamp(2.25rem, 4vw, 3rem);
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+  
+  .heading--subsection {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+  }
+  
+  /* Desktop visual improvements */
+  .hero__visual {
+    height: clamp(250px, 30vh, 400px);
+    margin: clamp(3rem, 6vw, 4rem) 0;
+  }
+  
+  /* Desktop interaction improvements */
+  .btn {
+    min-height: 52px;
+    padding: clamp(1rem, 2.5vw, 1.25rem) clamp(2rem, 4vw, 2.5rem);
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    transition: all 0.2s ease-out;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .form__input {
+    min-height: 52px;
+    padding: clamp(1rem, 2.5vw, 1.25rem) clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(1rem, 2vw, 1.125rem);
+  }
+  
+  /* Desktop form layouts */
+  .hero__form {
+    max-width: clamp(500px, 60vw, 700px);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+  
+  .cta__form {
+    max-width: clamp(600px, 70vw, 900px);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+  
+  /* Flex utilities for desktop */
+  .flex--desktop-row {
+    flex-direction: row;
+  }
+  
+  .flex--desktop-column {
+    flex-direction: column;
+  }
+  
+  /* Desktop-specific content width optimizations */
+  .content {
+    max-width: clamp(60ch, 70vw, 75ch);
+  }
+  
+  .content--wide {
+    max-width: clamp(75ch, 80vw, 90ch);
+  }
+  
+  .content--narrow {
+    max-width: clamp(45ch, 60vw, 60ch);
+  }
+}
+
+/* Large desktop and up (1440px+) */
+@media (min-width: 1440px) {
+  :root {
+    /* Large desktop typography with optimal scaling */
+    --text-xs: 0.875rem;
+    --text-sm: 1rem;
+    --text-base: 1.125rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.375rem;
+    --text-2xl: 1.75rem;
+    --text-3xl: 2.25rem;
+    --text-4xl: clamp(3rem, 3.5vw, 3.75rem);
+    --text-5xl: clamp(4rem, 4.5vw, 5rem);
+    
+    /* Large desktop spacing */
+    --container-padding: 3rem;
+    --space-4xl: clamp(6rem, 8vw, 10rem);
+  }
+  
+  /* Large desktop container */
+  .container {
+    max-width: 1200px;
+    --container-padding: 3rem;
+  }
+  
+  /* Large desktop grid enhancements */
+  .grid--2-col {
+    gap: clamp(3rem, 5vw, 5rem);
+  }
+  
+  .grid--3-col {
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+  
+  .grid--4-col {
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+  
+  /* Large desktop section spacing */
+  .section {
+    padding: clamp(5rem, 8vw, 8rem) 0;
+  }
+  
+  .section--large {
+    padding: clamp(8rem, 12vw, 12rem) 0;
+  }
+  
+  .section--hero {
+    padding: clamp(3rem, 6vw, 5rem) 0;
+  }
+  
+  /* Large desktop typography */
+  .heading--hero {
+    font-size: clamp(3.5rem, 5vw, 4.5rem);
+    margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  }
+  
+  .heading--section {
+    font-size: clamp(2.5rem, 3.5vw, 3rem);
+    margin-bottom: clamp(3rem, 5vw, 4rem);
+  }
+  
+  /* Large desktop visual improvements */
+  .hero__visual {
+    height: clamp(300px, 35vh, 450px);
+    margin: clamp(3.5rem, 6vw, 5rem) 0;
+  }
+  
+  /* Large desktop interaction enhancements */
+  .btn {
+    min-height: 56px;
+    padding: 1.25rem 2.5rem;
+    font-size: 1.125rem;
+  }
+  
+  .form__input {
+    min-height: 56px;
+    padding: 1.25rem 2rem;
+    font-size: 1.125rem;
+  }
+  
+  /* Large desktop form layouts */
+  .hero__form {
+    max-width: 700px;
+    gap: 1.5rem;
+  }
+  
+  .cta__form {
+    max-width: 900px;
+    gap: 1.5rem;
+  }
+  
+  /* Large desktop content optimization */
+  .content {
+    max-width: 75ch;
+  }
+  
+  .content--wide {
+    max-width: 90ch;
+  }
+  
+  .content--narrow {
+    max-width: 60ch;
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Hardware acceleration for better performance */
+.btn,
+.form__input,
+.hero__visual,
+.network-visualization,
+[data-animate] {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Optimize rendering for animations */
+@supports (will-change: transform) {
+  [data-animate],
+  .btn:hover,
+  .form__input:focus,
+  .network__core-light,
+  .network__line,
+  .network__node {
+    will-change: transform, opacity;
+  }
+}
+
+/* Remove will-change after animations complete */
+[data-animate].animate-in {
+  will-change: auto;
+}
+
+/* Optimize font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-display: swap;
+}
+
+/* Optimize image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* GPU acceleration for complex elements */
+.hero,
+.network-visualization,
+.demonstration__panels {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* ===== MOBILE PERFORMANCE OPTIMIZATIONS ===== */
+@media (max-width: 767px) {
+  /* Optimize animations for mobile performance */
+  * {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Improve scrolling performance */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Optimize touch interactions */
+  .btn,
+  .form__input,
+  button,
+  input,
+  [role="button"] {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.2);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent zoom on input focus */
+  .form__input,
+  input[type="email"],
+  input[type="text"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="search"],
+  input[type="time"],
+  input[type="week"],
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Reduce complexity on mobile */
+  .network__line::before {
+    display: none;
+  }
+  
+  /* Simplify animations on mobile */
+  .animate-pulse {
+    animation-duration: 3s;
+  }
+}
+
+/* ===== BROWSER COMPATIBILITY ===== */
+
+/* Flexbox fallbacks for older browsers */
+@supports not (display: flex) {
+  .flex {
+    display: block;
+  }
+  
+  .hero__form {
+    text-align: center;
+  }
+  
+  .hero__form .form__group {
+    display: inline-block;
+    margin-right: 1rem;
+  }
+}
+
+/* Grid fallbacks for older browsers */
+@supports not (display: grid) {
+  .grid {
+    display: block;
+  }
+  
+  .grid--2-col > * {
+    width: 48%;
+    float: left;
+    margin-right: 4%;
+  }
+  
+  .grid--2-col > *:nth-child(2n) {
+    margin-right: 0;
+  }
+  
+  .grid--3-col > * {
+    width: 30%;
+    float: left;
+    margin-right: 5%;
+  }
+  
+  .grid--3-col > *:nth-child(3n) {
+    margin-right: 0;
+  }
+}
+
+/* Custom properties fallbacks */
+@supports not (color: var(--primary-blue)) {
+  .hero {
+    background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+  }
+  
+  .btn {
+    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+    color: #F8FAFC;
+  }
+  
+  .form__input {
+    background: rgba(30, 41, 59, 0.8);
+    color: #F8FAFC;
+    border: 2px solid #334155;
+  }
+}
+
+/* Backdrop-filter fallbacks */
+@supports not (backdrop-filter: blur(10px)) {
+  .hero__form .form__input {
+    background: rgba(30, 41, 59, 0.95);
+  }
+}
+
+/* ===== LOW-END DEVICE OPTIMIZATIONS ===== */
+
+/* Detect low-end devices and reduce animations */
+@media (max-width: 480px) and (max-height: 800px) {
+  /* Reduce animation complexity */
+  .network__line::before,
+  .network__core-light {
+    animation-duration: 4s;
+  }
+  
+  /* Simplify gradients */
+  .hero {
+    background: var(--primary-blue);
+  }
+  
+  /* Reduce shadow complexity */
+  .btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Reduce motion for battery saving */
+@media (prefers-reduced-motion: reduce), (update: slow) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  html {
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable transform animations for reduced motion */
+  .btn:hover,
+  .btn:active,
+  .btn:focus {
+    transform: none !important;
+  }
+  
+  .form__input:focus,
+  .form__input:hover {
+    transform: none !important;
+  }
+  
+  /* Disable all hover effects */
+  .hover-lift:hover,
+  .hover-scale:hover {
+    transform: none !important;
+  }
+  
+  /* Disable parallax effects */
+  [data-parallax] {
+    transform: none !important;
+  }
+  
+  /* Disable scroll-based animations */
+  [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  /* Disable loading animations */
+  .loading::after {
+    animation: none !important;
+  }
+  
+  /* Disable button shine effects */
+  .btn::before {
+    display: none !important;
+  }
+}
+/*
+ ===== UTILITY CLASSES ===== */
+
+/* Display utilities */
+.hidden { display: none !important; }
+.block { display: block !important; }
+.inline { display: inline !important; }
+.inline-block { display: inline-block !important; }
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+.grid { display: grid !important; }
+
+/* Position utilities */
+.relative { position: relative !important; }
+.absolute { position: absolute !important; }
+.fixed { position: fixed !important; }
+.sticky { position: sticky !important; }
+
+/* Overflow utilities */
+.overflow-hidden { overflow: hidden !important; }
+.overflow-auto { overflow: auto !important; }
+.overflow-scroll { overflow: scroll !important; }
+
+/* Width utilities */
+.w-full { width: 100% !important; }
+.w-auto { width: auto !important; }
+.max-w-none { max-width: none !important; }
+
+/* Height utilities */
+.h-full { height: 100% !important; }
+.h-screen { height: 100vh !important; }
+.min-h-screen { min-height: 100vh !important; }
+
+/* Margin utilities */
+.m-0 { margin: 0 !important; }
+.m-auto { margin: auto !important; }
+.mx-auto { margin-left: auto !important; margin-right: auto !important; }
+.my-auto { margin-top: auto !important; margin-bottom: auto !important; }
+
+/* Padding utilities */
+.p-0 { padding: 0 !important; }
+
+/* Text alignment utilities */
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+
+/* Responsive visibility utilities */
+.show-mobile { display: block !important; }
+.hide-mobile { display: none !important; }
+
+/* Mobile-specific utilities */
+@media (max-width: 767px) {
+  .mobile-center { text-align: center !important; }
+  .mobile-full-width { width: 100% !important; }
+  .mobile-stack { flex-direction: column !important; }
+  .mobile-no-gap { gap: 0 !important; }
+  .mobile-small-gap { gap: var(--space-sm) !important; }
+}
+
+@media (min-width: 768px) {
+  .show-mobile { display: none !important; }
+  .hide-mobile { display: block !important; }
+  .show-tablet { display: block !important; }
+  .hide-tablet { display: none !important; }
+  
+  /* Tablet-specific utilities */
+  .tablet-center { text-align: center !important; }
+  .tablet-left { text-align: left !important; }
+  .tablet-row { flex-direction: row !important; }
+  .tablet-column { flex-direction: column !important; }
+}
+
+@media (min-width: 1024px) {
+  .show-tablet { display: none !important; }
+  .hide-tablet { display: block !important; }
+  .show-desktop { display: block !important; }
+  .hide-desktop { display: none !important; }
+  
+  /* Desktop-specific utilities */
+  .desktop-center { text-align: center !important; }
+  .desktop-left { text-align: left !important; }
+  .desktop-right { text-align: right !important; }
+  .desktop-row { flex-direction: row !important; }
+  .desktop-column { flex-direction: column !important; }
+}
+
+@media (min-width: 1440px) {
+  .show-desktop { display: none !important; }
+  .hide-desktop { display: block !important; }
+  .show-large-desktop { display: block !important; }
+  .hide-large-desktop { display: none !important; }
+  
+  /* Large desktop utilities */
+  .large-desktop-center { text-align: center !important; }
+  .large-desktop-left { text-align: left !important; }
+  .large-desktop-right { text-align: right !important; }
+}
+
+/* Z-index utilities */
+.z-0 { z-index: 0 !important; }
+.z-10 { z-index: 10 !important; }
+.z-20 { z-index: 20 !important; }
+.z-30 { z-index: 30 !important; }
+.z-40 { z-index: 40 !important; }
+.z-50 { z-index: 50 !important; }
+
+/* Cursor utilities */
+.cursor-pointer { cursor: pointer !important; }
+.cursor-not-allowed { cursor: not-allowed !important; }
+
+/* User select utilities */
+.select-none { user-select: none !important; }
+.select-text { user-select: text !important; }
+
+/* Pointer events utilities */
+.pointer-events-none { pointer-events: none !important; }
+.pointer-events-auto { pointer-events: auto !important; }
+/*
+ ===== HERO SECTION ===== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-primary);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero__container {
+  position: relative;
+  z-index: 2;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--container-padding);
+  width: 100%;
+}
+
+.hero__content {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero__headline {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+  letter-spacing: -0.02em;
+}
+
+.hero__subheadline {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  line-height: 1.4;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3xl);
+  font-weight: 400;
+}
+
+.hero__visual {
+  margin: var(--space-3xl) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.hero__form .form__group {
+  margin-bottom: 0;
+}
+
+.hero__form .form__input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-lg);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--text-primary);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-base);
+}
+
+.hero__form .form__input::placeholder {
+  color: var(--text-accent);
+}
+
+.hero__form .form__input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.hero__form .btn {
+  padding: var(--space-md) var(--space-2xl);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-accent);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__form .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero__form .btn:active {
+  transform: translateY(0);
+}
+
+.hero__form .btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.hero__form .form__error {
+  color: #EF4444;
+  font-size: var(--text-sm);
+  margin-top: var(--space-xs);
+  min-height: 1.2em;
+}
+
+/* Responsive adjustments for hero */
+@media (min-width: 768px) {
+  .hero__form {
+    flex-direction: row;
+    max-width: 500px;
+  }
+  
+  .hero__form .form__group {
+    flex: 1;
+  }
+  
+  .hero__form .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero__container {
+    padding: var(--space-2xl) var(--container-padding);
+  }
+  
+  .hero__visual {
+    margin: var(--space-4xl) 0;
+  }
+}
+/* ====
+= CSS OPTIMIZATIONS FOR PERFORMANCE ===== */
+
+/* Optimize font loading */
+@font-face {
+  font-family: 'system-ui';
+  src: local('system-ui'), local('-apple-system'), local('BlinkMacSystemFont');
+  font-display: swap;
+}
+
+/* Optimize image loading */
+img {
+  loading: lazy;
+  decoding: async;
+}
+
+/* Optimize animations for performance */
+@media (prefers-reduced-motion: no-preference) {
+  /* Only apply complex animations when motion is not reduced */
+  .network__core-light {
+    animation: coreLight 3s ease-in-out infinite;
+  }
+  
+  .network__line::before {
+    animation: energyFlow 3s ease-in-out infinite;
+  }
+  
+  .demonstration__arrow--after {
+    animation: arrowPulse 2s ease-in-out infinite;
+  }
+  
+  .cta__form .btn {
+    animation: cta-gentle-pulse 3s ease-in-out infinite;
+  }
+}
+
+/* Optimize for high refresh rate displays */
+@media (min-resolution: 120dpi) {
+  * {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* Optimize for print */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  .hero,
+  .cta {
+    background: white !important;
+  }
+  
+  .btn {
+    border: 1px solid black !important;
+  }
+  
+  /* Hide interactive elements in print */
+  .form__input,
+  .btn,
+  .network-visualization,
+  .demonstration__processing {
+    display: none !important;
+  }
+}
+
+/* Optimize for dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Already optimized for dark mode */
+  }
+}
+
+/* Optimize for high contrast */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #FFFFFF;
+    --text-secondary: #E5E5E5;
+    --accent-blue: #4A90E2;
+    --border-subtle: #666666;
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+  
+  .form__input {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Optimize for forced colors (Windows High Contrast) */
+@media (forced-colors: active) {
+  .btn {
+    forced-color-adjust: none;
+    border: 1px solid ButtonText;
+  }
+  
+  .form__input {
+    forced-color-adjust: none;
+    border: 1px solid ButtonText;
+  }
+}
+
+/* Container queries for better responsive design */
+@supports (container-type: inline-size) {
+  .hero__container {
+    container-type: inline-size;
+  }
+  
+  @container (max-width: 600px) {
+    .hero__form {
+      flex-direction: column;
+    }
+  }
+}
+
+/* Optimize scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle) var(--dark-background);
+}
+
+/* Optimize selection styling */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--text-primary);
+}
+
+/* ===== HIGH CONTRAST MODE SUPPORT ===== */
+@media (prefers-contrast: high) {
+  :root {
+    /* Enhanced contrast colors */
+    --text-primary: #FFFFFF;
+    --text-secondary: #E5E7EB;
+    --text-accent: #D1D5DB;
+    --accent-blue: #60A5FA;
+    --premium-gold: #FBBF24;
+    --border-subtle: #6B7280;
+    --surface-dark: #111827;
+    --dark-background: #000000;
+  }
+  
+  /* Enhanced focus indicators for high contrast */
+  *:focus,
+  *:focus-visible {
+    outline: 4px solid var(--premium-gold) !important;
+    outline-offset: 4px !important;
+    box-shadow: 
+      0 0 0 2px var(--dark-background),
+      0 0 0 8px var(--accent-blue) !important;
+  }
+  
+  /* High contrast button styles */
+  .btn {
+    border: 2px solid currentColor;
+  }
+  
+  .btn--primary {
+    background: var(--accent-blue);
+    color: var(--dark-background);
+    border-color: var(--accent-blue);
+  }
+  
+  .btn--primary:hover {
+    background: var(--premium-gold);
+    color: var(--dark-background);
+    border-color: var(--premium-gold);
+  }
+  
+  /* High contrast form inputs */
+  .form__input {
+    border: 2px solid var(--text-secondary);
+    background: var(--dark-background);
+    color: var(--text-primary);
+  }
+  
+  .form__input:focus {
+    border-color: var(--premium-gold);
+    background: var(--surface-dark);
+  }
+  
+  /* High contrast text */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  p, span, div {
+    color: var(--text-secondary);
+  }
+}
+
+/* ===== WINDOWS HIGH CONTRAST MODE ===== */
+@media screen and (-ms-high-contrast: active) {
+  /* Windows High Contrast Mode overrides */
+  * {
+    background-color: ButtonFace !important;
+    color: ButtonText !important;
+  }
+  
+  .btn {
+    background-color: ButtonFace !important;
+    color: ButtonText !important;
+    border: 2px solid ButtonText !important;
+  }
+  
+  .btn:focus,
+  .btn:hover {
+    background-color: Highlight !important;
+    color: HighlightText !important;
+    border-color: HighlightText !important;
+  }
+  
+  .form__input {
+    background-color: Field !important;
+    color: FieldText !important;
+    border: 2px solid FieldText !important;
+  }
+  
+  .form__input:focus {
+    background-color: Highlight !important;
+    color: HighlightText !important;
+  }
+  
+  a, a:visited {
+    color: LinkText !important;
+  }
+  
+  a:hover, a:focus {
+    color: HighlightText !important;
+    background-color: Highlight !important;
+  }
+}
+
+/* ===== FORCED COLORS MODE (MODERN HIGH CONTRAST) ===== */
+@media (forced-colors: active) {
+  :root {
+    /* Use system colors in forced colors mode */
+    --text-primary: CanvasText;
+    --text-secondary: CanvasText;
+    --text-accent: CanvasText;
+    --accent-blue: LinkText;
+    --premium-gold: LinkText;
+    --border-subtle: CanvasText;
+    --surface-dark: Canvas;
+    --dark-background: Canvas;
+  }
+  
+  .btn {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+    forced-color-adjust: none;
+  }
+  
+  .btn:hover,
+  .btn:focus {
+    background: Highlight;
+    color: HighlightText;
+    border-color: HighlightText;
+  }
+  
+  .form__input {
+    background: Field;
+    color: FieldText;
+    border: 2px solid FieldText;
+    forced-color-adjust: none;
+  }
+  
+  .form__input:focus {
+    background: Field;
+    color: FieldText;
+    border-color: Highlight;
+  }
+  
+  /* Ensure decorative elements don't interfere */
+  .hero::before,
+  .cta::before,
+  .cta::after,
+  .network__line,
+  .fragmentation__line,
+  .unified__line {
+    display: none;
+  }
+}
+
+/* ===== IMPROVED COLOR CONTRAST ===== */
+/* Ensure WCAG AA compliance for all text elements */
+
+/* Large text (18pt+ or 14pt+ bold) - minimum 3:1 contrast */
+h1, h2, h3, 
+.heading--hero,
+.heading--section,
+.heading--subsection {
+  color: var(--text-primary);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Normal text - minimum 4.5:1 contrast */
+p, span, div, li, td, th,
+.text,
+.form__label,
+.comparison-table__text {
+  color: var(--text-secondary);
+  /* Ensure sufficient contrast against dark background */
+}
+
+/* Interactive elements - minimum 3:1 contrast for non-text */
+.btn,
+.form__input,
+button,
+input,
+select,
+textarea {
+  /* Enhanced contrast borders */
+  border-color: var(--border-subtle);
+}
+
+/* Error states with high contrast */
+.form__error {
+  color: #FCA5A5; /* Light red with better contrast */
+  background: rgba(239, 68, 68, 0.1);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #EF4444;
+}
+
+/* Success states with high contrast */
+.form__success {
+  color: #86EFAC; /* Light green with better contrast */
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 3px solid #10B981;
+}
+
+/* Link contrast improvements */
+a {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+a:hover,
+a:focus {
+  color: var(--premium-gold);
+  text-decoration-thickness: 3px;
+}
+
+/* Ensure sufficient contrast for placeholder text */
+::placeholder {
+  color: var(--text-accent);
+  opacity: 1; /* Firefox fix */
+}
+
+/* Enhanced contrast for form validation states */
+.form__input.error {
+  border-color: #FCA5A5;
+  color: var(--text-primary);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.form__input--success {
+  border-color: #86EFAC;
+  color: var(--text-primary);
+  background: rgba(16, 185, 129, 0.05);
+}

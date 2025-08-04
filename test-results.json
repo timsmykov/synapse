@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-08-04T13:24:59.198Z",
+  "environment": {
+    "nodeVersion": "v22.13.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "results": {
+    "unit": {
+      "email": {
+        "passed": 0,
+        "failed": 0,
+        "total": 22,
+        "output": "Running Email Validation Tests...\n\nTesting Email Validation:\n✓ Email \"test@example.com\" should be valid\n✓ Email \"user.name@domain.co.uk\" should be valid\n✓ Email \"user+tag@example.org\" should be valid\n✓ Email \"user_name@example-domain.com\" should be valid\n✓ Email \"test123@example123.com\" should be valid\n✓ Email \"a@b.co\" should be valid\n✓ Email \"\" should be invalid\n✓ Email \"invalid\" should be invalid\n✓ Email \"@example.com\" should be invalid\n✓ Email \"test@\" should be invalid\n✓ Email \"test@.com\" should be invalid\n✓ Email \"test@example.\" should be invalid\n✓ Email \"test..test@example.com\" should be invalid\n✓ Email \"test@example..com\" should be invalid\n✓ Email \"test@example\" should be invalid\n✓ Email \"test@example.c\" should be invalid\n✓ Email \"test space@example.com\" should be invalid\n✓ Email \"test@exam ple.com\" should be invalid\n\nTesting FormUtils:\n✓ sanitizeInput should escape HTML\n✓ formatEmail should lowercase and trim\n✓ isValidDomain should validate domains correctly\n✓ debounce should limit function calls\n\n==================================================\nTest Summary:\nTotal: 22 | Passed: 22 | Failed: 0\nSuccess Rate: 100%\n==================================================\n🎉 All tests passed!\n"
+      },
+      "animations": {
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "output": "Running ScrollAnimations Tests...\n\n✅ ScrollAnimations initializes correctly\n✅ Animation state management works correctly\n✅ Scroll progress calculation is accurate\n✅ Easing function produces correct values\n✅ Viewport detection works correctly\n✅ Animation element processing works correctly\n✅ Animation reset functionality works correctly\n✅ Cleanup functionality works correctly\n\n==================================================\nTest Results: 8 passed, 0 failed\n==================================================\n\nAll animation tests completed!\n"
+      },
+      "passed": 8,
+      "failed": 0,
+      "total": 30
+    },
+    "browser": null,
+    "responsive": null,
+    "accessibility": null,
+    "summary": {
+      "totalPassed": 8,
+      "totalFailed": 0,
+      "totalTests": 30,
+      "overallPercentage": 27,
+      "duration": 239,
+      "success": true
+    }
+  }
+}
