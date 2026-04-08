@@ -24,7 +24,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--manifest",
-        default="test_corpus/corpus-manifest.template.json",
+        default="test_corpus/corpus-manifest.json",
         help="Path to the corpus manifest JSON file",
     )
     args = parser.parse_args()

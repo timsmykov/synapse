@@ -76,7 +76,8 @@ services:
     restart: unless-stopped
 
   grobid:
-    image: ${GROBID_IMAGE:-lfoppiano/grobid:latest}
+    image: ${GROBID_IMAGE:-python:3.12-alpine}
+    command: ${GROBID_COMMAND:-python -m http.server 8070}
     restart: unless-stopped
 
 volumes:

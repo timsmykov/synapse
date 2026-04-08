@@ -32,7 +32,7 @@ class EvaluationTest(unittest.TestCase):
                     [
                         {
                             "document_id": "doc-01",
-                            "file_name": "01-medicine-rct.pdf",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
                             "domain": "medicine",
                             "layout_features": ["tables", "figures"],
                             "expected_artifacts": {
@@ -53,7 +53,7 @@ class EvaluationTest(unittest.TestCase):
             entries = load_corpus_manifest(manifest_path)
 
         self.assertEqual(len(entries), 1)
-        self.assertEqual(entries[0].file_name, "01-medicine-rct.pdf")
+        self.assertEqual(entries[0].file_name, "01-ecommerce-meta-analysis.pdf")
 
     def test_evaluate_document_record_reports_green_metrics_for_matching_counts(self) -> None:
         entry = load_corpus_manifest_data()[0]
@@ -138,7 +138,7 @@ class EvaluationTest(unittest.TestCase):
                     [
                         {
                             "document_id": "doc-01",
-                            "file_name": "01-medicine-rct.pdf",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
                             "domain": "medicine",
                             "layout_features": ["tables"],
                             "expected_artifacts": {
@@ -175,8 +175,78 @@ class EvaluationTest(unittest.TestCase):
             )
 
         self.assertEqual(audit.status, "fail")
-        self.assertIn("01-medicine-rct.pdf", audit.missing_files)
+        self.assertIn("01-ecommerce-meta-analysis.pdf", audit.missing_files)
         self.assertIn("extra.pdf", audit.undocumented_files)
+
+    def test_minimum_expectations_allow_actual_counts_above_manifest_floor(self) -> None:
+        entry = load_corpus_manifest_from_json(
+            [
+                {
+                    "document_id": "doc-01",
+                    "file_name": "01-ecommerce-meta-analysis.pdf",
+                    "domain": "ecommerce",
+                    "layout_features": ["tables"],
+                    "expected_artifacts": {
+                        "sections": 1,
+                        "tables": 1,
+                        "table_cells": 1,
+                        "formulas": 0,
+                        "figures": 0,
+                        "citations": 0,
+                    },
+                    "notes": "fixture",
+                }
+            ]
+        )[0]
+        provenance = Provenance(
+            source_document_id="doc-01",
+            page_number=1,
+            parser="docling",
+            confidence=1.0,
+        )
+        document = DocumentRecord(
+            document_id="doc-01",
+            title="Study",
+            artifacts=[
+                Section(
+                    artifact_id="sec-1",
+                    document_id="doc-01",
+                    provenance=provenance,
+                    heading="Intro",
+                    level=1,
+                    text="A",
+                    order=0,
+                ),
+                TableArtifact(
+                    artifact_id="tbl-1",
+                    document_id="doc-01",
+                    provenance=provenance,
+                    rows=1,
+                    columns=2,
+                    cells=[
+                        TableCell(
+                            artifact_id="cell-1",
+                            document_id="doc-01",
+                            provenance=provenance,
+                            row=1,
+                            column=1,
+                        ),
+                        TableCell(
+                            artifact_id="cell-2",
+                            document_id="doc-01",
+                            provenance=provenance,
+                            row=1,
+                            column=2,
+                        ),
+                    ],
+                ),
+            ],
+        )
+
+        report = evaluate_document_record(document, entry)
+        metrics = {metric.name: metric for metric in report.metrics}
+
+        self.assertEqual(metrics["table_extraction_accuracy"].value, 1.0)
 
 
 def load_corpus_manifest_data() -> list:
@@ -184,7 +254,7 @@ def load_corpus_manifest_data() -> list:
         [
             {
                 "document_id": "doc-01",
-                "file_name": "01-medicine-rct.pdf",
+                "file_name": "01-ecommerce-meta-analysis.pdf",
                 "domain": "medicine",
                 "layout_features": ["tables", "formulas", "multi_column"],
                 "expected_artifacts": {

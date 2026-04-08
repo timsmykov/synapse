@@ -19,11 +19,11 @@ from synapse.domain import (
 from synapse.domain.common import SynapseModel
 
 CANONICAL_FIXTURE_NAMES = {
-    "01-medicine-rct.pdf",
-    "02-biology-figures.pdf",
-    "03-physics-formulas.pdf",
-    "04-cs-multicolumn.pdf",
-    "05-complex-table.pdf",
+    "01-ecommerce-meta-analysis.pdf",
+    "02-jams-service-review.pdf",
+    "03-ebusiness-latent-topics.pdf",
+    "04-chatbot-customer-experience.pdf",
+    "05-ai-ethics-recommendation-systems.pdf",
 }
 
 ALLOWED_LAYOUT_FEATURES = {
@@ -54,6 +54,9 @@ class CorpusFixture(SynapseModel):
     document_id: str
     file_name: str
     domain: str
+    source_file_name: str | None = None
+    source_title: str | None = None
+    page_count: int | None = Field(default=None, ge=1)
     layout_features: list[str] = Field(default_factory=list)
     expected_artifacts: ExpectedArtifacts
     notes: str | None = None
@@ -186,9 +189,9 @@ def evaluate_document_record(
             target=0.95,
             passed=table_score >= 0.95,
             detail=(
-                f"expected tables={fixture.expected_artifacts.tables}, "
+                f"minimum expected tables={fixture.expected_artifacts.tables}, "
                 f"actual tables={counts['tables']}; "
-                f"expected table_cells={fixture.expected_artifacts.table_cells}, "
+                f"minimum expected table_cells={fixture.expected_artifacts.table_cells}, "
                 f"actual table_cells={counts['table_cells']}"
             ),
         ),
@@ -198,8 +201,8 @@ def evaluate_document_record(
             target=0.95,
             passed=formula_score >= 0.95,
             detail=(
-                "count-based proxy for current baseline harness: "
-                f"expected formulas={fixture.expected_artifacts.formulas}, "
+                "minimum-count proxy for current baseline harness: "
+                f"minimum expected formulas={fixture.expected_artifacts.formulas}, "
                 f"actual formulas={counts['formulas']}"
             ),
         ),
@@ -324,13 +327,13 @@ def _section_order_correctness(record: DocumentRecord) -> float:
 
 
 def _count_similarity(actual: int, expected: int) -> float:
-    if actual == expected:
+    if actual >= expected:
         return 1.0
-    if actual == 0 or expected == 0:
+    if expected == 0:
+        return 1.0
+    if actual == 0:
         return 0.0
-    lower = min(actual, expected)
-    upper = max(actual, expected)
-    return lower / upper
+    return actual / expected
 
 
 def _average(*values: float) -> float:

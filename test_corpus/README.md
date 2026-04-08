@@ -1,45 +1,63 @@
 # Test Corpus Contract
 
-`test_corpus/` — это не случайная папка с PDF. Это repo-side fixture layer для manifest, mirrors и metadata вокруг ingest, provenance и retrieval.
+`test_corpus/` is the repo-side fixture layer for manifest, mirrors, and metadata around ingest, provenance, and retrieval.
 
-Канонический источник реальных golden PDF сейчас описан в [`docs/test-corpus.md`](../docs/test-corpus.md) и находится вне репо: `/Users/timsmykov/Desktop/Статьи для теста`.
+The canonical source of the real PDFs is outside the repo and documented in [`/Users/timsmykov/Desktop/Synapse/docs/test-corpus.md`](/Users/timsmykov/Desktop/Synapse/docs/test-corpus.md):
 
-## Minimum Coverage
+- `/Users/timsmykov/Desktop/Статьи для теста`
 
-В baseline corpus должны быть как минимум:
+## Current Baseline
 
-- 1 статья по медицине с таблицами клинических исходов
-- 1 статья по биологии с figure panels и captions
-- 1 статья по физике или math-heavy domain с формулами
-- 1 статья по computer science с multi-column layout
-- 1 статья со сложной таблицей и merged cells
+The first operational baseline now uses five real papers from that source folder and maps them to stable mirrored names:
+
+- `01-ecommerce-meta-analysis.pdf` -> `Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf`
+- `02-service-robot-study.pdf` -> `Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf`
+- `03-anthropomorphism-meta-analysis.pdf` -> `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
+- `04-ai-systematic-review.pdf` -> `Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf`
+- `05-ai-ethics-review.pdf` -> `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
+
+This starter baseline is good enough for the first server-side ingest pass, corpus audit, and evaluation harness.
+It does not yet cover the full target shape for formula-heavy, biology-panel, or clinical-RCT-specific PDFs.
+
+## Target Coverage
+
+Longer term, the corpus should still include:
+
+- 1 article with strong table-heavy review or meta-analysis structure
+- 1 article with figure-heavy or conceptual-model layout
+- 1 formula-heavy paper
+- 1 clean multi-column journal paper
+- 1 document with complex or merged tables
 
 ## File Naming
 
-Если PDF зеркалится внутрь `test_corpus/` для технических нужд, используем стабильные имена:
+When the selected PDFs are mirrored into a technical corpus directory, use these stable names:
 
-- `01-medicine-rct.pdf`
-- `02-biology-figures.pdf`
-- `03-physics-formulas.pdf`
-- `04-cs-multicolumn.pdf`
-- `05-complex-table.pdf`
+- `01-ecommerce-meta-analysis.pdf`
+- `02-service-robot-study.pdf`
+- `03-anthropomorphism-meta-analysis.pdf`
+- `04-ai-systematic-review.pdf`
+- `05-ai-ethics-review.pdf`
 
-Не переименовываем файлы после того, как они попали в golden corpus.
+Do not rename files after they are accepted into the baseline.
 
 ## Required Sidecar Metadata
 
-Для каждого PDF должен быть metadata entry в `corpus-manifest.template.json` со следующими полями:
+Each entry in `corpus-manifest.template.json` should contain:
 
 - `document_id`
 - `file_name`
 - `domain`
+- `source_path`
+- `source_title`
+- `page_count`
 - `layout_features`
 - `expected_artifacts`
 - `notes`
 
 ## Required Layout Features
 
-`layout_features` должен явно фиксировать, есть ли в документе:
+`layout_features` should capture whether the document contains:
 
 - `tables`
 - `merged_cells`
@@ -51,7 +69,7 @@
 
 ## Expected Artifacts
 
-`expected_artifacts` фиксирует минимальные ожидания для ingest:
+`expected_artifacts` stores minimum expectations for ingest, not exact final counts:
 
 - `sections`
 - `tables`
@@ -60,7 +78,12 @@
 - `figures`
 - `citations`
 
-## Rule
+## Sync Rule
 
-Пока документ не описан в manifest, он не считается частью рабочего test corpus.
-Пока документ не выбран из внешнего source folder и не синхронизирован в server-side corpus location, он не считается активным golden fixture.
+A document is not an active golden fixture until:
+
+1. it is described in the manifest;
+2. it exists in the external source folder; and
+3. it has been mirrored into a server-side or local execution corpus directory under the canonical filename.
+
+Use [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py) to perform that mirror step.

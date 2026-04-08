@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: install dev lint test api compose-up compose-down cli-help ci staging-config staging-up staging-check staging-down
+.PHONY: install dev lint test api compose-up compose-down cli-help ci staging-config staging-up staging-check staging-down corpus-sync
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -47,3 +47,6 @@ staging-check:
 
 staging-down:
 	docker compose --env-file deploy/.env.staging -f deploy/docker-compose.staging.yml down
+
+corpus-sync:
+	./scripts/sync_test_corpus.sh

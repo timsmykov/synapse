@@ -11,12 +11,22 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 1
 fi
 
-set -a
-source "${ENV_FILE}"
-set +a
+read_env_value() {
+  local key="$1"
+  local default_value="$2"
+  local value
 
-PROJECT_NAME="${COMPOSE_PROJECT_NAME:-synapse-testing}"
-APP_URL="http://127.0.0.1:${SYNAPSE_STAGING_HTTP_PORT:-18080}"
+  value="$(grep -E "^${key}=" "${ENV_FILE}" | head -n1 | cut -d= -f2- || true)"
+  if [[ -z "${value}" ]]; then
+    printf '%s\n' "${default_value}"
+    return
+  fi
+  printf '%s\n' "${value}"
+}
+
+PROJECT_NAME="$(read_env_value "COMPOSE_PROJECT_NAME" "synapse-testing")"
+APP_PORT="$(read_env_value "SYNAPSE_STAGING_HTTP_PORT" "18080")"
+APP_URL="http://127.0.0.1:${APP_PORT}"
 export APP_URL
 
 docker compose \
@@ -25,7 +35,7 @@ docker compose \
   -f "${COMPOSE_FILE}" \
   ps
 
-python - <<'PY'
+python3 - <<'PY'
 import json
 import os
 import sys

@@ -25,6 +25,7 @@ The current goal is a single remote server that acts as the default install, tes
 - `deploy/Caddyfile`: reverse proxy config for the test stack
 - `scripts/deploy_staging.sh`: build and launch the stack
 - `scripts/check_staging.sh`: health and smoke verification
+- `scripts/sync_test_corpus.sh`: sync selected golden PDFs from the external Mac source folder to the server corpus path
 
 ## Services in the testing stack
 
@@ -37,6 +38,10 @@ The current goal is a single remote server that acts as the default install, tes
 
 Async worker containers are intentionally not part of this stack yet.
 The queue/worker contract belongs to a later phase and should not be faked now.
+
+For the first remote testing rollout, `grobid` is a lightweight stub container on port `8070`.
+This keeps the shared VPS setup fast and isolated while the team is still validating the rest of the runtime.
+Swap it for a real GROBID image only when remote parser testing becomes necessary.
 
 ## Port policy
 
@@ -60,6 +65,7 @@ Then edit `deploy/.env.staging`:
 - set real credentials where needed
 - keep `SYNAPSE_LLM_PROVIDER=openai` or another API-backed provider
 - leave `OPENAI_API_KEY` empty only if the current task does not need model calls yet
+- keep the default `grobid` stub unless you explicitly need remote GROBID extraction on this box
 - change host port values only if they conflict with something already running
 
 ## Deploy

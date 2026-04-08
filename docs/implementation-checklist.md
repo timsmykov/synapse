@@ -31,7 +31,7 @@ Primary navigation:
 - [x] Обеспечить сохранение provenance для каждого artifact: `source_document_id`, `page_number`, `bbox`, `parser`, `confidence`.
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
-- [ ] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
+- [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -97,10 +97,8 @@ Primary navigation:
 
 Следующий правильный execution slice:
 
-1. Выбрать первые 3-5 реальных golden PDF из `/Users/timsmykov/Desktop/Статьи для теста` и описать их в manifest.
-2. Синхронизировать выбранные PDF в server-side corpus location.
-3. Прогнать `synapse ingest` по golden fixtures и зафиксировать первые quality gaps.
-4. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
+1. Прогнать `synapse ingest` по golden fixtures в `/srv/synapse/test_corpus/golden` и зафиксировать первые quality gaps.
+2. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 

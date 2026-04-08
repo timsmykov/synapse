@@ -1,8 +1,11 @@
 [
   {
     "document_id": "doc-01",
-    "file_name": "01-medicine-rct.pdf",
-    "domain": "medicine",
+    "file_name": "01-ecommerce-meta-analysis.pdf",
+    "domain": "ecommerce",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf",
+    "source_title": "Purchasing in the digital age: A meta-analytical perspective on trust, risk, security, and e-WOM in e-commerce",
+    "page_count": 24,
     "layout_features": [
       "tables",
       "citations",
@@ -10,13 +13,101 @@
     ],
     "expected_artifacts": {
       "sections": 6,
-      "tables": 2,
-      "table_cells": 24,
+      "tables": 1,
+      "table_cells": 4,
+      "formulas": 0,
+      "figures": 0,
+      "citations": 1
+    },
+    "notes": "Starter baseline meta-analysis fixture. Good first candidate for multi-column review-style ingest and citation-heavy extraction."
+  },
+  {
+    "document_id": "doc-02",
+    "file_name": "02-service-robot-study.pdf",
+    "domain": "service-robots",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf",
+    "source_title": "Examining the effects of robots' physical appearance, warmth, and competence in frontline services: The Humanness-Value-Loyalty model",
+    "page_count": 20,
+    "layout_features": [
+      "tables",
+      "citations",
+      "multi_column"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 4,
+      "formulas": 0,
+      "figures": 0,
+      "citations": 1
+    },
+    "notes": "Empirical journal article chosen for standard article structure, likely result tables, and stable multi-column layout."
+  },
+  {
+    "document_id": "doc-03",
+    "file_name": "03-anthropomorphism-meta-analysis.pdf",
+    "domain": "anthropomorphism",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf",
+    "source_title": "Understanding anthropomorphism in service provision: a meta-analysis of physical robots, chatbots, and other AI",
+    "page_count": 27,
+    "layout_features": [
+      "tables",
+      "citations",
+      "multi_column"
+    ],
+    "expected_artifacts": {
+      "sections": 7,
+      "tables": 1,
+      "table_cells": 4,
+      "formulas": 0,
+      "figures": 0,
+      "citations": 1
+    },
+    "notes": "Meta-analysis fixture for long structured articles with dense citation sections and likely synthesis tables."
+  },
+  {
+    "document_id": "doc-04",
+    "file_name": "04-ai-systematic-review.pdf",
+    "domain": "systematic-review",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf",
+    "source_title": "Engaging consumers through artificially intelligent technologies: Systematic review, conceptual model, and further research",
+    "page_count": 19,
+    "layout_features": [
+      "tables",
+      "figures",
+      "citations",
+      "multi_column"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 4,
       "formulas": 0,
       "figures": 1,
-      "citations": 18
+      "citations": 1
     },
-    "notes": "Use as the first ingestion regression fixture."
+    "notes": "Systematic review fixture selected for conceptual-model figures plus review-style tables and references."
+  },
+  {
+    "document_id": "doc-05",
+    "file_name": "05-ai-ethics-review.pdf",
+    "domain": "ai-ethics",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf",
+    "source_title": "A Systematic Literature Review on AI based Recommendation Systems and their Ethical Considerations",
+    "page_count": 19,
+    "layout_features": [
+      "tables",
+      "citations",
+      "multi_column"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 4,
+      "formulas": 0,
+      "figures": 0,
+      "citations": 1
+    },
+    "notes": "Review fixture for structured sections and baseline table/citation extraction. Useful for first server-side regression pass."
   }
 ]
-

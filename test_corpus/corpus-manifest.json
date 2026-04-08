@@ -1,0 +1,108 @@
+[
+  {
+    "document_id": "handoyo-2024-meta-analysis",
+    "file_name": "01-ecommerce-meta-analysis.pdf",
+    "source_file_name": "Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf",
+    "domain": "ecommerce_meta_analysis",
+    "layout_features": [
+      "tables",
+      "figures",
+      "multi_column",
+      "citations"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 2,
+      "table_cells": 12,
+      "formulas": 0,
+      "figures": 1,
+      "citations": 20
+    },
+    "notes": "Initial golden fixture. Meta-analysis paper and the strongest first source for summary tables and citation-heavy layout."
+  },
+  {
+    "document_id": "blut-2021-jams",
+    "file_name": "02-jams-service-review.pdf",
+    "source_file_name": "Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf",
+    "domain": "marketing_service_research",
+    "layout_features": [
+      "tables",
+      "figures",
+      "multi_column",
+      "citations"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 2,
+      "table_cells": 10,
+      "formulas": 0,
+      "figures": 2,
+      "citations": 25
+    },
+    "notes": "Long journal-format article selected as the baseline multi-column research paper."
+  },
+  {
+    "document_id": "oprea-bra-2025-ebusiness",
+    "file_name": "03-ebusiness-latent-topics.pdf",
+    "source_file_name": "Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf",
+    "domain": "ebusiness_topic_modeling",
+    "layout_features": [
+      "tables",
+      "formulas",
+      "figures",
+      "multi_column",
+      "citations"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 6,
+      "formulas": 2,
+      "figures": 1,
+      "citations": 20
+    },
+    "notes": "Methods-heavy LaTeX-origin paper selected for formula and model-oriented extraction coverage."
+  },
+  {
+    "document_id": "nguyen-2023-chatbots-frontline",
+    "file_name": "04-chatbot-customer-experience.pdf",
+    "source_file_name": "Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf",
+    "domain": "chatbot_customer_experience",
+    "layout_features": [
+      "tables",
+      "figures",
+      "multi_column",
+      "citations"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 6,
+      "formulas": 0,
+      "figures": 1,
+      "citations": 25
+    },
+    "notes": "Mainstream empirical paper selected for chatbot and customer-experience layouts."
+  },
+  {
+    "document_id": "masciari-2024-ai-ethics",
+    "file_name": "05-ai-ethics-recommendation-systems.pdf",
+    "source_file_name": "Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf",
+    "domain": "ai_recommendation_ethics",
+    "layout_features": [
+      "tables",
+      "figures",
+      "multi_column",
+      "citations"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 2,
+      "table_cells": 12,
+      "formulas": 0,
+      "figures": 2,
+      "citations": 20
+    },
+    "notes": "Selected as the likely complex-table and taxonomy-style fixture for the first baseline corpus."
+  }
+]

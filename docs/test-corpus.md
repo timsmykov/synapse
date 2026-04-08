@@ -22,30 +22,42 @@ This path is the operator-owned source folder on the Mac workstation.
 - Server runs ingest, tests, and runtime flows.
 - CI must not depend on the Mac-local absolute path.
 
-## Current Inventory
+## Selected Starter Baseline
 
-The current source folder contains the first candidate papers for golden fixture selection, including:
+The first operational baseline uses these five source PDFs:
 
-- `Acikgoz et al. (2023) - Consumer Engagement with AI Voice Assistants.pdf`
-- `Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf`
-- `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
-- `Bouhlal & Belahcen (2025) - Conversational AI and Consumer Behavior.pdf`
-- `Epley et al. (2007) — On seeing human- A three-factor theory of anthropomorphism.pdf`
-- `Greilich et al. (2025) - Consumer Response to Anthropomorphism of AI Chatbots.pdf`
 - `Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf`
-- `Hardcastle et al. (2025) - Customer Responses to AI-Driven Personalization.pdf`
-- `Hollebeek et al. (2021) - Customer Engagement in Automated Service.pdf`
-- `Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf`
-- `Lopez-Lopez & Iniesta (2025) - Conversational AI Impact on Decision-Making.pdf`
-- `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
-- `Mittameedi et al. (2025) - Customer Experience in E-Commerce and AI.pdf`
-- `Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf`
+- `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
 - `Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf`
-- `Prentice & Nguyen (2020) - Engaging Customers with AI and Employee Service.pdf`
-- `Raji et al. (2024) - E-commerce AI Personalization Market Trends.pdf`
-- `Reeves, B., & Nass, C. (1996) - The Media Equation (книга).pdf`
-- `Yu et al. (2025) - Consumer Reactions to AI-Generated Content.pdf`
+- `Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf`
+- `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
+
+These are mapped to stable mirrored names in [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json).
+They are already synced to the server at `/srv/synapse/test_corpus/golden`.
+
+## Why These Five
+
+They give a solid first server-side ingest baseline for:
+
+- citation-heavy review and meta-analysis papers
+- multi-column journal layouts
+- table extraction on long-form academic PDFs
+- one methods-heavy paper with likely formulas or formal notation
+- one likely complex-table or taxonomy-style review article
+
+## Current Gap
+
+This starter baseline is not yet strong for:
+
+- formula-heavy scientific PDFs
+- biology-style figure panel layouts
+- clinical RCT tables with more specialized structure
+
+That second corpus wave should be added after the first ingest pass is stable.
 
 ## Next Step
 
-The next ingest-quality slice should choose 3-5 files from this folder, describe them in the manifest, sync them to the server corpus location, and run the first server-side ingest pass.
+1. Run the first server-side ingest pass on `/srv/synapse/test_corpus/golden`.
+2. Evaluate the resulting JSON with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py).
+3. Refine `expected_artifacts` from provisional lower bounds to measured thresholds.
+4. Add a second corpus wave for formula-heavy and non-marketing scientific PDFs.
