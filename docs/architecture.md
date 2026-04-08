@@ -14,23 +14,24 @@ The core value is traceable extraction from scientific PDFs into verifiable stru
 - Storage: PostgreSQL 16+ with JSONB and pgvector, MinIO, Redis
 - Retrieval: LlamaIndex with hybrid vector + keyword + metadata search
 - Deployment: Docker Compose first, Kubernetes later
-- Validation: local pytest/smoke loop plus CI gates plus remote staging
+- Validation: CI gates plus server-side smoke and integration checks
 
 ## Environments
-- Local development stays on the Mac for the fast inner loop: unit tests, CLI checks, contract tests, and small-scope API smoke tests.
+- Local Mac is for source editing, review, and document preparation only.
 - CI is the mandatory validation gate for lint, unit, contract, and compose smoke checks before deploy.
-- Remote staging runs on a single self-hosted VPS with Docker Compose, Postgres, Redis, MinIO, GROBID, and the Synapse app/worker services.
-- Current staging host assumption: `ssh root@194.163.181.122` for initial provisioning, followed by a dedicated non-root deploy user.
+- Remote testing runs on a single self-hosted VPS with Docker Compose, Postgres, Redis, MinIO, GROBID, reverse proxy, and the Synapse app service.
+- Current testing host assumption: `ssh root@194.163.181.122` for bootstrap, runtime, and manual test operation.
 - Production should move to a separate node once usage or parsing concurrency grows beyond private MVP traffic.
-- A single VPS is acceptable for both staging and low-traffic private production only as a temporary step, and only without colocating heavy local LLM inference on the same machine.
+- A single VPS is acceptable for shared testing and low-traffic private demos only as a temporary step, and only without colocating heavy local LLM inference on the same machine.
 
 ## Runtime policy
-- Keep the inner development loop local; do not make the VPS the default dev environment.
-- Use the remote VPS as the shared integration box for real PDFs, multi-service testing, and manual QA.
+- Use the remote VPS as the default execution environment for installs, tests, runtime, and manual QA.
+- Keep the Mac out of the runtime path; use it for editing code and handling external source documents.
 - Treat GROBID and document parsing as memory-sensitive workloads; keep ingest concurrency low on the first VPS tier.
 - Do not expose Postgres, Redis, or MinIO directly to the public internet.
-- Put the public API behind a reverse proxy such as Caddy or Nginx with HTTPS termination.
-- Use a non-root deploy user and scripted Docker Compose deploys.
+- Put the externally reachable API behind a reverse proxy such as Caddy or Nginx when that becomes necessary.
+- Keep the Synapse stack isolated under its own Docker Compose project name so it does not interfere with unrelated server workloads.
+- Use API-backed model providers on the VPS; do not install local LLM runtimes there.
 
 ## Code boundaries
 - `src/synapse/domain/` owns canonical artifacts, provenance, and request/response models.
@@ -69,5 +70,6 @@ The core value is traceable extraction from scientific PDFs into verifiable stru
 - `src/synapse/services/` owns workflow orchestration shared by interfaces.
 - `docs/master-roadmap.md` is the source of truth for delivery order.
 - `docs/implementation-checklist.md` is the progress ledger.
-- `docs/deployment.md` is the VPS deploy and operations runbook baseline.
+- `docs/deploy.md` is the canonical server deploy and operations runbook baseline.
+- `docs/test-corpus.md` is the source of truth for the external golden PDF set.
 - `docs/repo-map.md` is the source of truth for navigation.

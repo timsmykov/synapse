@@ -30,7 +30,8 @@ Use local repo docs as implementation mirrors, not as product invention:
 - `docs/architecture.md`
 - `docs/master-roadmap.md`
 - `docs/implementation-checklist.md`
-- `docs/deployment.md`
+- `docs/deploy.md`
+- `docs/test-corpus.md`
 - `docs/repo-map.md`
 - `docs/agent-prompts.md`
 
@@ -39,6 +40,7 @@ Use local repo docs as implementation mirrors, not as product invention:
 If repo docs and Notion diverge, pause and align them before coding beyond the immediate task.
 
 Current staging/integration target is `ssh root@194.163.181.122`. Treat `root` as provisioning-only access; long-lived deploy scripts and compose operations should move to a dedicated non-root deploy user.
+Code may be edited locally, but installs, tests, runtime commands, and deploy verification happen on the server.
 
 ## Development Principles
 
@@ -62,9 +64,9 @@ Current staging/integration target is `ssh root@194.163.181.122`. Treat `root` a
 - `src/synapse/primitives/` for review-specific analysis primitives.
 - `tests/` for unit and integration tests.
 - `docs/` for implementation guidance and repo maps.
-- `data/` for local working data and generated artifacts.
+- `data/` for generated artifacts and runtime data.
 - `eval/` for evaluation scripts and metrics.
-- `test_corpus/` for sample or golden PDFs.
+- `test_corpus/` for manifest files, mirrors, and corpus metadata, not as the canonical source of truth for the real PDFs.
 - `scripts/` for helper scripts and developer utilities.
 
 ## Core Stack To Build Against
@@ -84,7 +86,7 @@ Do not assume all of this exists on day one. Build thin seams so the repo can gr
 
 ## Commands
 
-Use these as the default local workflow once the scaffold is in place:
+Use these as the default server-side workflow once the scaffold is in place:
 
 - `python -m pytest`
 - `python -m synapse --help`
@@ -95,6 +97,7 @@ Use these as the default local workflow once the scaffold is in place:
 - `uvicorn synapse.server:app --reload`
 - `docker compose up --build`
 
+Run them on the server or inside the server containers, not as a required Mac-local setup.
 If a command is not implemented yet, add the smallest practical stub and document the gap.
 
 ## Coding Expectations

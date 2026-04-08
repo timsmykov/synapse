@@ -1,6 +1,6 @@
-"""Shared use-case layer for CLI and API."""
+"""Public evaluation helpers re-exported from the service layer."""
 
-from .evaluation import (
+from synapse.services.evaluation import (
     CorpusAuditReport,
     CorpusFixture,
     ExpectedArtifacts,
@@ -12,23 +12,16 @@ from .evaluation import (
     load_corpus_manifest,
     load_document_records,
 )
-from .reporting import DoctorReport
-from .workflows import analyze_workflow, doctor_workflow, ingest_workflow, query_workflow
 
 __all__ = [
     "CorpusAuditReport",
     "CorpusFixture",
-    "DoctorReport",
     "ExpectedArtifacts",
     "IngestEvaluationReport",
     "MetricResult",
-    "analyze_workflow",
     "audit_corpus_manifest",
-    "doctor_workflow",
     "evaluate_document_record",
     "evaluate_ingest_outputs",
-    "ingest_workflow",
     "load_corpus_manifest",
     "load_document_records",
-    "query_workflow",
 ]

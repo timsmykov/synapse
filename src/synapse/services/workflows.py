@@ -20,6 +20,7 @@ from synapse.ingest import (
     resolve_ingest_sources,
     write_document_records,
 )
+from synapse.runtime_health import build_runtime_health_report
 
 from .reporting import DoctorReport
 
@@ -87,10 +88,15 @@ def analyze_workflow(request: AnalyzeTaskRequest) -> TaskReceipt:
 def doctor_workflow(settings: Settings | None = None) -> DoctorReport:
     runtime = settings or get_settings()
     summary = runtime.summary
+    health = build_runtime_health_report(runtime)
     return DoctorReport(
+        status=health.status,
         app_name=summary["app_name"],
         environment=summary["environment"],
         version=summary["version"],
+        deployment_target=summary["deployment_target"],
+        public_base_url=summary["public_base_url"] or None,
+        reverse_proxy=summary["reverse_proxy"],
         data_dir=summary["data_dir"],
         corpus_dir=summary["corpus_dir"],
         eval_dir=summary["eval_dir"],
@@ -98,9 +104,14 @@ def doctor_workflow(settings: Settings | None = None) -> DoctorReport:
         redis_url=summary["redis_url"],
         minio_endpoint=summary["minio_endpoint"],
         minio_bucket=summary["minio_bucket"],
+        grobid_url=summary["grobid_url"],
         llm_provider=summary["llm_provider"],
         default_parser=summary["default_parser"],
         default_embedding_model=summary["default_embedding_model"],
+        ingest_concurrency=runtime.ingest_concurrency,
+        service_endpoints=health.service_endpoints,
+        warnings=health.warnings,
+        checks=health.checks,
     )
 
 

@@ -1,6 +1,8 @@
 # Test Corpus Contract
 
-`test_corpus/` — это не случайная папка с PDF. Это канонический fixture layer для проверки ingest, provenance и retrieval.
+`test_corpus/` — это не случайная папка с PDF. Это repo-side fixture layer для manifest, mirrors и metadata вокруг ingest, provenance и retrieval.
+
+Канонический источник реальных golden PDF сейчас описан в [`docs/test-corpus.md`](../docs/test-corpus.md) и находится вне репо: `/Users/timsmykov/Desktop/Статьи для теста`.
 
 ## Minimum Coverage
 
@@ -14,7 +16,7 @@
 
 ## File Naming
 
-Используем стабильные имена:
+Если PDF зеркалится внутрь `test_corpus/` для технических нужд, используем стабильные имена:
 
 - `01-medicine-rct.pdf`
 - `02-biology-figures.pdf`
@@ -61,4 +63,4 @@
 ## Rule
 
 Пока документ не описан в manifest, он не считается частью рабочего test corpus.
-
+Пока документ не выбран из внешнего source folder и не синхронизирован в server-side corpus location, он не считается активным golden fixture.

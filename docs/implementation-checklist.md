@@ -12,7 +12,7 @@ Primary navigation:
 
 - [x] Полностью удалить старый landing/static-site код и заменить репо на новый Synapse scaffold.
 - [x] Поднять Python package baseline: `pyproject.toml`, console entrypoint, `README`, `Makefile`, `Dockerfile`.
-- [x] Поднять локальный infra skeleton: `docker-compose.yml` с `Postgres + pgvector`, `Redis`, `MinIO`.
+- [x] Поднять compose infra skeleton: `docker-compose.yml` с `Postgres + pgvector`, `Redis`, `MinIO`.
 - [x] Зафиксировать runtime config в `.env.example`.
 - [x] Ввести канонический `domain`-слой для provenance/artifact/task contracts.
 - [x] Ввести `services`-слой как общий use-case boundary между CLI и API.
@@ -40,8 +40,8 @@ Primary navigation:
 - [ ] Реализовать MinIO-backed binary/object storage для raw PDFs и extracted figures.
 - [ ] Зафиксировать mapping `domain -> storage` без дублирования shape.
 - [ ] Реализовать persistence path из `ingest` в Postgres и MinIO.
-- [ ] Добавить bootstrap/init path для local infra: DB init, bucket creation, minimal health checks.
-- [ ] Добавить integration tests на local Postgres/MinIO contract.
+- [ ] Добавить bootstrap/init path для server compose infra: DB init, bucket creation, minimal health checks.
+- [ ] Добавить integration tests на server Postgres/MinIO contract.
 
 ## Phase 3. Retrieval And Indexing Layer
 
@@ -78,9 +78,9 @@ Primary navigation:
 - [ ] Закрыть README/examples реальными командами и expected output.
 - [ ] Добавить smoke flow: `docker compose up` -> ingest -> query -> analyze.
 - [ ] Зафиксировать acceptance criteria для MVP на одном понятном dataset.
-- [ ] Поднять CI pipeline для `ruff`, `pytest`, contract tests и compose smoke checks.
-- [ ] Зафиксировать remote staging baseline на single-node VPS: `app`, `worker`, `postgres`, `redis`, `minio`, `grobid`, reverse proxy.
-- [ ] Закрыть deploy hardening для staging: non-root deploy user, HTTPS, закрытые internal ports, backup policy для Postgres и MinIO.
+- [x] Поднять CI pipeline для `ruff`, `pytest`, contract tests и compose smoke checks.
+- [x] Зафиксировать remote testing baseline на single-node VPS: `app`, `postgres`, `redis`, `minio`, `grobid`, reverse proxy.
+- [ ] Закрыть deploy hardening для testing/staging: non-root deploy user, HTTPS, закрытые internal ports, backup policy для Postgres и MinIO.
 - [ ] Зафиксировать триггеры, когда staging и production должны быть разведены на разные узлы.
 
 ## Closed Now
@@ -91,21 +91,22 @@ Primary navigation:
 - [x] `domain` + provenance contracts.
 - [x] `services` boundary.
 - [x] Reserved package boundaries.
-- [x] Smoke tests и reproducible local Python setup.
+- [x] Smoke tests и reproducible Python setup.
 
 ## Next Up
 
 Следующий правильный execution slice:
 
-1. Положить первые 3-5 реальных golden PDF в `test_corpus/` и описать их в manifest.
-2. Прогнать `synapse ingest` по golden fixtures и зафиксировать первые quality gaps.
-3. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
+1. Выбрать первые 3-5 реальных golden PDF из `/Users/timsmykov/Desktop/Статьи для теста` и описать их в manifest.
+2. Синхронизировать выбранные PDF в server-side corpus location.
+3. Прогнать `synapse ingest` по golden fixtures и зафиксировать первые quality gaps.
+4. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 
 ## Environment Policy
 
-- Локальная машина нужна для быстрого inner loop: `pytest`, CLI smoke, contract tests.
-- Общий VPS нужен как staging/integration box, а не как замена локальной разработке.
-- До отдельного production node допускается один VPS для staging и приватных demo-нагрузок, но без тяжёлого локального LLM inference на той же машине.
-- Текущий staging target: `ssh root@194.163.181.122`. Root использовать только для первичного provisioning; deploy path должен перейти на отдельного non-root пользователя.
+- Локальная машина используется для редактирования кода и хранения исходных PDF, но не как обязательная runtime/install среда.
+- Общий VPS является основной средой установки, тестов, runtime и testing/integration.
+- До отдельного production node допускается один VPS для testing и приватных demo-нагрузок, но без тяжёлого локального LLM inference на той же машине.
+- Текущий testing target: `ssh root@194.163.181.122`.

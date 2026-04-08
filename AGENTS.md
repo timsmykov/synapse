@@ -5,6 +5,8 @@ Use [Agent.md](/Users/timsmykov/Desktop/Synapse/Agent.md) as the canonical repo 
 Before work:
 - read [docs/master-roadmap.md](/Users/timsmykov/Desktop/Synapse/docs/master-roadmap.md)
 - read [docs/implementation-checklist.md](/Users/timsmykov/Desktop/Synapse/docs/implementation-checklist.md)
+- if the task touches runtime or deploy, read [docs/deploy.md](/Users/timsmykov/Desktop/Synapse/docs/deploy.md)
+- if the task touches fixtures or ingest evaluation, read [docs/test-corpus.md](/Users/timsmykov/Desktop/Synapse/docs/test-corpus.md)
 - identify the exact phase and checklist items you own
 - if you use subagents, use only `gpt-5.4`; do not use mini variants
 

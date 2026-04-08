@@ -19,20 +19,22 @@ Already done:
 - reserved package boundaries for `ingest`, `storage`, `retrieval`, and `primitives`
 - test corpus contract and evaluation contract
 - smoke tests for config, CLI, services, and API
+- CI workflow skeleton for lint, test, compose validation, and image build
+- remote testing-box deploy skeleton under `deploy/` and `scripts/`
 
 ## Operational Baseline
 
 The repo should target three execution environments:
 
-- local Mac development for the fast inner loop
+- local Mac for code editing and external document handling only
 - CI for mandatory validation on every push/PR
-- a remote single-node staging box for integrated service testing and manual QA
+- a remote single-node testing box for integrated service testing and manual QA
 
 This does not change the product build order. It defines where each class of testing and deployment should happen.
 
 Current remote target assumption:
 
-- one VPS is acceptable for shared staging and early private demos
+- one VPS is acceptable for shared testing and early private demos
 - current operator-provided host is `ssh root@194.163.181.122`
 - treat a 4 vCPU / 8 GB RAM / 100+ GB disk class machine as the minimum practical starter box
 - do not colocate heavy local LLM inference on that same node during the MVP phase
@@ -92,7 +94,7 @@ After ingestion is stable:
 - add MinIO artifact storage
 - wire persistence from ingest to storage
 - bootstrap local infra health checks
-- prepare the remote staging compose profile once Postgres, Redis, and MinIO contracts are stable
+- prepare the remote testing compose profile once Postgres, Redis, and MinIO contracts are stable
 
 ### Phase 3. Retrieval And Indexing Layer
 
@@ -128,17 +130,18 @@ Final step:
 - complete docs/examples
 - verify the full `docker compose up -> ingest -> query -> analyze` flow
 - wire CI gates for lint, unit, contract, and compose smoke tests
-- formalize the single-node staging deploy path behind HTTPS reverse proxy
+- formalize the single-node testing deploy path with isolated compose project and high-port loopback bindings
 - separate staging and production once traffic or ingest concurrency justifies another node
 
 ## What Is Next Now
 
 The next execution slice is:
 
-1. add the first golden PDFs and manifest entries under `test_corpus/`
-2. run `synapse ingest` across those fixtures and capture shape and quality gaps
-3. lock the first acceptance expectations in `eval/contracts.md`
-4. begin Phase 2 storage interfaces only after the golden ingest pass is stable
+1. select the first golden PDFs from `/Users/timsmykov/Desktop/Статьи для теста`
+2. mirror or sync the chosen files into the server-side corpus location and describe them in the manifest
+3. run `synapse ingest` across those fixtures and capture shape and quality gaps
+4. lock the first acceptance expectations in `eval/contracts.md`
+5. begin Phase 2 storage interfaces only after the golden ingest pass is stable
 
 Do not move to storage or retrieval until this slice is green.
 
@@ -146,9 +149,9 @@ Do not move to storage or retrieval until this slice is green.
 
 Use this operating model during the MVP:
 
-1. Run unit, contract, and quick CLI tests locally on the Mac.
+1. Edit code locally if convenient, but do not rely on Mac-local installs or runtime.
 2. Run repeatable validation in CI before deploy.
-3. Run integrated parser/storage tests and manual QA on the remote staging box.
+3. Run installs, integrated parser/storage tests, and manual QA on the remote testing box.
 4. Treat production as a later isolation step, not as a prerequisite for Phase 1-3 delivery.
 
 ## Operating Rules For Agents

@@ -7,6 +7,8 @@ Progress tracking lives in `docs/implementation-checklist.md`.
 ## Goal
 Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenance, and answer traceable research queries from the CLI.
 
+Execution note: edit code wherever convenient, but installs, tests, and runtime happen on the server. The canonical deploy/runbook is `docs/deploy.md`.
+
 ## Day 0
 - Create the repository skeleton.
 - Add `synapse --help`.
@@ -42,7 +44,7 @@ Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenanc
 - Run final smoke tests against the test corpus.
 - Freeze the MVP scope.
 - Prepare the next iteration plan for better retrieval and extraction quality.
-- Prepare the first remote staging deploy on a single VPS with HTTPS and conservative ingest concurrency.
+- Prepare the first remote testing deploy on a single VPS with isolated compose scope and conservative ingest concurrency.
 
 ## Build order
 1. Repo skeleton and developer tooling.
@@ -52,9 +54,9 @@ Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenanc
 5. Tests, docs, and release hardening.
 
 ## MVP acceptance
-- `docker compose up` starts the local stack.
+- `docker compose up` starts the server stack.
 - `synapse ingest` processes sample PDFs.
 - `synapse query` returns traceable results.
 - Outputs link back to source documents.
 - The system runs self-hosted without external dependencies in the happy path.
-- A shared remote staging environment can run integrated parser/storage tests outside the developer laptop.
+- The remote server is the default integrated execution environment.

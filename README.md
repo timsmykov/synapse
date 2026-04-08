@@ -9,45 +9,38 @@ The current baseline now includes the missing architectural seams for Day 1 work
 - `ingest`: parse scientific PDFs into traceable structured artifacts
 - `query`: retrieve document, section, table, formula, and figure context
 - `analyze`: run science-specific workflows such as consistency checks and systematic review primitives
-- `doctor`: validate local configuration before heavier integrations land
+- `doctor`: validate server/runtime configuration before heavier integrations land
 
 This scaffold intentionally keeps heavyweight parsing and retrieval integrations out of the critical path. Those adapters belong to the next implementation phases documented in [`docs/architecture.md`](./docs/architecture.md) and [`docs/master-roadmap.md`](./docs/master-roadmap.md).
 
 The most important rule for future work is to keep workflow logic out of entrypoints. `cli.py` and `server.py` should call services; services should use domain models and adapters.
 
-Current integrated staging target is `ssh root@194.163.181.122`. Root access is acceptable for first provisioning only; the lasting deploy path should move to a dedicated non-root user.
+Current execution policy:
 
-## Quick Start
+- code can be edited from this Mac workspace
+- installs, tests, runtime, and deploy verification happen on the server
+- current remote target is `ssh root@194.163.181.122`
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -e '.[dev]'
-cp .env.example .env
-docker compose up -d postgres redis minio
-synapse doctor
-pytest
-```
+Do not treat the Mac as the default runtime environment for Synapse.
 
-To run the API:
+## Server-First Start
 
-```bash
-uvicorn synapse.server:app --reload
-```
+Use the remote server as the default execution environment. The canonical flow is:
 
-To inspect the CLI:
+1. edit code locally in this repo
+2. push changes to GitHub
+3. pull and run them on the server
+4. run install/test/runtime commands on the server or inside the server containers
 
-```bash
-synapse --help
-```
+The concrete runbook lives in [`docs/deploy.md`](./docs/deploy.md).
 
 ## Repository Guide
 
 - [`Agent.md`](./Agent.md): canonical operating manual for Codex and future agent work
 - [`AGENTS.md`](./AGENTS.md): thin agents entrypoint for toolchains that expect it
 - [`docs/master-roadmap.md`](./docs/master-roadmap.md): single operational roadmap and phase order
-- [`docs/deployment.md`](./docs/deployment.md): single-node VPS deploy/runbook baseline
+- [`docs/deploy.md`](./docs/deploy.md): canonical server deploy and operations runbook
+- [`docs/test-corpus.md`](./docs/test-corpus.md): canonical source and handling rules for golden PDFs
 - [`docs/repo-map.md`](./docs/repo-map.md): directory ownership and where new code belongs
 - [`docs/agent-prompts.md`](./docs/agent-prompts.md): prompt templates for parallel implementation work
 - [`docs/implementation-checklist.md`](./docs/implementation-checklist.md): chronological technical execution checklist
@@ -60,8 +53,8 @@ The master execution roadmap lives in [`docs/master-roadmap.md`](./docs/master-r
 - `postgres`: primary store with `pgvector`
 - `redis`: queue and transient workflow state
 - `minio`: PDF, figure, and artifact object storage
-- `app`: FastAPI control plane and local development entrypoint
+- `app`: FastAPI control plane and server runtime entrypoint
 
 ## Current Status
 
-The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. Phase 1 now includes real single-file and batch JSON ingest, parser adapters, and merge contracts. The next implementation pass should focus on golden corpus fixtures and the first quality gate run.
+The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. Phase 1 now includes real single-file and batch JSON ingest, parser adapters, and merge contracts. The next implementation pass should focus on selecting golden corpus fixtures from `/Users/timsmykov/Desktop/Статьи для теста` and running the first quality gate pass on the server.

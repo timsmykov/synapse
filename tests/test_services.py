@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from synapse.config import Settings
 from synapse.domain import DocumentRecord
 from synapse.domain.tasks import AnalyzeTaskRequest, IngestTaskRequest, QueryTaskRequest
 from synapse.ingest import DoclingParseResult, GrobidDependencyError
@@ -29,6 +30,25 @@ class ServicesTest(unittest.TestCase):
         self.assertEqual(report.command, "doctor")
         self.assertEqual(report.app_name, "Synapse")
         self.assertEqual(report.default_parser, "docling")
+        self.assertEqual(report.deployment_target, "local")
+        self.assertEqual(report.status, "ok")
+        self.assertEqual(report.grobid_url, "http://localhost:8070")
+        self.assertEqual(report.warnings, [])
+
+    def test_doctor_report_matches_remote_runtime_health_policy(self) -> None:
+        report = doctor_workflow(
+            Settings(
+                environment="staging",
+                deployment_target="staging",
+            )
+        )
+
+        self.assertEqual(report.status, "fail")
+        self.assertEqual(report.deployment_target, "staging")
+        checks = {check.name: check for check in report.checks}
+        self.assertEqual(checks["database_url"].status, "fail")
+        self.assertEqual(checks["public_base_url"].status, "warn")
+        self.assertTrue(report.warnings)
 
     def test_ingest_file_writes_json_output(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

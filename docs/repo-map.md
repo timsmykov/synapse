@@ -3,7 +3,7 @@
 ## Top level
 - `README.md` - project overview and quick start.
 - `pyproject.toml` - Python package metadata and tooling.
-- `docker-compose.yml` - local infrastructure stack.
+- `docker-compose.yml` - server/runtime infrastructure stack.
 - `.env.example` - environment variables.
 - `Agent.md` - canonical guide for Codex and any future agent work.
 
@@ -27,14 +27,15 @@
 - `docs/architecture.md` - product and technical architecture.
 - `docs/master-roadmap.md` - active execution order and phase status.
 - `docs/implementation-checklist.md` - checkbox ledger for execution progress.
-- `docs/deployment.md` - single-node VPS deploy/runbook baseline.
+- `docs/deploy.md` - canonical server deploy and operations runbook.
+- `docs/test-corpus.md` - canonical source and handling rules for the external golden PDF set.
 - `docs/roadmap.md` - condensed historical MVP snapshot, not the active execution map.
 - `docs/repo-map.md` - navigation guide.
 - `docs/agent-prompts.md` - prompt templates for subagents.
 
 ## Data and local assets
-- `data/` - local runtime data and scratch files.
-- `test_corpus/` - sample scientific PDFs for validation.
+- `data/` - generated artifacts and runtime data.
+- `test_corpus/` - corpus manifests, mirrors, and test metadata; the real golden PDFs live outside the repo.
 - `eval/` - evaluation scripts and metrics.
 
 ## Working rules

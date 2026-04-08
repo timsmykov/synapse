@@ -5,6 +5,8 @@ from unittest.mock import patch
 
 import synapse.cli as cli
 from synapse.domain import TaskReceipt
+from synapse.runtime_health import RuntimeHealthCheck
+from synapse.services.reporting import DoctorReport
 
 
 class CliTest(unittest.TestCase):
@@ -59,6 +61,51 @@ class CliTest(unittest.TestCase):
         self.assertEqual(analyze_payload["command"], "analyze")
         self.assertEqual(analyze_payload["receipt"]["result"]["corpus_id"], "data/corpus.db")
         self.assertEqual(analyze_payload["receipt"]["result"]["analysis_mode"], "systematic-review")
+
+    def test_doctor_payload_is_serializable(self) -> None:
+        with patch.object(
+            cli,
+            "doctor_workflow",
+            return_value=DoctorReport(
+                status="warn",
+                app_name="Synapse",
+                environment="staging",
+                version="0.1.0",
+                deployment_target="staging",
+                public_base_url="https://synapse.example.com",
+                reverse_proxy="caddy",
+                data_dir="data",
+                corpus_dir="test_corpus",
+                eval_dir="eval",
+                database_url="postgresql://postgres:5432/synapse",
+                redis_url="redis://redis:6379/0",
+                minio_endpoint="minio:9000",
+                minio_bucket="synapse-artifacts",
+                grobid_url="http://grobid:8070",
+                llm_provider="openai",
+                default_parser="docling",
+                default_embedding_model="specter2",
+                ingest_concurrency=2,
+                service_endpoints={
+                    "database_url": "postgresql://postgres:5432/synapse",
+                    "redis_url": "redis://redis:6379/0",
+                },
+                warnings=["reverse proxy missing hardening"],
+                checks=[
+                    RuntimeHealthCheck(
+                        name="reverse_proxy",
+                        status="warn",
+                        detail="reverse proxy needs HTTPS hardening",
+                    )
+                ],
+            ),
+        ):
+            doctor_payload = cli.doctor()
+
+        self.assertEqual(doctor_payload["command"], "doctor")
+        self.assertEqual(doctor_payload["status"], "warn")
+        self.assertEqual(doctor_payload["deployment_target"], "staging")
+        self.assertEqual(doctor_payload["checks"][0]["name"], "reverse_proxy")
 
 
 if __name__ == "__main__":
