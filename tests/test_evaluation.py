@@ -16,6 +16,7 @@ from synapse.domain import (
     TableCell,
 )
 from synapse.evaluation import (
+    audit_corpus_manifest,
     evaluate_document_record,
     evaluate_ingest_outputs,
     load_corpus_manifest,
@@ -161,6 +162,21 @@ class EvaluationTest(unittest.TestCase):
 
             with self.assertRaises(KeyError):
                 evaluate_ingest_outputs(manifest_path, output_path)
+
+    def test_audit_corpus_manifest_reports_missing_and_undocumented_files(self) -> None:
+        fixtures = load_corpus_manifest_data()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            corpus_dir = Path(temp_dir)
+            (corpus_dir / "extra.pdf").write_bytes(b"%PDF-1.4\n")
+            audit = audit_corpus_manifest(
+                fixtures,
+                manifest_path="test_corpus/corpus-manifest.template.json",
+                corpus_dir=corpus_dir,
+            )
+
+        self.assertEqual(audit.status, "fail")
+        self.assertIn("01-medicine-rct.pdf", audit.missing_files)
+        self.assertIn("extra.pdf", audit.undocumented_files)
 
 
 def load_corpus_manifest_data() -> list:

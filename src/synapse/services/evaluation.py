@@ -90,6 +90,12 @@ class MetricResult(SynapseModel):
     passed: bool
     detail: str
 
+    @property
+    def score(self) -> float:
+        """Compatibility alias used by the current test surface."""
+
+        return self.value
+
 
 class IngestEvaluationReport(SynapseModel):
     """Evaluation report for one fixture/document pair."""
