@@ -12,11 +12,13 @@ The current goal is a single remote server that acts as the default install, tes
 ## Current server policy
 
 - Use the VPS as the canonical Synapse execution environment.
+- Treat `root@194.163.181.122` as bootstrap and provisioning access, not as the long-lived deploy identity.
+- Move repeatable pull/deploy/check commands to a dedicated non-root deploy user as part of deploy hardening.
 - Do not install a local LLM runtime on the box.
 - Use API-backed models instead.
 - Do not touch Hermes-related containers, ports, or support processes.
 - Keep the Synapse stack isolated under its own Docker Compose project name.
-- Current host: `ssh root@194.163.181.122`
+- Current bootstrap host: `ssh root@194.163.181.122`
 
 ## Files
 
@@ -75,6 +77,7 @@ Then edit `deploy/.env.staging`:
 ```
 
 The script scopes all operations to the `synapse-testing` Docker Compose project unless overridden via `COMPOSE_PROJECT_NAME`.
+Until a non-root deploy user exists, treat this as a controlled bootstrap path rather than the final hardened deploy shape.
 
 ## Verify
 
@@ -97,6 +100,9 @@ If the services stay bound to loopback on the server, inspect them through an SS
 ```bash
 ssh -L 18080:127.0.0.1:18080 -L 19001:127.0.0.1:19001 root@194.163.181.122
 ```
+
+This example uses bootstrap access because that is the currently provisioned identity.
+Once a deploy user exists, use that user for routine inspection and deploy operations.
 
 Then open:
 

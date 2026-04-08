@@ -33,7 +33,8 @@ The first operational baseline uses these five source PDFs:
 - `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
 
 These are mapped to stable mirrored names in [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json).
-They are already synced to the server at `/srv/synapse/test_corpus/golden`.
+The repo-side manifest and [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh) are the authoritative bridge into the server corpus.
+The current server copy at `/srv/synapse/test_corpus/golden` was verified on 2026-04-08.
 
 ## Why These Five
 

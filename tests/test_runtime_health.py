@@ -72,6 +72,23 @@ class RuntimeHealthReportTest(unittest.TestCase):
         checks = {item.name: item for item in report.checks}
         self.assertEqual(checks["ingest_concurrency"].status, "warn")
 
+    def test_testing_target_uses_remote_server_checks(self) -> None:
+        report = build_runtime_health_report(
+            Settings(
+                environment="testing",
+                deployment_target="testing",
+            )
+        )
+
+        self.assertEqual(report.status, "fail")
+        checks = {item.name: item for item in report.checks}
+        self.assertEqual(checks["database_url"].status, "fail")
+        self.assertEqual(checks["redis_url"].status, "fail")
+        self.assertEqual(checks["minio_endpoint"].status, "fail")
+        self.assertEqual(checks["grobid_url"].status, "fail")
+        self.assertEqual(checks["public_base_url"].status, "warn")
+        self.assertEqual(checks["reverse_proxy"].status, "warn")
+
 
 if __name__ == "__main__":
     unittest.main()

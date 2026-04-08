@@ -92,6 +92,7 @@ Primary navigation:
 - [x] `services` boundary.
 - [x] Reserved package boundaries.
 - [x] Smoke tests и reproducible Python setup.
+- [x] Явная Phase 0 verification sweep зафиксирована в `docs/phase-0-verification.md`.
 
 ## Next Up
 

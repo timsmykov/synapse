@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from synapse.config import Settings
 from synapse.domain.common import SynapseModel
 
-REMOTE_TARGETS = {"staging", "production"}
+REMOTE_TARGETS = {"testing", "staging", "production"}
 
 
 class RuntimeHealthCheck(SynapseModel):

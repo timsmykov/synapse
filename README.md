@@ -19,7 +19,8 @@ Current execution policy:
 
 - code can be edited from this Mac workspace
 - installs, tests, runtime, and deploy verification happen on the server
-- current remote target is `ssh root@194.163.181.122`
+- current bootstrap/provisioning access is `ssh root@194.163.181.122`
+- long-lived deploy commands should move to a dedicated non-root deploy user
 
 Do not treat the Mac as the default runtime environment for Synapse.
 
@@ -41,6 +42,7 @@ The concrete runbook lives in [`docs/deploy.md`](./docs/deploy.md).
 - [`docs/master-roadmap.md`](./docs/master-roadmap.md): single operational roadmap and phase order
 - [`docs/deploy.md`](./docs/deploy.md): canonical server deploy and operations runbook
 - [`docs/test-corpus.md`](./docs/test-corpus.md): canonical source and handling rules for golden PDFs
+- [`docs/phase-0-verification.md`](./docs/phase-0-verification.md): explicit verification evidence and closeout for Phase 0 baseline
 - [`docs/repo-map.md`](./docs/repo-map.md): directory ownership and where new code belongs
 - [`docs/agent-prompts.md`](./docs/agent-prompts.md): prompt templates for parallel implementation work
 - [`docs/implementation-checklist.md`](./docs/implementation-checklist.md): chronological technical execution checklist
@@ -57,4 +59,4 @@ The master execution roadmap lives in [`docs/master-roadmap.md`](./docs/master-r
 
 ## Current Status
 
-The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. Phase 1 now includes real single-file and batch JSON ingest, parser adapters, and merge contracts. The next implementation pass should focus on selecting golden corpus fixtures from `/Users/timsmykov/Desktop/Статьи для теста` and running the first quality gate pass on the server.
+The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. Phase 0 has been explicitly verified, and Phase 1 already includes real single-file and batch JSON ingest, parser adapters, and merge contracts. The next implementation pass should focus on the first quality gate pass on the server against the selected golden corpus.
