@@ -1,0 +1,22 @@
+[
+  {
+    "document_id": "doc-01",
+    "file_name": "01-medicine-rct.pdf",
+    "domain": "medicine",
+    "layout_features": [
+      "tables",
+      "citations",
+      "multi_column"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 2,
+      "table_cells": 24,
+      "formulas": 0,
+      "figures": 1,
+      "citations": 18
+    },
+    "notes": "Use as the first ingestion regression fixture."
+  }
+]
+

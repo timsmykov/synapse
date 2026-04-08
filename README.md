@@ -43,8 +43,13 @@ synapse --help
 ## Repository Guide
 
 - [`Agent.md`](./Agent.md): canonical operating manual for Codex and future agent work
+- [`AGENTS.md`](./AGENTS.md): thin agents entrypoint for toolchains that expect it
+- [`docs/master-roadmap.md`](./docs/master-roadmap.md): single operational roadmap and phase order
 - [`docs/repo-map.md`](./docs/repo-map.md): directory ownership and where new code belongs
 - [`docs/agent-prompts.md`](./docs/agent-prompts.md): prompt templates for parallel implementation work
+- [`docs/implementation-checklist.md`](./docs/implementation-checklist.md): chronological technical execution checklist
+
+The master execution roadmap lives in [`docs/master-roadmap.md`](./docs/master-roadmap.md). The checkbox ledger lives in [`docs/implementation-checklist.md`](./docs/implementation-checklist.md). Future agents should read both before starting work and mark completed checklist items when they finish their scoped task.
 
 ## Planned Infrastructure
 

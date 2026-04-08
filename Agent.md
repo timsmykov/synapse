@@ -29,6 +29,8 @@ Use local repo docs as implementation mirrors, not as product invention:
 
 - `docs/architecture.md`
 - `docs/roadmap.md`
+- `docs/master-roadmap.md`
+- `docs/implementation-checklist.md`
 - `docs/repo-map.md`
 - `docs/agent-prompts.md`
 
@@ -102,6 +104,17 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - Do not add framework glue that is not yet needed by the MVP.
 - Document public entry points and any non-obvious side effects.
 
+## Roadmap Discipline
+
+- Read `docs/master-roadmap.md` before starting any scoped work.
+- Read `docs/implementation-checklist.md` before starting any scoped work.
+- Treat `docs/master-roadmap.md` as the master execution roadmap for the repo.
+- Treat `docs/implementation-checklist.md` as the progress ledger for checkbox status.
+- Before coding, identify which phase and which checklist items your task covers.
+- After completing a scoped task, update the relevant checklist items in the same pass.
+- If a task spans multiple phases, mark only the items you actually closed and leave the rest open.
+- Do not invent new sequencing; follow the dependency order already recorded in the roadmap and checklist.
+
 ## Working Rules For Agents
 
 - Read the relevant Notion source and the local docs before coding.
@@ -109,3 +122,20 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - Edit only the files needed for the task.
 - Do not revert unrelated user changes.
 - If a change affects provenance, storage, or CLI semantics, update the relevant docs in the same pass.
+
+## Subagent Operating Mode
+
+- Default to aggressive subagent usage whenever work can be parallelized safely.
+- Treat the available subagent pool as the default execution model, not as an exception path.
+- Keep the immediate blocking step local, but delegate adjacent exploration, implementation, and verification tasks in parallel.
+- Spawn explorer-style subagents to inspect separate areas of the codebase, trace call graphs, review docs, and surface constraints before or during implementation.
+- Spawn worker-style subagents for bounded code changes with explicit file ownership whenever multiple edits can proceed independently.
+- Prefer multiple narrow subagent tasks over one broad delegated task.
+- Give each subagent a concrete deliverable, clear boundaries, and a disjoint write scope whenever possible.
+- Tell subagents they are operating in a shared repo and must not revert or overwrite unrelated changes.
+- Use subagents for verification passes as well: tests, targeted reviews, regression checks, and doc-sync checks can run in parallel with coding.
+- Reuse active subagents when follow-up work stays in the same context, instead of restarting analysis from scratch.
+- Do not wait idly on one subagent if another useful task can be delegated or completed locally.
+- If a task is large, split it into discovery, implementation, and verification lanes and run them concurrently.
+- Only avoid delegation when the task is tiny, fully linear, or so tightly coupled that subagents would add coordination cost.
+- Optimize for iteration speed and total throughput across the whole team of agents, not for single-agent neatness.

@@ -14,9 +14,11 @@ data/*
 !data/.gitkeep
 eval/*
 !eval/.gitkeep
+!eval/contracts.md
 test_corpus/*
 !test_corpus/.gitkeep
+!test_corpus/README.md
+!test_corpus/corpus-manifest.template.json
 
 dist/
 build/
-
