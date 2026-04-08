@@ -15,6 +15,14 @@ The core value is traceable extraction from scientific PDFs into verifiable stru
 - Retrieval: LlamaIndex with hybrid vector + keyword + metadata search
 - Deployment: Docker Compose first, Kubernetes later
 
+## Code boundaries
+- `src/synapse/domain/` owns canonical artifacts, provenance, and request/response models.
+- `src/synapse/services/` owns use cases shared by CLI and API.
+- `src/synapse/ingest/` owns parser adapters and normalization.
+- `src/synapse/storage/` owns Postgres, MinIO, and queue persistence.
+- `src/synapse/retrieval/` owns indexes and query assembly.
+- `src/synapse/primitives/` owns review-specific analysis primitives.
+
 ## Core flow
 1. `synapse ingest` accepts PDFs and writes raw artifacts to object storage.
 2. Parsing normalizes document structure, tables, formulas, figures, metadata, and provenance.
@@ -39,6 +47,7 @@ The core value is traceable extraction from scientific PDFs into verifiable stru
 - `src/synapse/cli.py` owns command entry points.
 - `src/synapse/server.py` owns the FastAPI app.
 - `src/synapse/config.py` owns environment and settings.
+- `src/synapse/domain/` owns canonical schema for traceable research artifacts.
+- `src/synapse/services/` owns workflow orchestration shared by interfaces.
 - `docs/roadmap.md` is the source of truth for delivery order.
 - `docs/repo-map.md` is the source of truth for navigation.
-

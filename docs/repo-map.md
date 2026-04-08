@@ -12,6 +12,12 @@
 - `src/synapse/config.py` - settings and environment access.
 - `src/synapse/cli.py` - Typer commands.
 - `src/synapse/server.py` - FastAPI application.
+- `src/synapse/domain/` - canonical artifact and provenance models.
+- `src/synapse/services/` - shared use cases for CLI and API.
+- `src/synapse/ingest/` - parsing and ingestion adapter boundaries.
+- `src/synapse/storage/` - persistence and object storage boundaries.
+- `src/synapse/retrieval/` - indexing and query boundaries.
+- `src/synapse/primitives/` - research-primitives boundaries.
 
 ## Tests
 - `tests/` - unit and integration tests.
@@ -32,4 +38,5 @@
 - Do not move implementation logic into docs.
 - Keep CLI behavior visible and easy to test.
 - Prefer adding one clear module per responsibility instead of large utility files.
+- Keep entrypoints thin and route work through `services/` and `domain/`.
 - If a future file is not obvious, update this map.

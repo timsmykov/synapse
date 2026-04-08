@@ -10,7 +10,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from .config import get_settings
+from .services import doctor_workflow
 
 try:  # pragma: no cover - exercised when FastAPI is installed later.
     from fastapi import FastAPI as _FastAPI
@@ -42,11 +42,11 @@ class _FallbackFastAPI:
 
 
 def create_app() -> Any:
-    settings = get_settings()
+    report = doctor_workflow()
     if _FastAPI is None:
-        app = _FallbackFastAPI(title=settings.app_name, version=settings.version)
+        app = _FallbackFastAPI(title=report.app_name, version=report.version)
     else:  # pragma: no cover - only when FastAPI is installed.
-        app = _FastAPI(title=settings.app_name, version=settings.version)
+        app = _FastAPI(title=report.app_name, version=report.version)
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -55,9 +55,9 @@ def create_app() -> Any:
     @app.get("/info")
     def info() -> dict[str, Any]:
         return {
-            "app_name": settings.app_name,
-            "environment": settings.environment,
-            "version": settings.version,
+            "app_name": report.app_name,
+            "environment": report.environment,
+            "version": report.version,
             "components": [
                 "cli-first",
                 "docling",

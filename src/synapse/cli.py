@@ -9,7 +9,14 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .config import get_settings
+from .domain.tasks import AnalyzeTaskRequest, IngestTaskRequest, QueryTaskRequest
+from .services import (
+    DoctorReport,
+    analyze_workflow,
+    doctor_workflow,
+    ingest_workflow,
+    query_workflow,
+)
 
 try:  # pragma: no cover - exercised when Typer is installed later.
     import typer as _typer
@@ -42,13 +49,9 @@ else:  # pragma: no cover - only when Typer is installed.
     app = _typer.Typer(add_completion=False, help="Synapse CLI")
 
 
-def _format_payload(command: str, **fields: Any) -> dict[str, Any]:
-    payload = {"command": command}
-    payload.update(fields)
-    return payload
-
-
-def _finalize_payload(payload: dict[str, Any]) -> dict[str, Any]:
+def _finalize_payload(payload: Any) -> Any:
+    if hasattr(payload, "model_dump"):
+        payload = payload.model_dump()
     if _typer is not None:
         _typer.echo(json.dumps(payload, indent=2, sort_keys=True))
     return payload
@@ -61,7 +64,16 @@ def ingest(
 ) -> dict[str, Any]:
     """Prepare a corpus ingest job."""
 
-    return _finalize_payload(_format_payload("ingest", source=source, output=output))
+    request = IngestTaskRequest(source_uri=source)
+    receipt = ingest_workflow(request)
+    return _finalize_payload(
+        {
+            "command": "ingest",
+            "source": source,
+            "output": output,
+            "receipt": receipt.model_dump(),
+        }
+    )
 
 
 @app.command("query")
@@ -71,7 +83,11 @@ def query(
 ) -> dict[str, Any]:
     """Prepare a retrieval query job."""
 
-    return _finalize_payload(_format_payload("query", prompt=prompt, limit=limit))
+    request = QueryTaskRequest(query=prompt, top_k=limit)
+    receipt = query_workflow(request)
+    return _finalize_payload(
+        {"command": "query", "prompt": prompt, "limit": limit, "receipt": receipt.model_dump()}
+    )
 
 
 @app.command("analyze")
@@ -81,15 +97,19 @@ def analyze(
 ) -> dict[str, Any]:
     """Prepare an analysis job."""
 
-    return _finalize_payload(_format_payload("analyze", corpus=corpus, mode=mode))
+    request = AnalyzeTaskRequest(corpus_id=corpus, analysis_mode=mode)
+    receipt = analyze_workflow(request)
+    return _finalize_payload(
+        {"command": "analyze", "corpus": corpus, "mode": mode, "receipt": receipt.model_dump()}
+    )
 
 
 @app.command("doctor")
 def doctor() -> dict[str, Any]:
     """Report the current runtime and configuration state."""
 
-    settings = get_settings()
-    return _finalize_payload(_format_payload("doctor", settings=settings.summary))
+    report: DoctorReport = doctor_workflow()
+    return _finalize_payload(report)
 
 
 def main() -> None:

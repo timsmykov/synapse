@@ -2,6 +2,8 @@
 
 Synapse is a CLI-first research context layer for systematic reviews and meta-analyses. The initial repository scaffold is aligned to the Notion plan: Python 3.12, Typer CLI, FastAPI control plane, PostgreSQL + pgvector + MinIO + Redis infrastructure, and a repository layout optimized for agent-driven development.
 
+The current baseline now includes the missing architectural seams for Day 1 work: a canonical domain/provenance model, a shared service layer for CLI/API, and reserved package boundaries for ingestion, storage, retrieval, and primitives.
+
 ## Scope
 
 - `ingest`: parse scientific PDFs into traceable structured artifacts
@@ -10,6 +12,8 @@ Synapse is a CLI-first research context layer for systematic reviews and meta-an
 - `doctor`: validate local configuration before heavier integrations land
 
 This scaffold intentionally keeps heavyweight parsing and retrieval integrations out of the critical path. Those adapters belong to the next implementation phases documented in [`docs/architecture.md`](./docs/architecture.md) and [`docs/roadmap.md`](./docs/roadmap.md).
+
+The most important rule for future work is to keep workflow logic out of entrypoints. `cli.py` and `server.py` should call services; services should use domain models and adapters.
 
 ## Quick Start
 

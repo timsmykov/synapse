@@ -48,6 +48,12 @@ If repo docs and Notion diverge, pause and align them before coding beyond the i
 ## Expected Repo Shape
 
 - `src/synapse/` for the Python package.
+- `src/synapse/domain/` for canonical artifact and provenance models.
+- `src/synapse/services/` for shared use cases invoked by CLI and API.
+- `src/synapse/ingest/` for parsing and ingestion adapters.
+- `src/synapse/storage/` for persistence and object storage adapters.
+- `src/synapse/retrieval/` for indexing and query logic.
+- `src/synapse/primitives/` for review-specific analysis primitives.
 - `tests/` for unit and integration tests.
 - `docs/` for implementation guidance and repo maps.
 - `data/` for local working data and generated artifacts.
@@ -90,6 +96,7 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - Keep modules short and purpose-built.
 - Prefer clear names over compressed abstractions.
 - Add tests for new behavior, especially CLI parsing, config loading, and health endpoints.
+- Add contract tests for domain shapes and service outputs as soon as those layers exist.
 - Keep error messages actionable.
 - Use typed Python where it improves reliability.
 - Do not add framework glue that is not yet needed by the MVP.
@@ -102,4 +109,3 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - Edit only the files needed for the task.
 - Do not revert unrelated user changes.
 - If a change affects provenance, storage, or CLI semantics, update the relevant docs in the same pass.
-
