@@ -38,7 +38,7 @@ synapse --help
 
 ## Repository Guide
 
-- [`Agent.md`](./Agent.md): canonical operating manual for agents
+- [`Agent.md`](./Agent.md): canonical operating manual for Codex and future agent work
 - [`docs/repo-map.md`](./docs/repo-map.md): directory ownership and where new code belongs
 - [`docs/agent-prompts.md`](./docs/agent-prompts.md): prompt templates for parallel implementation work
 

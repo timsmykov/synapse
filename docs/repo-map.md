@@ -5,8 +5,7 @@
 - `pyproject.toml` - Python package metadata and tooling.
 - `docker-compose.yml` - local infrastructure stack.
 - `.env.example` - environment variables.
-- `Agent.md` - canonical guide for future agents.
-- `CLAUDE.md` and `AGENTS.md` - compatibility shims.
+- `Agent.md` - canonical guide for Codex and any future agent work.
 
 ## Source
 - `src/synapse/__init__.py` - package entry.
@@ -34,4 +33,3 @@
 - Keep CLI behavior visible and easy to test.
 - Prefer adding one clear module per responsibility instead of large utility files.
 - If a future file is not obvious, update this map.
-
