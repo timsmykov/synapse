@@ -28,13 +28,17 @@ Use these as the authoritative product references:
 Use local repo docs as implementation mirrors, not as product invention:
 
 - `docs/architecture.md`
-- `docs/roadmap.md`
 - `docs/master-roadmap.md`
 - `docs/implementation-checklist.md`
+- `docs/deployment.md`
 - `docs/repo-map.md`
 - `docs/agent-prompts.md`
 
+`docs/roadmap.md` may remain as a compact historical snapshot, but it is not the active execution source of truth.
+
 If repo docs and Notion diverge, pause and align them before coding beyond the immediate task.
+
+Current staging/integration target is `ssh root@194.163.181.122`. Treat `root` as provisioning-only access; long-lived deploy scripts and compose operations should move to a dedicated non-root deploy user.
 
 ## Development Principles
 
@@ -127,6 +131,7 @@ If a command is not implemented yet, add the smallest practical stub and documen
 
 - Default to aggressive subagent usage whenever work can be parallelized safely.
 - Treat the available subagent pool as the default execution model, not as an exception path.
+- Use only the frontier `gpt-5.4` model for subagents; do not use `gpt-5.4-mini` or other mini variants.
 - Keep the immediate blocking step local, but delegate adjacent exploration, implementation, and verification tasks in parallel.
 - Spawn explorer-style subagents to inspect separate areas of the codebase, trace call graphs, review docs, and surface constraints before or during implementation.
 - Spawn worker-style subagents for bounded code changes with explicit file ownership whenever multiple edits can proceed independently.

@@ -1,5 +1,9 @@
 # Synapse Roadmap
 
+Legacy note: this file is a compact MVP snapshot only.
+Active execution order lives in `docs/master-roadmap.md`.
+Progress tracking lives in `docs/implementation-checklist.md`.
+
 ## Goal
 Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenance, and answer traceable research queries from the CLI.
 
@@ -31,12 +35,14 @@ Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenanc
 - Add a minimal Python SDK layer if needed.
 - Add smoke tests and end-to-end checks.
 - Clean up error handling and output formatting.
+- Add CI validation for lint, unit, contract, and compose smoke checks.
 
 ## Day 5
 - Polish docs and examples.
 - Run final smoke tests against the test corpus.
 - Freeze the MVP scope.
 - Prepare the next iteration plan for better retrieval and extraction quality.
+- Prepare the first remote staging deploy on a single VPS with HTTPS and conservative ingest concurrency.
 
 ## Build order
 1. Repo skeleton and developer tooling.
@@ -51,4 +57,4 @@ Ship a working MVP in 5 days that can ingest scientific PDFs, preserve provenanc
 - `synapse query` returns traceable results.
 - Outputs link back to source documents.
 - The system runs self-hosted without external dependencies in the happy path.
-
+- A shared remote staging environment can run integrated parser/storage tests outside the developer laptop.

@@ -11,9 +11,11 @@ The current baseline now includes the missing architectural seams for Day 1 work
 - `analyze`: run science-specific workflows such as consistency checks and systematic review primitives
 - `doctor`: validate local configuration before heavier integrations land
 
-This scaffold intentionally keeps heavyweight parsing and retrieval integrations out of the critical path. Those adapters belong to the next implementation phases documented in [`docs/architecture.md`](./docs/architecture.md) and [`docs/roadmap.md`](./docs/roadmap.md).
+This scaffold intentionally keeps heavyweight parsing and retrieval integrations out of the critical path. Those adapters belong to the next implementation phases documented in [`docs/architecture.md`](./docs/architecture.md) and [`docs/master-roadmap.md`](./docs/master-roadmap.md).
 
 The most important rule for future work is to keep workflow logic out of entrypoints. `cli.py` and `server.py` should call services; services should use domain models and adapters.
+
+Current integrated staging target is `ssh root@194.163.181.122`. Root access is acceptable for first provisioning only; the lasting deploy path should move to a dedicated non-root user.
 
 ## Quick Start
 
@@ -45,9 +47,11 @@ synapse --help
 - [`Agent.md`](./Agent.md): canonical operating manual for Codex and future agent work
 - [`AGENTS.md`](./AGENTS.md): thin agents entrypoint for toolchains that expect it
 - [`docs/master-roadmap.md`](./docs/master-roadmap.md): single operational roadmap and phase order
+- [`docs/deployment.md`](./docs/deployment.md): single-node VPS deploy/runbook baseline
 - [`docs/repo-map.md`](./docs/repo-map.md): directory ownership and where new code belongs
 - [`docs/agent-prompts.md`](./docs/agent-prompts.md): prompt templates for parallel implementation work
 - [`docs/implementation-checklist.md`](./docs/implementation-checklist.md): chronological technical execution checklist
+- [`docs/roadmap.md`](./docs/roadmap.md): legacy condensed MVP snapshot, not the execution source of truth
 
 The master execution roadmap lives in [`docs/master-roadmap.md`](./docs/master-roadmap.md). The checkbox ledger lives in [`docs/implementation-checklist.md`](./docs/implementation-checklist.md). Future agents should read both before starting work and mark completed checklist items when they finish their scoped task.
 
@@ -60,4 +64,4 @@ The master execution roadmap lives in [`docs/master-roadmap.md`](./docs/master-r
 
 ## Current Status
 
-The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. The next implementation pass should focus on the Day 1 ingestion pipeline and corpus evaluation harness.
+The repository has been reset from the old landing-page codebase and reinitialized as a clean Synapse backend/CLI project. Phase 1 now includes real single-file and batch JSON ingest, parser adapters, and merge contracts. The next implementation pass should focus on golden corpus fixtures and the first quality gate run.

@@ -25,7 +25,10 @@
 
 ## Docs
 - `docs/architecture.md` - product and technical architecture.
-- `docs/roadmap.md` - delivery order and MVP scope.
+- `docs/master-roadmap.md` - active execution order and phase status.
+- `docs/implementation-checklist.md` - checkbox ledger for execution progress.
+- `docs/deployment.md` - single-node VPS deploy/runbook baseline.
+- `docs/roadmap.md` - condensed historical MVP snapshot, not the active execution map.
 - `docs/repo-map.md` - navigation guide.
 - `docs/agent-prompts.md` - prompt templates for subagents.
 

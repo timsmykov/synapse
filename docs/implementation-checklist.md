@@ -23,14 +23,14 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
-- [ ] Реализовать `Docling` adapter в `src/synapse/ingest/`.
-- [ ] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
-- [ ] Зафиксировать merge-contract: как `Docling` и `GROBID` собираются в один `DocumentRecord`.
-- [ ] Сделать реальный `synapse ingest <path>` для одного PDF.
-- [ ] Поддержать batch ingest для директории / glob.
-- [ ] Обеспечить сохранение provenance для каждого artifact: `source_document_id`, `page_number`, `bbox`, `parser`, `confidence`.
-- [ ] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
-- [ ] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
+- [x] Реализовать `Docling` adapter в `src/synapse/ingest/`.
+- [x] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
+- [x] Зафиксировать merge-contract: как `Docling` и `GROBID` собираются в один `DocumentRecord`.
+- [x] Сделать реальный `synapse ingest <path>` для одного PDF.
+- [x] Поддержать batch ingest для директории / glob.
+- [x] Обеспечить сохранение provenance для каждого artifact: `source_document_id`, `page_number`, `bbox`, `parser`, `confidence`.
+- [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
+- [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [ ] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
 
 ## Phase 2. Storage And Persistence Layer
@@ -78,6 +78,10 @@ Primary navigation:
 - [ ] Закрыть README/examples реальными командами и expected output.
 - [ ] Добавить smoke flow: `docker compose up` -> ingest -> query -> analyze.
 - [ ] Зафиксировать acceptance criteria для MVP на одном понятном dataset.
+- [ ] Поднять CI pipeline для `ruff`, `pytest`, contract tests и compose smoke checks.
+- [ ] Зафиксировать remote staging baseline на single-node VPS: `app`, `worker`, `postgres`, `redis`, `minio`, `grobid`, reverse proxy.
+- [ ] Закрыть deploy hardening для staging: non-root deploy user, HTTPS, закрытые internal ports, backup policy для Postgres и MinIO.
+- [ ] Зафиксировать триггеры, когда staging и production должны быть разведены на разные узлы.
 
 ## Closed Now
 
@@ -93,9 +97,15 @@ Primary navigation:
 
 Следующий правильный execution slice:
 
-1. Реализовать `Docling` adapter.
-2. Реализовать `GROBID` adapter.
-3. Собрать первый реальный `synapse ingest <pdf>` с `DocumentRecord` JSON output.
-4. Прогнать ingest на первом golden fixture и проверить gates из `eval/contracts.md`.
+1. Положить первые 3-5 реальных golden PDF в `test_corpus/` и описать их в manifest.
+2. Прогнать `synapse ingest` по golden fixtures и зафиксировать первые quality gaps.
+3. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
+
+## Environment Policy
+
+- Локальная машина нужна для быстрого inner loop: `pytest`, CLI smoke, contract tests.
+- Общий VPS нужен как staging/integration box, а не как замена локальной разработке.
+- До отдельного production node допускается один VPS для staging и приватных demo-нагрузок, но без тяжёлого локального LLM inference на той же машине.
+- Текущий staging target: `ssh root@194.163.181.122`. Root использовать только для первичного provisioning; deploy path должен перейти на отдельного non-root пользователя.

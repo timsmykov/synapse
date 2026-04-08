@@ -26,6 +26,11 @@ DEFAULT_MINIO_BUCKET = "synapse-artifacts"
 DEFAULT_LLM_PROVIDER = "ollama"
 DEFAULT_PARSER = "docling"
 DEFAULT_EMBEDDING_MODEL = "specter2"
+DEFAULT_DEPLOYMENT_TARGET = "local"
+DEFAULT_PUBLIC_BASE_URL = ""
+DEFAULT_REVERSE_PROXY = "none"
+DEFAULT_GROBID_URL = "http://localhost:8070"
+DEFAULT_INGEST_CONCURRENCY = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +52,11 @@ class Settings:
     llm_provider: str = DEFAULT_LLM_PROVIDER
     default_parser: str = DEFAULT_PARSER
     default_embedding_model: str = DEFAULT_EMBEDDING_MODEL
+    deployment_target: str = DEFAULT_DEPLOYMENT_TARGET
+    public_base_url: str = DEFAULT_PUBLIC_BASE_URL
+    reverse_proxy: str = DEFAULT_REVERSE_PROXY
+    grobid_url: str = DEFAULT_GROBID_URL
+    ingest_concurrency: int = DEFAULT_INGEST_CONCURRENCY
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -69,6 +79,28 @@ class Settings:
                 "SYNAPSE_DEFAULT_EMBEDDING_MODEL",
                 DEFAULT_EMBEDDING_MODEL,
             ),
+            deployment_target=os.getenv(
+                "SYNAPSE_DEPLOYMENT_TARGET",
+                DEFAULT_DEPLOYMENT_TARGET,
+            ),
+            public_base_url=os.getenv(
+                "SYNAPSE_PUBLIC_BASE_URL",
+                DEFAULT_PUBLIC_BASE_URL,
+            ),
+            reverse_proxy=os.getenv(
+                "SYNAPSE_REVERSE_PROXY",
+                DEFAULT_REVERSE_PROXY,
+            ),
+            grobid_url=os.getenv("SYNAPSE_GROBID_URL", DEFAULT_GROBID_URL),
+            ingest_concurrency=max(
+                1,
+                int(
+                    os.getenv(
+                        "SYNAPSE_INGEST_CONCURRENCY",
+                        str(DEFAULT_INGEST_CONCURRENCY),
+                    )
+                ),
+            ),
         )
 
     @property
@@ -89,6 +121,11 @@ class Settings:
             "llm_provider": self.llm_provider,
             "default_parser": self.default_parser,
             "default_embedding_model": self.default_embedding_model,
+            "deployment_target": self.deployment_target,
+            "public_base_url": self.public_base_url,
+            "reverse_proxy": self.reverse_proxy,
+            "grobid_url": self.grobid_url,
+            "ingest_concurrency": str(self.ingest_concurrency),
         }
 
 

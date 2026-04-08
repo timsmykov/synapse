@@ -19,6 +19,7 @@ class TaskRequest(SynapseModel):
 class IngestTaskRequest(TaskRequest):
     task_type: Literal["ingest"] = "ingest"
     source_uri: str
+    output_uri: str = "data/ingest"
     parser: str = "docling"
     force: bool = False
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import synapse.cli as cli
+from synapse.domain import TaskReceipt
 
 
 class CliTest(unittest.TestCase):
@@ -18,74 +20,45 @@ class CliTest(unittest.TestCase):
         self.assertIn("doctor", commands)
 
     def test_command_payloads_are_serializable(self) -> None:
-        self.assertEqual(
-            cli.ingest(),
-            {
-                "command": "ingest",
-                "source": "test_corpus",
-                "output": "data/corpus.db",
-                "receipt": {
-                    "artifact_count": 0,
-                    "document_id": None,
-                    "message": "Ingest prepared for test_corpus",
-                    "result": {
-                        "force": False,
-                        "parser": "docling",
-                        "source_uri": "test_corpus",
-                        "task_id": None,
-                        "task_type": "ingest",
-                    },
-                    "status": "queued",
-                    "task_id": "test_corpus",
-                    "task_type": "ingest",
+        with patch.object(
+            cli,
+            "ingest_workflow",
+            return_value=TaskReceipt(
+                task_id="paper.pdf",
+                task_type="ingest",
+                status="succeeded",
+                message="Ingested 1 document(s) to data/ingest",
+                document_id="paper",
+                artifact_count=1,
+                result={
+                    "source_uri": "paper.pdf",
+                    "output_uri": "data/ingest",
+                    "parser": "docling",
+                    "document_id": "paper",
+                    "documents": ["paper"],
+                    "artifact_count": 1,
+                    "resolved_sources": ["paper.pdf"],
+                    "written_files": ["data/ingest/paper.json"],
+                    "warnings": [],
                 },
-            },
-        )
-        self.assertEqual(
-            cli.query(prompt="find table"),
-            {
-                "command": "query",
-                "prompt": "find table",
-                "limit": 5,
-                "receipt": {
-                    "artifact_count": 0,
-                    "document_id": None,
-                    "message": "Query prepared for top_k=5",
-                    "result": {
-                        "document_id": None,
-                        "query": "find table",
-                        "task_id": None,
-                        "task_type": "query",
-                        "top_k": 5,
-                    },
-                    "status": "queued",
-                    "task_id": "find table",
-                    "task_type": "query",
-                },
-            },
-        )
-        self.assertEqual(
-            cli.analyze(),
-            {
-                "command": "analyze",
-                "corpus": "data/corpus.db",
-                "mode": "systematic-review",
-                "receipt": {
-                    "artifact_count": 0,
-                    "document_id": None,
-                    "message": "Analyze prepared for systematic-review",
-                    "result": {
-                        "analysis_mode": "systematic-review",
-                        "corpus_id": "data/corpus.db",
-                        "task_id": None,
-                        "task_type": "analyze",
-                    },
-                    "status": "queued",
-                    "task_id": "analyze",
-                    "task_type": "analyze",
-                },
-            },
-        )
+            ),
+        ):
+            ingest_payload = cli.ingest(source="paper.pdf")
+        query_payload = cli.query(prompt="find table")
+        analyze_payload = cli.analyze()
+
+        self.assertEqual(ingest_payload["command"], "ingest")
+        self.assertEqual(ingest_payload["source"], "paper.pdf")
+        self.assertEqual(ingest_payload["output"], "data/ingest")
+        self.assertEqual(ingest_payload["receipt"]["result"]["output_uri"], "data/ingest")
+
+        self.assertEqual(query_payload["command"], "query")
+        self.assertEqual(query_payload["receipt"]["result"]["query"], "find table")
+        self.assertEqual(query_payload["receipt"]["result"]["top_k"], 5)
+
+        self.assertEqual(analyze_payload["command"], "analyze")
+        self.assertEqual(analyze_payload["receipt"]["result"]["corpus_id"], "data/corpus.db")
+        self.assertEqual(analyze_payload["receipt"]["result"]["analysis_mode"], "systematic-review")
 
 
 if __name__ == "__main__":

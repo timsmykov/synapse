@@ -1,15 +1,31 @@
 """Ingestion boundary for Synapse.
 
-Reserved for Day 1 ingestion work. Concrete Docling/GROBID/MinerU
-implementations should live in modules under this package, not in CLI
-or API entrypoints.
+Concrete Docling/GROBID/MinerU implementations should live in modules
+under this package, not in CLI or API entrypoints.
 """
 
 from __future__ import annotations
 
 from typing import Any, Protocol, runtime_checkable
 
-__all__ = ["IngestionAdapter"]
+from .docling_adapter import DoclingAdapter, DoclingDependencyError
+from .grobid_adapter import GrobidAdapter, GrobidDependencyError
+from .io import resolve_ingest_sources, write_document_records
+from .merge import merge_document_record
+from .models import DoclingParseResult, GrobidMetadataResult
+
+__all__ = [
+    "DoclingAdapter",
+    "DoclingDependencyError",
+    "DoclingParseResult",
+    "GrobidAdapter",
+    "GrobidDependencyError",
+    "GrobidMetadataResult",
+    "IngestionAdapter",
+    "merge_document_record",
+    "resolve_ingest_sources",
+    "write_document_records",
+]
 
 
 @runtime_checkable

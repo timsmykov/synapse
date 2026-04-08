@@ -6,6 +6,7 @@ Before work:
 - read [docs/master-roadmap.md](/Users/timsmykov/Desktop/Synapse/docs/master-roadmap.md)
 - read [docs/implementation-checklist.md](/Users/timsmykov/Desktop/Synapse/docs/implementation-checklist.md)
 - identify the exact phase and checklist items you own
+- if you use subagents, use only `gpt-5.4`; do not use mini variants
 
 After work:
 - update the roadmap if sequencing changed

@@ -60,11 +60,11 @@ def _finalize_payload(payload: Any) -> Any:
 @app.command("ingest")
 def ingest(
     source: str = "test_corpus",
-    output: str = "data/corpus.db",
+    output: str = "data/ingest",
 ) -> dict[str, Any]:
-    """Prepare a corpus ingest job."""
+    """Ingest one PDF, directory, or glob into structured JSON output."""
 
-    request = IngestTaskRequest(source_uri=source)
+    request = IngestTaskRequest(source_uri=source, output_uri=output)
     receipt = ingest_workflow(request)
     return _finalize_payload(
         {

@@ -20,6 +20,24 @@ Already done:
 - test corpus contract and evaluation contract
 - smoke tests for config, CLI, services, and API
 
+## Operational Baseline
+
+The repo should target three execution environments:
+
+- local Mac development for the fast inner loop
+- CI for mandatory validation on every push/PR
+- a remote single-node staging box for integrated service testing and manual QA
+
+This does not change the product build order. It defines where each class of testing and deployment should happen.
+
+Current remote target assumption:
+
+- one VPS is acceptable for shared staging and early private demos
+- current operator-provided host is `ssh root@194.163.181.122`
+- treat a 4 vCPU / 8 GB RAM / 100+ GB disk class machine as the minimum practical starter box
+- do not colocate heavy local LLM inference on that same node during the MVP phase
+- keep ingest concurrency conservative until parser memory profiles are measured on real PDFs
+
 ## Execution Order
 
 1. Test corpus and evaluation gates
@@ -44,13 +62,19 @@ The repo now has the structural baseline required for Day 1 work.
 
 ### Phase 1. Ingestion Contract And Parsing Pipeline
 
-Next work:
+Status: in progress.
 
-- define ingest IO contract
-- implement Docling adapter
-- implement GROBID adapter
-- define merge rules into `DocumentRecord`
-- emit structured JSON before persistence
+Closed in this slice:
+
+- ingest IO contract for single PDF, directory, and glob sources
+- Docling adapter normalization into structured parser output
+- GROBID metadata adapter with optional dependency fallback
+- merge rules into canonical `DocumentRecord`
+- structured JSON output from `synapse ingest`
+- contract coverage for ingest IO and merge behavior
+
+Remaining:
+
 - add golden fixtures for tables, formulas, and multi-column layout
 
 Success means:
@@ -68,6 +92,7 @@ After ingestion is stable:
 - add MinIO artifact storage
 - wire persistence from ingest to storage
 - bootstrap local infra health checks
+- prepare the remote staging compose profile once Postgres, Redis, and MinIO contracts are stable
 
 ### Phase 3. Retrieval And Indexing Layer
 
@@ -102,18 +127,29 @@ Final step:
 - add SDK if needed
 - complete docs/examples
 - verify the full `docker compose up -> ingest -> query -> analyze` flow
+- wire CI gates for lint, unit, contract, and compose smoke tests
+- formalize the single-node staging deploy path behind HTTPS reverse proxy
+- separate staging and production once traffic or ingest concurrency justifies another node
 
 ## What Is Next Now
 
 The next execution slice is:
 
-1. implement `src/synapse/ingest/docling_adapter.py`
-2. implement `src/synapse/ingest/grobid_adapter.py`
-3. add `src/synapse/ingest/merge.py`
-4. wire `synapse ingest` to emit local JSON output
-5. run the first golden fixture through the ingest path
+1. add the first golden PDFs and manifest entries under `test_corpus/`
+2. run `synapse ingest` across those fixtures and capture shape and quality gaps
+3. lock the first acceptance expectations in `eval/contracts.md`
+4. begin Phase 2 storage interfaces only after the golden ingest pass is stable
 
 Do not move to storage or retrieval until this slice is green.
+
+## Testing And Deploy Policy
+
+Use this operating model during the MVP:
+
+1. Run unit, contract, and quick CLI tests locally on the Mac.
+2. Run repeatable validation in CI before deploy.
+3. Run integrated parser/storage tests and manual QA on the remote staging box.
+4. Treat production as a later isolation step, not as a prerequisite for Phase 1-3 delivery.
 
 ## Operating Rules For Agents
 
@@ -124,4 +160,3 @@ Do not move to storage or retrieval until this slice is green.
 - If a task changes the execution order, update this file first, then the checklist.
 - Keep entrypoints thin; put logic into `domain`, `services`, or the relevant layer package.
 - Treat the checklist as the progress ledger and this file as the strategic execution map.
-
