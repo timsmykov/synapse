@@ -15,7 +15,7 @@ if str(SRC) not in sys.path:
 
 
 def main() -> int:
-    from synapse.evaluation import evaluate_ingest_outputs
+    from synapse.evaluation import IngestCoverageError, evaluate_ingest_outputs
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -29,7 +29,17 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    reports = evaluate_ingest_outputs(args.manifest, args.ingest_output)
+    try:
+        reports = evaluate_ingest_outputs(args.manifest, args.ingest_output)
+    except (IngestCoverageError, KeyError) as exc:
+        payload = {
+            "reports": [],
+            "passed": False,
+            "error": str(exc),
+        }
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 1
+
     payload = {
         "reports": [report.model_dump(mode="json") for report in reports],
         "passed": all(report.passed for report in reports),

@@ -23,6 +23,8 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
+Phase 1 status: in progress. The canonical golden baseline now lives in `test_corpus/corpus-manifest.json`, and Phase 1 must remain open until the full golden output set is evaluated against that manifest with no missing fixtures. See `docs/phase-1-verification.md`.
+
 - [x] Реализовать `Docling` adapter в `src/synapse/ingest/`.
 - [x] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
 - [x] Зафиксировать merge-contract: как `Docling` и `GROBID` собираются в один `DocumentRecord`.
@@ -32,6 +34,7 @@ Primary navigation:
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
+- [ ] Прогнать полный golden fixture set на VPS и зафиксировать Phase 1 verification against `test_corpus/corpus-manifest.json`.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -98,8 +101,11 @@ Primary navigation:
 
 Следующий правильный execution slice:
 
-1. Прогнать `synapse ingest` по golden fixtures в `/srv/synapse/test_corpus/golden` и зафиксировать первые quality gaps.
-2. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
+1. Прогнать `synapse ingest` по полному golden fixture set в `/srv/synapse/test_corpus/golden`.
+2. Прогнать `scripts/evaluate_ingest.py` по полному output set против `test_corpus/corpus-manifest.json`.
+3. Упасть, если в output set нет хотя бы одного `document_id` из канонического manifest.
+4. Зафиксировать результат в `docs/phase-1-verification.md`.
+5. Только после этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 

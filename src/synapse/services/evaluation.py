@@ -109,6 +109,10 @@ class IngestEvaluationReport(SynapseModel):
     passed: bool
 
 
+class IngestCoverageError(ValueError):
+    """Raised when an ingest output set does not cover the selected manifest."""
+
+
 def load_corpus_manifest(manifest_path: str | Path) -> list[CorpusFixture]:
     """Load and validate the corpus manifest JSON file."""
 
@@ -245,13 +249,22 @@ def evaluate_ingest_outputs(
     fixtures = load_corpus_manifest(manifest_path)
     fixture_index = {fixture.document_id: fixture for fixture in fixtures}
     reports: list[IngestEvaluationReport] = []
+    evaluated_document_ids: set[str] = set()
     for record in load_document_records(output_path):
         fixture = fixture_index.get(record.document_id)
         if fixture is None:
             raise KeyError(
                 f"document_id {record.document_id!r} is missing from the corpus manifest"
             )
+        evaluated_document_ids.add(record.document_id)
         reports.append(evaluate_document_record(record, fixture))
+
+    missing_document_ids = sorted(set(fixture_index) - evaluated_document_ids)
+    if missing_document_ids:
+        raise IngestCoverageError(
+            "ingest outputs do not cover the full corpus manifest; "
+            f"missing document_ids: {', '.join(missing_document_ids)}"
+        )
     return reports
 
 

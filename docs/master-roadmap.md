@@ -77,13 +77,16 @@ Closed in this slice:
 
 Remaining:
 
-- add golden fixtures for tables, formulas, and multi-column layout
+- run the full golden ingest sweep on the VPS-backed corpus
+- evaluate the full output set against `test_corpus/corpus-manifest.json`
+- keep Phase 1 open until the evaluation gate is green for every selected fixture
 
 Success means:
 
 - `synapse ingest <pdf>` produces structured JSON
 - provenance is preserved for sections, tables, cells, formulas, and figures
 - contract tests pass on canonical domain shapes
+- the evaluation path fails on partial output coverage instead of silently accepting a subset
 
 ### Phase 2. Storage And Persistence Layer
 
@@ -137,11 +140,11 @@ Final step:
 
 The next execution slice is:
 
-1. select the first golden PDFs from `/Users/timsmykov/Desktop/Статьи для теста`
-2. mirror or sync the chosen files into the server-side corpus location and describe them in the manifest
-3. run `synapse ingest` across those fixtures and capture shape and quality gaps
-4. lock the first acceptance expectations in `eval/contracts.md`
-5. begin Phase 2 storage interfaces only after the golden ingest pass is stable
+1. run `synapse ingest` across the full selected fixture set in `/srv/synapse/test_corpus/golden`
+2. run `scripts/evaluate_ingest.py` against `test_corpus/corpus-manifest.json`
+3. require full fixture coverage and fail the gate if any manifest `document_id` is missing from the output set
+4. lock the first acceptance expectations in the canonical manifest and `docs/phase-1-verification.md`
+5. begin Phase 2 storage interfaces only after the full golden ingest pass is stable
 
 Do not move to storage or retrieval until this slice is green.
 

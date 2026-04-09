@@ -19,6 +19,7 @@ from synapse.evaluation import (
     audit_corpus_manifest,
     evaluate_document_record,
     evaluate_ingest_outputs,
+    IngestCoverageError,
     load_corpus_manifest,
 )
 
@@ -170,13 +171,67 @@ class EvaluationTest(unittest.TestCase):
             (corpus_dir / "extra.pdf").write_bytes(b"%PDF-1.4\n")
             audit = audit_corpus_manifest(
                 fixtures,
-                manifest_path="test_corpus/corpus-manifest.template.json",
+                manifest_path="test_corpus/corpus-manifest.json",
                 corpus_dir=corpus_dir,
             )
 
         self.assertEqual(audit.status, "fail")
         self.assertIn("01-ecommerce-meta-analysis.pdf", audit.missing_files)
         self.assertIn("extra.pdf", audit.undocumented_files)
+
+    def test_evaluate_ingest_outputs_requires_full_manifest_coverage(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = root / "manifest.json"
+            outputs_dir = root / "outputs"
+            outputs_dir.mkdir()
+            manifest_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "document_id": "doc-01",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
+                            "domain": "medicine",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 0,
+                                "tables": 0,
+                                "table_cells": 0,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                        {
+                            "document_id": "doc-02",
+                            "file_name": "02-jams-service-review.pdf",
+                            "domain": "medicine",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 0,
+                                "tables": 0,
+                                "table_cells": 0,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            (outputs_dir / "doc-01.json").write_text(
+                DocumentRecord(document_id="doc-01", title="Study").model_dump_json(),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                IngestCoverageError,
+                "missing document_ids: doc-02",
+            ):
+                evaluate_ingest_outputs(manifest_path, outputs_dir)
 
     def test_minimum_expectations_allow_actual_counts_above_manifest_floor(self) -> None:
         entry = load_corpus_manifest_from_json(

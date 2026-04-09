@@ -43,7 +43,7 @@ Do not rename files after they are accepted into the baseline.
 
 ## Required Sidecar Metadata
 
-Each entry in `corpus-manifest.template.json` should contain:
+Each entry in `corpus-manifest.json` should contain:
 
 - `document_id`
 - `file_name`
@@ -86,4 +86,10 @@ A document is not an active golden fixture until:
 2. it exists in the external source folder; and
 3. it has been mirrored into a server-side or local execution corpus directory under the canonical filename.
 
-Use [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py) to perform that mirror step.
+Use [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh) to perform that mirror step.
+
+## Manifest Policy
+
+- `corpus-manifest.json` is the canonical active manifest for the current golden baseline.
+- `corpus-manifest.template.json` is historical scaffolding only and must not be used as the default evaluation input.
+- A partial output directory is not a valid evaluation target. The active output set must cover every `document_id` in the canonical manifest before Phase 1 can be considered green.
