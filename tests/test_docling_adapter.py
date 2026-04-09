@@ -111,14 +111,10 @@ class DoclingAdapterTest(unittest.TestCase):
         self.assertEqual(result.sections[0].bbox.x0, 1.0)
         self.assertEqual(result.sections[0].bbox.y0, 2.0)
         self.assertEqual(result.sections[0].bbox.y1, 20.0)
-        self.assertEqual(result.sections[0].confidence, 0.8)
         self.assertEqual(result.tables[0].cells[0].value, "A")
         self.assertEqual(result.tables[0].cells[0].bbox.x1, 8.0)
-        self.assertEqual(result.tables[0].cells[0].confidence, 0.7)
         self.assertEqual(result.formulas[0].latex, "E=mc^2")
-        self.assertEqual(result.formulas[0].confidence, 0.6)
         self.assertEqual(result.figures[0].figure_type, "chart")
-        self.assertEqual(result.figures[0].confidence, 0.5)
         self.assertEqual(converter.received_source, Path(handle.name))
 
     def test_adapter_normalizes_bottom_left_bbox_coordinates(self) -> None:

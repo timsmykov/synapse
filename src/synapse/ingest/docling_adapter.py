@@ -101,7 +101,6 @@ class DoclingAdapter:
                     text=text,
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
-                    confidence=cls._confidence_from_item(item),
                 )
             )
         if not sections and exported.get("markdown"):
@@ -123,7 +122,6 @@ class DoclingAdapter:
                         cell,
                         cls._page_number_from_item(cell, default=table_page_number),
                     ),
-                    confidence=cls._confidence_from_item(cell),
                 )
                 for cell in item.get("cells", [])
             ]
@@ -137,7 +135,6 @@ class DoclingAdapter:
                     columns=item.get("columns", max(cell.column for cell in cells)),
                     page_number=table_page_number,
                     bbox=cls._bbox_from_item(item, table_page_number),
-                    confidence=cls._confidence_from_item(item),
                     cells=cells,
                 )
             )
@@ -157,7 +154,6 @@ class DoclingAdapter:
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
                     display_mode=item.get("display_mode", False),
-                    confidence=cls._confidence_from_item(item),
                 )
             )
         return formulas
@@ -176,23 +172,9 @@ class DoclingAdapter:
                     bbox=cls._bbox_from_item(item, page_number),
                     image_ref=item.get("image_ref"),
                     alt_text=item.get("alt_text"),
-                    confidence=cls._confidence_from_item(item),
                 )
             )
         return figures
-
-    @staticmethod
-    def _confidence_from_item(item: dict[str, Any]) -> float:
-        raw_value = item.get("confidence", item.get("score"))
-        if raw_value is None:
-            provenance = item.get("prov")
-            if isinstance(provenance, list) and provenance:
-                first = provenance[0]
-                if isinstance(first, dict):
-                    raw_value = first.get("confidence", first.get("score"))
-        if raw_value is None:
-            return 1.0
-        return max(0.0, min(1.0, float(raw_value)))
 
     @staticmethod
     def _page_number_from_item(item: dict[str, Any], default: int = 1) -> int:
