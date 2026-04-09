@@ -59,9 +59,8 @@ Mac prohibition:
 Async worker containers are intentionally not part of this stack yet.
 The queue/worker contract belongs to a later phase and should not be faked now.
 
-For the first remote testing rollout, `grobid` is a lightweight stub container on port `8070`.
-This keeps the shared VPS setup fast and isolated while the team is still validating the rest of the runtime.
-Swap it for a real GROBID image only when remote parser testing becomes necessary.
+The testing stack now uses a real lightweight `grobid` service on port `8070`.
+That is necessary because Phase 1 verification now includes real metadata/citation extraction, not just Docling-only fallback behavior.
 
 ## Port policy
 
@@ -91,7 +90,8 @@ Then edit `deploy/.env.staging`:
 - keep `SYNAPSE_SERVER_CORPUS_DIR=/srv/synapse/test_corpus` so the `app` container can read the same golden PDFs under the same absolute path as the host
 - keep `SYNAPSE_PYTORCH_INDEX_URL=https://download.pytorch.org/whl/cpu` so the testing image preinstalls CPU-only `torch` / `torchvision` wheels before `docling`
 - keep `SYNAPSE_PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu` as the auxiliary extra index used during the rest of the research install
-- keep the default `grobid` stub unless you explicitly need remote GROBID extraction on this box
+- keep `SYNAPSE_GROBID_URL=http://grobid:8070` so the `app` container and isolated helpers use the compose-network service alias
+- keep the default lightweight `GROBID_IMAGE` unless you explicitly need a different GROBID build
 - keep `SYNAPSE_PARSER_OCR_ENABLED=0` for the MVP baseline
 - keep `SYNAPSE_COLPALI_ENABLED=0` until retrieval work explicitly enables it
 - change host port values only if they conflict with something already running
@@ -161,6 +161,32 @@ Optional arguments:
 ```
 
 Use this script instead of ad-hoc detached containers so the real-PDF path shares the same environment, networking, and `SYNAPSE_GROBID_URL` contract as the canonical `app` runtime.
+
+## Isolated golden ingest
+
+```bash
+./scripts/run_golden_ingest_isolated.sh
+```
+
+Use this helper when you need a one-shot container instead of `docker compose exec app`, but still want the same compose-network DNS contract for `grobid`.
+
+By default this:
+
+- runs a fresh `synapse-testing:latest` container on `${COMPOSE_PROJECT_NAME}_default`
+- uses `deploy/.env.staging` for `SYNAPSE_GROBID_URL` and the rest of the runtime env
+- mounts `${SYNAPSE_SERVER_CORPUS_DIR}` read-only at the same absolute path inside the container
+- writes JSON to `data/ingest-golden-isolated/`
+
+Optional arguments:
+
+```bash
+./scripts/run_golden_ingest_isolated.sh \
+  data/phase1-canary \
+  '/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf' \
+  synapse-phase1-canary
+```
+
+Do not use ad-hoc `docker run ... -e SYNAPSE_GROBID_URL=http://localhost:8070` for parser verification. Outside the compose network, `localhost` points at the isolated container itself, not at the `grobid` service.
 
 ## Golden evaluation
 
