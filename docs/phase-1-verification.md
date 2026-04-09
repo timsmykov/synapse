@@ -29,41 +29,35 @@ Observed canary result on 2026-04-09:
 
 ## Full Batch Evidence On The Current Server Corpus
 
-The currently installed five-document server corpus already has a full emitted output set:
-
-- `/srv/synapse/repo/data/phase1-batch`
-
-Evaluating that output set against the server-side golden manifest is green:
+The current scaffold launcher for a full five-document pass is now the updated sequential helper:
 
 ```bash
-cd /srv/synapse/repo
-/srv/synapse/.venv/bin/python scripts/evaluate_ingest.py \
-  data/phase1-batch \
-  --manifest /srv/synapse/test_corpus/golden/corpus-manifest.json
+cd /srv/synapse/worktrees/phase1-gate-hardening
+./scripts/run_golden_ingest.sh data/phase1-golden-full
 ```
 
-Observed result on 2026-04-09:
+This path now starts correctly and writes per-file logs such as:
 
-- `passed=true`
-- all five selected fixtures passed
-- `table_extraction_accuracy`, `formula_fidelity`, `provenance_correctness`, and `section_order_correctness` were green for all five outputs
+- `/srv/synapse/worktrees/phase1-gate-hardening/data/phase1-golden-full/run-01.log`
+
+However, the first document in the batch still does not complete on the current VPS.
 
 ## Current Blocker
 
-The remaining blocker is now corpus-contract drift, not parser/runtime stability.
+The remaining blocker is now VPS memory pressure during the full-batch path.
 
-There is a mismatch between:
+Observed failure on 2026-04-09:
 
-- `/srv/synapse/repo/test_corpus/corpus-manifest.json`
-- `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+- the sequential full-batch launcher starts normally on the updated PR worktree
+- `run-01.log` is created for `01-ecommerce-meta-analysis.pdf`
+- the `synapse ingest` process inside `app` is OOM-killed before the first JSON is emitted
 
-The repo-local manifest describes a newer fixture set with renamed files such as `02-jams-service-review.pdf`.
-The server golden corpus still describes the older installed fixture set with files such as `02-service-robot-study.pdf`.
+Evidence from `dmesg` on the VPS:
 
-Because of that drift:
+- `Out of memory: Killed process 541264 (synapse) ... anon-rss:1489124kB`
 
-- evaluating `data/phase1-batch` against the repo-local manifest fails with a manifest mismatch
-- evaluating the same emitted JSON against the matching server manifest passes cleanly
+This means the current blocker is no longer canary correctness or stale launcher logic.
+It is the memory envelope of the shared testing box when the full-batch path runs inside the long-lived `app` container.
 
 ## Phase 1 Status
 
@@ -75,10 +69,10 @@ Closed:
 - stable ingest CLI contract
 - optional GROBID fallback behavior
 - green real-PDF canary on the canonical `app` path
-- green full-batch evaluation for the corpus currently installed on the server
+- working sequential full-batch launcher in the updated PR worktree
 
 Still open:
 
-- reconcile the repo-local manifest and the server golden-corpus manifest so the same fixture set is canonical in both places
-- rerun the agreed full-batch evaluation after that corpus contract is unified
+- complete the full-batch pass without OOM-killing the `synapse ingest` process on the VPS
+- rerun full-batch evaluation after the memory/runtime blocker is removed
 - only then close the Phase 1 checklist item

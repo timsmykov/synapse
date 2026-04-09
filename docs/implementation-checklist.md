@@ -23,7 +23,7 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
-Phase 1 status: partially verified. The canonical VPS `app`-container canary is green, and the currently installed five-document server corpus passes as a full batch when evaluated against the matching server-side manifest. The remaining blocker is corpus-contract drift between the repo-local manifest and the server golden-corpus manifest. See `docs/phase-1-verification.md`.
+Phase 1 status: partially verified. The canonical VPS `app`-container canary is green, and the updated sequential full-batch launcher now starts correctly from the PR worktree on the server. The remaining blocker is VPS memory pressure: the first real-PDF pass in the full-batch flow is currently OOM-killed before JSON is emitted. See `docs/phase-1-verification.md`.
 
 Execution rule for this phase:
 
@@ -40,7 +40,7 @@ Execution rule for this phase:
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
-- [ ] Свести repo-local fixture manifest и server golden-corpus manifest к одному canonical fixture set и зафиксировать `docs/phase-1-verification.md`.
+- [ ] Снять VPS OOM blocker с canonical full-batch ingest path и зафиксировать `docs/phase-1-verification.md`.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -107,8 +107,8 @@ Execution rule for this phase:
 
 Следующий правильный execution slice:
 
-1. Свести `test_corpus/corpus-manifest.json` и `/srv/synapse/test_corpus/golden/corpus-manifest.json` к одному canonical fixture set.
-2. Повторно прогнать canonical full-batch evaluation на этом unified contract и обновить `docs/phase-1-verification.md`.
+1. Снять VPS OOM blocker с canonical full-batch ingest path.
+2. Повторно прогнать canonical full-batch evaluation и обновить `docs/phase-1-verification.md`.
 3. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
