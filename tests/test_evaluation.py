@@ -19,10 +19,10 @@ from synapse.domain import (
     TableCell,
 )
 from synapse.evaluation import (
+    IngestCoverageError,
     audit_corpus_manifest,
     evaluate_document_record,
     evaluate_ingest_outputs,
-    IngestCoverageError,
     load_corpus_manifest,
 )
 
