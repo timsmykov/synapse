@@ -7,6 +7,10 @@ import synapse.cli as cli
 from synapse.domain import TaskReceipt
 from synapse.runtime_health import RuntimeHealthCheck
 from synapse.services.reporting import DoctorReport
+from typer.testing import CliRunner
+
+
+RUNNER = CliRunner()
 
 
 class CliTest(unittest.TestCase):
@@ -61,6 +65,46 @@ class CliTest(unittest.TestCase):
         self.assertEqual(analyze_payload["command"], "analyze")
         self.assertEqual(analyze_payload["receipt"]["result"]["corpus_id"], "data/corpus.db")
         self.assertEqual(analyze_payload["receipt"]["result"]["analysis_mode"], "systematic-review")
+
+    def test_ingest_help_exposes_stable_source_output_options(self) -> None:
+        result = RUNNER.invoke(cli.app, ["ingest", "--help"])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("--source", result.stdout)
+        self.assertIn("--output", result.stdout)
+
+    def test_ingest_cli_accepts_source_and_output_options(self) -> None:
+        with patch.object(
+            cli,
+            "ingest_workflow",
+            return_value=TaskReceipt(
+                task_id="paper.pdf",
+                task_type="ingest",
+                status="succeeded",
+                message="Ingested 1 document(s) to data/ingest",
+                document_id="paper",
+                artifact_count=1,
+                result={
+                    "source_uri": "paper.pdf",
+                    "output_uri": "data/ingest",
+                    "parser": "docling",
+                    "document_id": "paper",
+                    "documents": ["paper"],
+                    "artifact_count": 1,
+                    "resolved_sources": ["paper.pdf"],
+                    "written_files": ["data/ingest/paper.json"],
+                    "warnings": [],
+                },
+            ),
+        ) as ingest_mock:
+            result = RUNNER.invoke(
+                cli.app,
+                ["ingest", "--source", "paper.pdf", "--output", "data/ingest"],
+            )
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn('"command": "ingest"', result.stdout)
+        ingest_mock.assert_called_once()
 
     def test_doctor_payload_is_serializable(self) -> None:
         with patch.object(

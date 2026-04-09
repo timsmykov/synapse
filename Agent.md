@@ -42,6 +42,7 @@ If repo docs and Notion diverge, pause and align them before coding beyond the i
 
 Current staging/integration target is `ssh root@194.163.181.122`. Treat `root` as provisioning-only access; long-lived deploy scripts and compose operations should move to a dedicated non-root deploy user.
 Code may be edited locally, but installs, tests, runtime commands, and deploy verification happen on the server.
+Do not create or keep a project-local Synapse runtime on the Mac. No local `.venv`, no local compose verification, no local deploy path.
 
 ## Development Principles
 
@@ -83,6 +84,13 @@ Code may be edited locally, but installs, tests, runtime commands, and deploy ve
 - LlamaIndex for retrieval and indexing.
 - LangGraph and Celery for orchestration when the workflow needs it.
 
+Current provider policy:
+
+- `MiniMax` is the primary agent/base LLM provider.
+- `OpenRouter` is the default path for embeddings and other non-primary model routing.
+- Default ingest is `Docling + GROBID` without OCR.
+- `ColPali` remains deferred until the retrieval phase.
+
 Do not assume all of this exists on day one. Build thin seams so the repo can grow into it.
 
 ## Commands
@@ -99,6 +107,7 @@ Use these as the default server-side workflow once the scaffold is in place:
 - `docker compose up --build`
 
 Run them on the server or inside the server containers, not as a required Mac-local setup.
+If a local runtime artifact is created on the Mac for convenience, treat it as disposable and remove it.
 If a command is not implemented yet, add the smallest practical stub and document the gap.
 
 ## Coding Expectations
@@ -123,6 +132,38 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - After completing a scoped task, proactively update any roadmap, verification, corpus, deploy, repo-map, or architecture docs touched by that work in the same pass; do not wait for a separate reminder.
 - If a task spans multiple phases, mark only the items you actually closed and leave the rest open.
 - Do not invent new sequencing; follow the dependency order already recorded in the roadmap and checklist.
+
+## Carcass vs Components
+
+Keep the project split between:
+
+- `carcass/scaffold`: repo/runtime integration, contracts, deploy path, docs, and phase verification
+- `components`: isolated product modules developed within the current phase
+
+Do not replace the phase model with component-only planning.
+The phases in `docs/master-roadmap.md` remain the sequencing mechanism.
+Execute each phase through disjoint component workstreams plus one scaffold workstream.
+
+Default scaffold scope:
+
+- `src/synapse/config.py`
+- `src/synapse/cli.py`
+- `src/synapse/server.py`
+- `src/synapse/domain/`
+- `src/synapse/services/`
+- `deploy/`
+- runtime scripts
+- roadmap/checklist/verification docs
+
+Default component scope:
+
+- parser adapters in `src/synapse/ingest/`
+- parser-specific tests
+- merge/eval modules with explicit ownership
+- later `storage/`, `retrieval/`, and `primitives/` modules
+
+Scaffold ownership should stay singular.
+Do not let multiple agents edit the same integration seam in parallel.
 
 ## Working Rules For Agents
 

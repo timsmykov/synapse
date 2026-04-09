@@ -109,9 +109,10 @@ class ServicesTest(unittest.TestCase):
     def test_ingest_missing_source_stays_queued(self) -> None:
         receipt = ingest_workflow(IngestTaskRequest(source_uri="test_corpus"))
 
-        self.assertEqual(receipt.status, "queued")
+        self.assertEqual(receipt.status, "failed")
         self.assertEqual(receipt.task_id, "test_corpus")
         self.assertEqual(receipt.result["source_uri"], "test_corpus")
+        self.assertIn("error", receipt.result)
 
     def test_build_document_record_falls_back_when_grobid_is_missing(self) -> None:
         structure = DoclingParseResult(
@@ -141,6 +142,72 @@ class ServicesTest(unittest.TestCase):
 
         self.assertIs(result, document)
         self.assertEqual(warnings, ["grobid unavailable"])
+        merge_mock.assert_called_once_with(structure, None)
+
+    def test_build_document_record_passes_ocr_setting_to_docling(self) -> None:
+        structure = DoclingParseResult(
+            document_id="paper",
+            title="Paper",
+            source_uri="/tmp/paper.pdf",
+        )
+        document = DocumentRecord(
+            document_id="paper",
+            title="Paper",
+            source_uri="/tmp/paper.pdf",
+            artifacts=[],
+        )
+
+        with (
+            patch(
+                "synapse.services.workflows.get_settings",
+                return_value=Settings(parser_ocr_enabled=False),
+            ),
+            patch("synapse.services.workflows.DoclingAdapter") as docling_adapter_cls,
+            patch("synapse.services.workflows.GrobidAdapter.extract", return_value=None),
+            patch(
+                "synapse.services.workflows.merge_document_record",
+                return_value=document,
+            ),
+        ):
+            docling_adapter_cls.return_value.convert.return_value = structure
+
+            result, warnings = build_document_record(Path("/tmp/paper.pdf"))
+
+        self.assertIs(result, document)
+        self.assertEqual(warnings, [])
+        docling_adapter_cls.assert_called_once_with(ocr_enabled=False)
+        docling_adapter_cls.return_value.convert.assert_called_once_with("/tmp/paper.pdf")
+
+    def test_build_document_record_falls_back_when_grobid_runtime_fails(self) -> None:
+        structure = DoclingParseResult(
+            document_id="paper",
+            title="Paper",
+            source_uri="/tmp/paper.pdf",
+        )
+        document = DocumentRecord(
+            document_id="paper",
+            title="Paper",
+            source_uri="/tmp/paper.pdf",
+            artifacts=[],
+        )
+
+        with (
+            patch("synapse.services.workflows.DoclingAdapter.convert", return_value=structure),
+            patch(
+                "synapse.services.workflows.GrobidAdapter.extract",
+                side_effect=RuntimeError("connection refused"),
+            ),
+            patch(
+                "synapse.services.workflows.merge_document_record",
+                return_value=document,
+            ) as merge_mock,
+        ):
+            result, warnings = build_document_record(Path("/tmp/paper.pdf"))
+
+        self.assertIs(result, document)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("GROBID extraction failed for paper.pdf", warnings[0])
+        self.assertIn("connection refused", warnings[0])
         merge_mock.assert_called_once_with(structure, None)
 
 

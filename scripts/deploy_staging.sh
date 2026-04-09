@@ -13,11 +13,20 @@ if [[ ! -f "${ENV_FILE}" ]]; then
 fi
 
 echo "Deploying Synapse testing stack with project name: ${PROJECT_NAME}"
+echo "Building a fresh app image from the current checkout"
 docker compose \
   --project-name "${PROJECT_NAME}" \
   --env-file "${ENV_FILE}" \
   -f "${COMPOSE_FILE}" \
-  up -d --build
+  build --pull --no-cache app
+
+echo
+echo "Recreating the testing stack"
+docker compose \
+  --project-name "${PROJECT_NAME}" \
+  --env-file "${ENV_FILE}" \
+  -f "${COMPOSE_FILE}" \
+  up -d --force-recreate --remove-orphans
 
 echo
 docker compose \

@@ -2,107 +2,116 @@
   {
     "document_id": "handoyo-2024-meta-analysis",
     "file_name": "01-ecommerce-meta-analysis.pdf",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf",
     "source_file_name": "Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf",
+    "source_title": "Purchasing in the digital age: A meta-analytical perspective on trust, risk, security, and e-WOM in e-commerce",
     "domain": "ecommerce_meta_analysis",
     "layout_features": [
       "tables",
-      "figures",
+      "citations",
       "multi_column",
-      "citations"
+      "figures"
     ],
     "expected_artifacts": {
       "sections": 6,
-      "tables": 2,
-      "table_cells": 12,
+      "tables": 1,
+      "table_cells": 4,
       "formulas": 0,
       "figures": 1,
-      "citations": 20
+      "citations": 1
     },
     "notes": "Initial golden fixture. Meta-analysis paper and the strongest first source for summary tables and citation-heavy layout."
   },
   {
-    "document_id": "blut-2021-jams",
-    "file_name": "02-jams-service-review.pdf",
+    "document_id": "belanche-2021-service-robots",
+    "file_name": "02-service-robot-study.pdf",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf",
+    "source_file_name": "Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf",
+    "source_title": "Examining the effects of robots' physical appearance, warmth, and competence in frontline services: The Humanness-Value-Loyalty model",
+    "domain": "service_robot_research",
+    "layout_features": [
+      "tables",
+      "citations",
+      "multi_column",
+      "figures"
+    ],
+    "expected_artifacts": {
+      "sections": 6,
+      "tables": 1,
+      "table_cells": 4,
+      "formulas": 0,
+      "figures": 0,
+      "citations": 1
+    },
+    "notes": "Empirical journal article chosen for standard article structure, likely result tables, and stable multi-column layout."
+  },
+  {
+    "document_id": "blut-2021-anthropomorphism",
+    "file_name": "03-anthropomorphism-meta-analysis.pdf",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf",
     "source_file_name": "Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf",
-    "domain": "marketing_service_research",
+    "source_title": "Understanding anthropomorphism in service provision: a meta-analysis of physical robots, chatbots, and other AI",
+    "domain": "anthropomorphism_meta_analysis",
     "layout_features": [
       "tables",
-      "figures",
+      "citations",
       "multi_column",
-      "citations"
+      "figures"
     ],
     "expected_artifacts": {
-      "sections": 6,
-      "tables": 2,
-      "table_cells": 10,
+      "sections": 7,
+      "tables": 1,
+      "table_cells": 4,
       "formulas": 0,
-      "figures": 2,
-      "citations": 25
+      "figures": 0,
+      "citations": 1
     },
-    "notes": "Long journal-format article selected as the baseline multi-column research paper."
+    "notes": "Meta-analysis fixture for long structured articles with dense citation sections and likely synthesis tables."
   },
   {
-    "document_id": "oprea-bra-2025-ebusiness",
-    "file_name": "03-ebusiness-latent-topics.pdf",
-    "source_file_name": "Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf",
-    "domain": "ebusiness_topic_modeling",
+    "document_id": "hollebeek-2024-ai-review",
+    "file_name": "04-ai-systematic-review.pdf",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf",
+    "source_file_name": "Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf",
+    "source_title": "Engaging consumers through artificially intelligent technologies: Systematic review, conceptual model, and further research",
+    "domain": "systematic_review",
     "layout_features": [
       "tables",
-      "formulas",
-      "figures",
+      "citations",
       "multi_column",
-      "citations"
+      "figures"
     ],
     "expected_artifacts": {
       "sections": 6,
       "tables": 1,
-      "table_cells": 6,
-      "formulas": 2,
-      "figures": 1,
-      "citations": 20
-    },
-    "notes": "Methods-heavy LaTeX-origin paper selected for formula and model-oriented extraction coverage."
-  },
-  {
-    "document_id": "nguyen-2023-chatbots-frontline",
-    "file_name": "04-chatbot-customer-experience.pdf",
-    "source_file_name": "Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf",
-    "domain": "chatbot_customer_experience",
-    "layout_features": [
-      "tables",
-      "figures",
-      "multi_column",
-      "citations"
-    ],
-    "expected_artifacts": {
-      "sections": 6,
-      "tables": 1,
-      "table_cells": 6,
+      "table_cells": 4,
       "formulas": 0,
       "figures": 1,
-      "citations": 25
+      "citations": 1
     },
-    "notes": "Mainstream empirical paper selected for chatbot and customer-experience layouts."
+    "notes": "Systematic review fixture selected for conceptual-model figures plus review-style tables and references."
   },
   {
     "document_id": "masciari-2024-ai-ethics",
-    "file_name": "05-ai-ethics-recommendation-systems.pdf",
+    "file_name": "05-ai-ethics-review.pdf",
+    "source_path": "/Users/timsmykov/Desktop/Статьи для теста/Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf",
     "source_file_name": "Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf",
+    "source_title": "A Systematic Literature Review on AI based Recommendation Systems and their Ethical Considerations",
     "domain": "ai_recommendation_ethics",
     "layout_features": [
       "tables",
-      "figures",
+      "citations",
       "multi_column",
-      "citations"
+      "figures"
     ],
     "expected_artifacts": {
       "sections": 6,
-      "tables": 2,
-      "table_cells": 12,
+      "tables": 1,
+      "table_cells": 4,
       "formulas": 0,
-      "figures": 2,
-      "citations": 20
+      "figures": 0,
+      "citations": 1
     },
-    "notes": "Selected as the likely complex-table and taxonomy-style fixture for the first baseline corpus."
+    "notes": "Review fixture for structured sections and baseline table/citation extraction. Useful for first server-side regression pass."
   }
 ]

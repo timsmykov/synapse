@@ -17,6 +17,7 @@ services:
       args:
         SYNAPSE_INSTALL_EXTRAS: ${SYNAPSE_INSTALL_EXTRAS:-}
         SYNAPSE_PIP_EXTRA_INDEX_URL: ${SYNAPSE_PIP_EXTRA_INDEX_URL:-}
+        SYNAPSE_PYTORCH_INDEX_URL: ${SYNAPSE_PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
     image: synapse-testing:latest
     env_file:
       - ./.env.staging
@@ -35,6 +36,7 @@ services:
     volumes:
       - ../data:/workspace/data
       - ../test_corpus:/workspace/test_corpus
+      - ${SYNAPSE_SERVER_CORPUS_DIR:-../test_corpus}:/srv/synapse/test_corpus:ro
     healthcheck:
       test:
         [

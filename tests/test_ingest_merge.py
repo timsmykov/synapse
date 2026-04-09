@@ -20,17 +20,18 @@ class IngestMergeTest(unittest.TestCase):
             document_id="paper-1",
             title="Docling Title",
             source_uri="paper-1.pdf",
-            sections=[ParsedSection(heading="Intro", text="Section text")],
+            sections=[ParsedSection(heading="Intro", text="Section text", confidence=0.8)],
             tables=[
                 ParsedTable(
                     caption="Table 1",
                     rows=1,
                     columns=1,
-                    cells=[ParsedTableCell(row=1, column=1, value="A")],
+                    confidence=0.7,
+                    cells=[ParsedTableCell(row=1, column=1, value="A", confidence=0.6)],
                 )
             ],
-            formulas=[ParsedFormula(latex="E=mc^2")],
-            figures=[ParsedFigure(caption="Figure 1", figure_type="chart")],
+            formulas=[ParsedFormula(latex="E=mc^2", confidence=0.5)],
+            figures=[ParsedFigure(caption="Figure 1", figure_type="chart", confidence=0.4)],
         )
         metadata = GrobidMetadataResult(
             source_uri="paper-1.pdf",
@@ -48,6 +49,21 @@ class IngestMergeTest(unittest.TestCase):
         self.assertEqual(record.doi, "10.1000/example")
         self.assertEqual(len(record.artifacts), 4)
         self.assertEqual(record.artifacts[0].artifact_type, "section")
+        self.assertEqual(record.provenance.parser, "docling+grobid")
+        self.assertEqual(record.artifacts[0].provenance.confidence, 0.8)
+        self.assertEqual(record.artifacts[1].provenance.confidence, 0.7)
+
+    def test_merge_marks_docling_only_when_metadata_is_missing(self) -> None:
+        structure = DoclingParseResult(
+            document_id="paper-2",
+            title="Docling Only",
+            source_uri="paper-2.pdf",
+            sections=[ParsedSection(text="Section text")],
+        )
+
+        record = merge_document_record(structure, None)
+
+        self.assertEqual(record.provenance.parser, "docling")
 
 
 if __name__ == "__main__":

@@ -18,12 +18,18 @@ RUN apt-get update && \
 
 ARG SYNAPSE_INSTALL_EXTRAS=""
 ARG SYNAPSE_PIP_EXTRA_INDEX_URL=""
+ARG SYNAPSE_PYTORCH_INDEX_URL="https://download.pytorch.org/whl/cpu"
 
 COPY pyproject.toml README.md ./
 COPY src ./src
 
 RUN pip install --upgrade pip && \
     if [ -n "$SYNAPSE_INSTALL_EXTRAS" ]; then \
+      case ",$SYNAPSE_INSTALL_EXTRAS," in \
+        *,research,*) \
+          pip install --no-cache-dir --index-url "$SYNAPSE_PYTORCH_INDEX_URL" torch torchvision; \
+          ;; \
+      esac && \
       PIP_EXTRA_INDEX_URL="$SYNAPSE_PIP_EXTRA_INDEX_URL" pip install --no-cache-dir -e ".[${SYNAPSE_INSTALL_EXTRAS}]"; \
     else \
       PIP_EXTRA_INDEX_URL="$SYNAPSE_PIP_EXTRA_INDEX_URL" pip install --no-cache-dir -e .; \

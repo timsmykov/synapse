@@ -23,9 +23,13 @@ DEFAULT_MINIO_ENDPOINT = "localhost:9000"
 DEFAULT_MINIO_ACCESS_KEY = "minioadmin"
 DEFAULT_MINIO_SECRET_KEY = "minioadmin"
 DEFAULT_MINIO_BUCKET = "synapse-artifacts"
-DEFAULT_LLM_PROVIDER = "ollama"
+DEFAULT_LLM_PROVIDER = "minimax"
+DEFAULT_LLM_MODEL = "MiniMax-M2.5"
 DEFAULT_PARSER = "docling"
-DEFAULT_EMBEDDING_MODEL = "specter2"
+DEFAULT_EMBEDDING_PROVIDER = "openrouter"
+DEFAULT_EMBEDDING_MODEL = "operator-configured"
+DEFAULT_PARSER_OCR_ENABLED = False
+DEFAULT_COLPALI_ENABLED = False
 DEFAULT_DEPLOYMENT_TARGET = "local"
 DEFAULT_PUBLIC_BASE_URL = ""
 DEFAULT_REVERSE_PROXY = "none"
@@ -50,8 +54,12 @@ class Settings:
     minio_secret_key: str = DEFAULT_MINIO_SECRET_KEY
     minio_bucket: str = DEFAULT_MINIO_BUCKET
     llm_provider: str = DEFAULT_LLM_PROVIDER
+    default_llm_model: str = DEFAULT_LLM_MODEL
     default_parser: str = DEFAULT_PARSER
+    embedding_provider: str = DEFAULT_EMBEDDING_PROVIDER
     default_embedding_model: str = DEFAULT_EMBEDDING_MODEL
+    parser_ocr_enabled: bool = DEFAULT_PARSER_OCR_ENABLED
+    colpali_enabled: bool = DEFAULT_COLPALI_ENABLED
     deployment_target: str = DEFAULT_DEPLOYMENT_TARGET
     public_base_url: str = DEFAULT_PUBLIC_BASE_URL
     reverse_proxy: str = DEFAULT_REVERSE_PROXY
@@ -74,10 +82,26 @@ class Settings:
             minio_secret_key=os.getenv("SYNAPSE_MINIO_SECRET_KEY", DEFAULT_MINIO_SECRET_KEY),
             minio_bucket=os.getenv("SYNAPSE_MINIO_BUCKET", DEFAULT_MINIO_BUCKET),
             llm_provider=os.getenv("SYNAPSE_LLM_PROVIDER", DEFAULT_LLM_PROVIDER),
+            default_llm_model=os.getenv(
+                "SYNAPSE_DEFAULT_LLM_MODEL",
+                DEFAULT_LLM_MODEL,
+            ),
             default_parser=os.getenv("SYNAPSE_DEFAULT_PARSER", DEFAULT_PARSER),
+            embedding_provider=os.getenv(
+                "SYNAPSE_EMBEDDING_PROVIDER",
+                DEFAULT_EMBEDDING_PROVIDER,
+            ),
             default_embedding_model=os.getenv(
                 "SYNAPSE_DEFAULT_EMBEDDING_MODEL",
                 DEFAULT_EMBEDDING_MODEL,
+            ),
+            parser_ocr_enabled=_env_flag(
+                "SYNAPSE_PARSER_OCR_ENABLED",
+                DEFAULT_PARSER_OCR_ENABLED,
+            ),
+            colpali_enabled=_env_flag(
+                "SYNAPSE_COLPALI_ENABLED",
+                DEFAULT_COLPALI_ENABLED,
             ),
             deployment_target=os.getenv(
                 "SYNAPSE_DEPLOYMENT_TARGET",
@@ -119,14 +143,25 @@ class Settings:
             "minio_endpoint": self.minio_endpoint,
             "minio_bucket": self.minio_bucket,
             "llm_provider": self.llm_provider,
+            "default_llm_model": self.default_llm_model,
             "default_parser": self.default_parser,
+            "embedding_provider": self.embedding_provider,
             "default_embedding_model": self.default_embedding_model,
+            "parser_ocr_enabled": str(self.parser_ocr_enabled).lower(),
+            "colpali_enabled": str(self.colpali_enabled).lower(),
             "deployment_target": self.deployment_target,
             "public_base_url": self.public_base_url,
             "reverse_proxy": self.reverse_proxy,
             "grobid_url": self.grobid_url,
             "ingest_concurrency": str(self.ingest_concurrency),
         }
+
+
+def _env_flag(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 @lru_cache(maxsize=1)

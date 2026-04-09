@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import tempfile
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
+
+from synapse.config import get_settings
 
 from .models import GrobidMetadataResult
 
@@ -36,6 +40,20 @@ class GrobidAdapter:
             raise GrobidDependencyError(f"GROBID extraction is unavailable: {exc}") from exc
         return self._parse_tei(tei_xml, str(source_path))
 
+    @classmethod
+    def runtime_hint(cls, grobid_url: str) -> str | None:
+        parsed = urlparse(grobid_url)
+        if parsed.hostname not in {"localhost", "127.0.0.1"}:
+            return None
+        if not cls._is_container_runtime():
+            return None
+        return (
+            " SYNAPSE_GROBID_URL points at localhost from inside a container, which "
+            "resolves to the container itself, not the Compose `grobid` service. "
+            "Use the canonical app container path or set SYNAPSE_GROBID_URL to "
+            "`http://grobid:8070` on the Compose network."
+        )
+
     def _load_client(self) -> Any:
         try:
             from grobid_client.grobid_client import GrobidClient
@@ -44,7 +62,11 @@ class GrobidAdapter:
                 "grobid-client-python is not installed. Install Synapse with the `research` "
                 "extras or provide a client_factory for tests."
             ) from exc
-        return GrobidClient()
+        return GrobidClient(grobid_server=get_settings().grobid_url)
+
+    @staticmethod
+    def _is_container_runtime() -> bool:
+        return os.path.exists("/.dockerenv")
 
     @staticmethod
     def _run_grobid(client: Any, source_path: Path) -> str:

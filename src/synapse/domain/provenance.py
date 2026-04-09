@@ -50,7 +50,7 @@ class Provenance(SynapseModel):
     bbox: BoundingBox | None = None
     parser: str | None = None
     extraction_stage: str | None = None
-    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
     source_uri: str | None = None
     source_sha256: str | None = None
     citation: Citation | None = None

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MANIFEST_PATH="${MANIFEST_PATH:-${ROOT_DIR}/test_corpus/corpus-manifest.template.json}"
+MANIFEST_PATH="${MANIFEST_PATH:-${ROOT_DIR}/test_corpus/corpus-manifest.json}"
 SOURCE_DIR="${GOLDEN_PDF_SOURCE_DIR:-/Users/timsmykov/Desktop/Статьи для теста}"
 REMOTE_HOST="${REMOTE_HOST:-root@194.163.181.122}"
 REMOTE_DIR="${REMOTE_DIR:-/srv/synapse/test_corpus/golden}"
