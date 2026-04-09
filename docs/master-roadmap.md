@@ -64,7 +64,7 @@ The repo now has the structural baseline required for Day 1 work.
 
 ### Phase 1. Ingestion Contract And Parsing Pipeline
 
-Status: in progress.
+Status: verified for the current selected corpus baseline.
 
 Closed in this slice:
 
@@ -75,9 +75,17 @@ Closed in this slice:
 - structured JSON output from `synapse ingest`
 - contract coverage for ingest IO and merge behavior
 
-Remaining:
+Closed with the current server verification pass:
 
-- add golden fixtures for tables, formulas, and multi-column layout
+- canonical VPS full golden sweep on the selected five-document corpus
+- strict full-corpus evaluation against the repo-local manifest
+- green Day 1 metric pass for all five emitted outputs
+
+This closes Phase 1 for the current selected five-document acceptance baseline; any future corpus expansion should be treated as a new acceptance wave, not as a reopening of this phase.
+
+Operational follow-up, but not a Phase 1 blocker:
+
+- harden `GROBID` service discovery inside the testing-box `app` container
 
 Success means:
 
@@ -137,13 +145,11 @@ Final step:
 
 The next execution slice is:
 
-1. select the first golden PDFs from `/Users/timsmykov/Desktop/Статьи для теста`
-2. mirror or sync the chosen files into the server-side corpus location and describe them in the manifest
-3. run `synapse ingest` across those fixtures and capture shape and quality gaps
-4. lock the first acceptance expectations in `eval/contracts.md`
-5. begin Phase 2 storage interfaces only after the golden ingest pass is stable
+1. begin Phase 2 storage interfaces and persistence path
+2. keep the current verified five-document corpus as the active acceptance baseline until a larger corpus wave is added intentionally
+3. close the separate testing-box hardening issue around intermittent `GROBID` DNS resolution
 
-Do not move to storage or retrieval until this slice is green.
+Do not move to retrieval until Phase 2 storage work is green.
 
 ## Testing And Deploy Policy
 

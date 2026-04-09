@@ -23,6 +23,8 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
+Phase 1 status: verified for the current selected corpus baseline. The canonical VPS `app`-container path now completes the full five-document golden sweep and passes the strict full-corpus evaluation gate. A separate testing-box hardening issue remains around intermittent `GROBID` DNS resolution inside the container, but that is warning-only under the current contract and does not block Phase 1 closeout. See `docs/phase-1-verification.md`.
+
 - [x] Реализовать `Docling` adapter в `src/synapse/ingest/`.
 - [x] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
 - [x] Зафиксировать merge-contract: как `Docling` и `GROBID` собираются в один `DocumentRecord`.
@@ -32,6 +34,7 @@ Primary navigation:
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
+- [x] Прогнать canonical full golden sweep на VPS и зафиксировать `docs/phase-1-verification.md`.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -98,10 +101,11 @@ Primary navigation:
 
 Следующий правильный execution slice:
 
-1. Прогнать `synapse ingest` по golden fixtures в `/srv/synapse/test_corpus/golden` и зафиксировать первые quality gaps.
-2. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
+1. Зафиксировать storage interfaces и persistence path в Postgres/MinIO.
+2. Добавить bootstrap/init path для server Postgres и MinIO contracts.
+3. Отдельным workstream закрыть `GROBID` service discovery hardening на testing box, не откатывая Phase 1 closeout.
 
-Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
+Пока эти 3 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 
 ## Environment Policy
 

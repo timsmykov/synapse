@@ -42,9 +42,8 @@ The current goal is a single remote server that acts as the default install, tes
 Async worker containers are intentionally not part of this stack yet.
 The queue/worker contract belongs to a later phase and should not be faked now.
 
-For the first remote testing rollout, `grobid` is a lightweight stub container on port `8070`.
-This keeps the shared VPS setup fast and isolated while the team is still validating the rest of the runtime.
-Swap it for a real GROBID image only when remote parser testing becomes necessary.
+The testing stack now uses a real lightweight `grobid` service on port `8070`.
+That is necessary because Phase 1 verification now includes real metadata and citation extraction, not just Docling-only fallback behavior.
 
 ## Port policy
 
@@ -69,7 +68,8 @@ Then edit `deploy/.env.staging`:
 - keep `SYNAPSE_LLM_PROVIDER=openai` or another API-backed provider
 - leave `OPENAI_API_KEY` empty only if the current task does not need model calls yet
 - keep `SYNAPSE_PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu` so the testing image resolves CPU-only PyTorch wheels for `docling`
-- keep the default `grobid` stub unless you explicitly need remote GROBID extraction on this box
+- keep `SYNAPSE_GROBID_URL=http://grobid:8070` so both the `app` container and the isolated golden-ingest helper resolve the Compose service alias
+- keep the default lightweight `GROBID_IMAGE` unless you explicitly need a different GROBID build
 - change host port values only if they conflict with something already running
 
 ## Deploy
