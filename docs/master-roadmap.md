@@ -105,23 +105,19 @@ Closed in this slice:
 
 Remaining:
 
-- complete the full VPS-backed golden ingest/evaluation sweep for the selected fixture set
-- treat partial emitted output as a hard evaluation failure, not as a partial closeout signal
-- close the Phase 1 checklist item only after the golden evaluation gate is green
+- reconcile the repo-local fixture manifest and the server golden-corpus manifest into one canonical selected set
+- rerun the full-batch evaluation on that unified corpus contract
 
 Current blocker on the testing box:
 
-- the scaffold path is now canonical and the first `app`-container canary is green again after a clean rebuild, but the full fixture sweep has not finished yet
+- the current server corpus is green, but repo and server now disagree about which fixture set is canonical
 
 Current blocking gaps from the 2026-04-09 testing-box pass:
 
-- runtime baseline is green through the canonical container path for at least one real golden PDF
-- provenance truthfulness is now verified on the emitted real-PDF output
-- the scaffold confusion around evaluation paths is closed: the canonical evaluation path is the server repo checkout, not the `app` container image
-- the current canonical canary is green again with `actual tables=9` and `actual table_cells=449`
-- the full selected fixture set still needs to clear the same VPS ingest/evaluation gate
-- the strict evaluation gate now rejects output directories that do not cover the full selected manifest fixture set
-- an isolated container using `http://localhost:8070` cannot reach GROBID, so hybrid Docling+GROBID verification still depends on container networking/configuration rather than code shape
+- the canonical `app`-container canary is green again with `actual tables=9` and `actual table_cells=449`
+- the full currently installed server corpus is green when evaluated against `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+- the repo-local `test_corpus/corpus-manifest.json` describes a different renamed fixture set, so the same emitted JSON fails against the repo manifest
+- the remaining blocker is corpus-contract reconciliation, not parser/runtime stabilization on the current server corpus
 
 Success means:
 
@@ -181,11 +177,10 @@ Final step:
 
 The next execution slice is:
 
-1. finish the full `synapse ingest` pass across `/srv/synapse/test_corpus/golden`
-2. run `scripts/evaluate_ingest.py` across that full output set
-3. decide whether the canonical verification target is Docling-only fallback or a container-networked Docling+GROBID path
-4. close Phase 1 only after the golden evaluation gate is green for the selected fixture set
-5. only then open Phase 2 storage work
+1. reconcile `test_corpus/corpus-manifest.json` with `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+2. keep exactly one canonical selected fixture set across repo and server
+3. rerun the agreed full-batch evaluation on that unified contract
+4. begin Phase 2 storage interfaces only after that unified golden gate is green
 
 Do not move to storage or retrieval until this slice is green.
 

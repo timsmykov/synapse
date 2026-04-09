@@ -23,7 +23,7 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
-Phase 1 status: partially verified. The canonical VPS `app`-container ingest path now emits real-PDF output through a fixed scaffold path, the first representative canary is green again as a debugging milestone, provenance truthfulness is verified, and partial emitted output is now a hard evaluation failure by design, but the full golden-fixture sweep on the VPS is still pending. See `docs/phase-1-verification.md`.
+Phase 1 status: partially verified. The canonical VPS `app`-container canary is green, and the currently installed five-document server corpus passes as a full batch when evaluated against the matching server-side manifest. The remaining blocker is corpus-contract drift between the repo-local manifest and the server golden-corpus manifest. See `docs/phase-1-verification.md`.
 
 Execution rule for this phase:
 
@@ -40,17 +40,7 @@ Execution rule for this phase:
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
-- [ ] Прогнать golden fixtures на VPS через canonical container ingest path и зафиксировать `docs/phase-1-verification.md`.
-
-Open observations from the 2026-04-09 testing-box pass:
-
-- canonical cycle confirmed: `git pull --ff-only origin main` -> `./scripts/deploy_staging.sh` -> `./scripts/run_ingest_smoke.sh` -> `./scripts/check_staging.sh`
-- canonical `app`-container ingest succeeded for `01-ecommerce-meta-analysis.pdf` and emitted `/srv/synapse/repo/data/phase1-canary/01-ecommerce-meta-analysis.json`
-- canonical evaluation now runs from the server repo checkout via `./scripts/evaluate_golden_ingest.sh`, not from inside the `app` container image
-- after a clean `app` image rebuild from the current checkout, the canonical canary output remains a useful parser/debugging milestone for provenance, section-order, formula, and table-extraction checks on that one fixture
-- the current canonical canary detail is `minimum expected tables=2, actual tables=9; minimum expected table_cells=12, actual table_cells=449`
-- partial emitted output no longer counts as acceptance evidence: `scripts/evaluate_ingest.py` now fails any output directory that does not cover the full selected manifest fixture set
-- the isolated container still could not reach `http://localhost:8070`, so the hybrid GROBID path was exercised as an optional warning fallback rather than as an integrated parser baseline
+- [ ] Свести repo-local fixture manifest и server golden-corpus manifest к одному canonical fixture set и зафиксировать `docs/phase-1-verification.md`.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -117,8 +107,8 @@ Open observations from the 2026-04-09 testing-box pass:
 
 Следующий правильный execution slice:
 
-1. Прогнать containerized `synapse ingest` по полному golden fixture set в `/srv/synapse/test_corpus/golden`.
-2. Прогнать `scripts/evaluate_ingest.py` по полному output set; частичный output set теперь должен считаться ошибкой, а не частичным успехом.
+1. Свести `test_corpus/corpus-manifest.json` и `/srv/synapse/test_corpus/golden/corpus-manifest.json` к одному canonical fixture set.
+2. Повторно прогнать canonical full-batch evaluation на этом unified contract и обновить `docs/phase-1-verification.md`.
 3. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
 
 Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
