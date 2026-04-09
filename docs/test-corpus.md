@@ -27,9 +27,9 @@ This path is the operator-owned source folder on the Mac workstation.
 The first operational baseline uses these five source PDFs:
 
 - `Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf`
+- `Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf`
 - `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
-- `Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf`
-- `Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf`
+- `Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf`
 - `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
 
 These are mapped to stable mirrored names in [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json).

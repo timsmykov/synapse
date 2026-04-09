@@ -34,6 +34,7 @@ class EvaluationTest(unittest.TestCase):
                             "document_id": "doc-01",
                             "file_name": "01-ecommerce-meta-analysis.pdf",
                             "domain": "medicine",
+                            "source_path": "/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf",
                             "layout_features": ["tables", "figures"],
                             "expected_artifacts": {
                                 "sections": 2,
@@ -54,6 +55,10 @@ class EvaluationTest(unittest.TestCase):
 
         self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0].file_name, "01-ecommerce-meta-analysis.pdf")
+        self.assertEqual(
+            entries[0].source_path,
+            "/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf",
+        )
 
     def test_evaluate_document_record_reports_green_metrics_for_matching_counts(self) -> None:
         entry = load_corpus_manifest_data()[0]
@@ -163,6 +168,98 @@ class EvaluationTest(unittest.TestCase):
             with self.assertRaises(KeyError):
                 evaluate_ingest_outputs(manifest_path, output_path)
 
+    def test_evaluate_ingest_outputs_matches_by_fixture_file_stem(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = root / "manifest.json"
+            output_path = root / "01-ecommerce-meta-analysis.json"
+            manifest_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "document_id": "doc-01",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
+                            "domain": "ecommerce",
+                            "source_path": "/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 0,
+                                "tables": 0,
+                                "table_cells": 0,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            output_path.write_text(
+                DocumentRecord(document_id="01-ecommerce-meta-analysis", title="Study").model_dump_json(),
+                encoding="utf-8",
+            )
+
+            reports = evaluate_ingest_outputs(manifest_path, output_path)
+
+        self.assertEqual(len(reports), 1)
+        self.assertEqual(reports[0].fixture_file_name, "01-ecommerce-meta-analysis.pdf")
+
+    def test_evaluate_ingest_outputs_can_require_full_fixture_set(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = root / "manifest.json"
+            output_path = root / "01-ecommerce-meta-analysis.json"
+            manifest_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "document_id": "doc-01",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
+                            "domain": "ecommerce",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 0,
+                                "tables": 0,
+                                "table_cells": 0,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                        {
+                            "document_id": "doc-02",
+                            "file_name": "02-service-robot-study.pdf",
+                            "domain": "robots",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 0,
+                                "tables": 0,
+                                "table_cells": 0,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            output_path.write_text(
+                DocumentRecord(document_id="01-ecommerce-meta-analysis", title="Study").model_dump_json(),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "full golden corpus fixture set"):
+                evaluate_ingest_outputs(
+                    manifest_path,
+                    output_path,
+                    require_complete_fixture_set=True,
+                )
+
     def test_audit_corpus_manifest_reports_missing_and_undocumented_files(self) -> None:
         fixtures = load_corpus_manifest_data()
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -170,7 +267,7 @@ class EvaluationTest(unittest.TestCase):
             (corpus_dir / "extra.pdf").write_bytes(b"%PDF-1.4\n")
             audit = audit_corpus_manifest(
                 fixtures,
-                manifest_path="test_corpus/corpus-manifest.template.json",
+                manifest_path="test_corpus/corpus-manifest.json",
                 corpus_dir=corpus_dir,
             )
 
@@ -248,6 +345,34 @@ class EvaluationTest(unittest.TestCase):
 
         self.assertEqual(metrics["table_extraction_accuracy"].value, 1.0)
 
+    def test_provenance_metric_allows_missing_confidence_when_other_fields_are_valid(self) -> None:
+        entry = load_corpus_manifest_data()[0]
+        provenance = Provenance(
+            source_document_id="doc-01",
+            page_number=1,
+            parser="docling",
+        )
+        document = DocumentRecord(
+            document_id="doc-01",
+            title="Study",
+            artifacts=[
+                Section(
+                    artifact_id="sec-1",
+                    document_id="doc-01",
+                    provenance=provenance,
+                    heading="Intro",
+                    level=1,
+                    text="A",
+                    order=0,
+                )
+            ],
+        )
+
+        report = evaluate_document_record(document, entry)
+        metrics = {metric.name: metric for metric in report.metrics}
+
+        self.assertEqual(metrics["provenance_correctness"].value, 1.0)
+
 
 def load_corpus_manifest_data() -> list:
     return load_corpus_manifest_from_json(
@@ -256,6 +381,7 @@ def load_corpus_manifest_data() -> list:
                 "document_id": "doc-01",
                 "file_name": "01-ecommerce-meta-analysis.pdf",
                 "domain": "medicine",
+                "source_path": "/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf",
                 "layout_features": ["tables", "formulas", "multi_column"],
                 "expected_artifacts": {
                     "sections": 2,

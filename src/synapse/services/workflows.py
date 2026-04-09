@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+from time import perf_counter
 
 from synapse.config import Settings, get_settings
 from synapse.domain import DocumentRecord
@@ -25,15 +27,22 @@ from synapse.runtime_health import build_runtime_health_report
 from .reporting import DoctorReport
 
 
+logger = logging.getLogger(__name__)
+
+
 def ingest_workflow(request: IngestTaskRequest) -> TaskReceipt:
     try:
         resolved_sources = resolve_ingest_sources(request.source_uri)
-    except FileNotFoundError:
+    except FileNotFoundError as exc:
         return TaskReceipt(
             task_id=request.task_id or request.source_uri,
             task_type=request.task_type,
-            message=f"Ingest prepared for {request.source_uri}",
-            result=request.model_dump(mode="json"),
+            status="failed",
+            message=str(exc),
+            result={
+                **request.model_dump(mode="json"),
+                "error": str(exc),
+            },
         )
 
     warnings: list[str] = []
@@ -117,10 +126,47 @@ def doctor_workflow(settings: Settings | None = None) -> DoctorReport:
 
 def build_document_record(source_path: Path) -> tuple[DocumentRecord, list[str]]:
     warnings: list[str] = []
-    docling = DoclingAdapter().convert(str(source_path))
+    settings = get_settings()
+    logger.info(
+        "Starting document build for %s with OCR %s",
+        source_path.name,
+        "enabled" if settings.parser_ocr_enabled else "disabled",
+    )
+
+    docling_started = perf_counter()
+    docling = DoclingAdapter(ocr_enabled=settings.parser_ocr_enabled).convert(str(source_path))
+    logger.info(
+        "Docling conversion completed for %s in %.2fs",
+        source_path.name,
+        perf_counter() - docling_started,
+    )
+
     grobid = None
+    grobid_started = perf_counter()
     try:
         grobid = GrobidAdapter().extract(str(source_path))
+        logger.info(
+            "GROBID extraction completed for %s in %.2fs",
+            source_path.name,
+            perf_counter() - grobid_started,
+        )
     except GrobidDependencyError as exc:
         warnings.append(str(exc))
+        logger.warning(
+            "GROBID dependency unavailable for %s after %.2fs: %s",
+            source_path.name,
+            perf_counter() - grobid_started,
+            exc,
+        )
+    except Exception as exc:
+        warnings.append(
+            f"GROBID extraction failed for {source_path.name}: {exc}. "
+            "Continuing with Docling-only ingest output."
+        )
+        logger.warning(
+            "GROBID extraction failed for %s after %.2fs: %s",
+            source_path.name,
+            perf_counter() - grobid_started,
+            exc,
+        )
     return merge_document_record(docling, grobid), warnings

@@ -15,7 +15,17 @@ if str(SRC) not in sys.path:
 
 
 def main() -> int:
-    from synapse.evaluation import evaluate_ingest_outputs
+    try:
+        from synapse.evaluation import evaluate_ingest_outputs
+    except ModuleNotFoundError as exc:
+        missing = exc.name or "required module"
+        print(
+            "Unable to import Synapse evaluation dependencies "
+            f"({missing}). Run this script inside the app container or install the repo "
+            "dependencies first.",
+            file=sys.stderr,
+        )
+        return 2
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -29,7 +39,11 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    reports = evaluate_ingest_outputs(args.manifest, args.ingest_output)
+    reports = evaluate_ingest_outputs(
+        args.manifest,
+        args.ingest_output,
+        require_complete_fixture_set=True,
+    )
     payload = {
         "reports": [report.model_dump(mode="json") for report in reports],
         "passed": all(report.passed for report in reports),

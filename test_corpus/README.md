@@ -43,7 +43,7 @@ Do not rename files after they are accepted into the baseline.
 
 ## Required Sidecar Metadata
 
-Each entry in `corpus-manifest.template.json` should contain:
+Each entry in `corpus-manifest.json` should contain:
 
 - `document_id`
 - `file_name`
