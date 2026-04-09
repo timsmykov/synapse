@@ -77,3 +77,10 @@ Phase 1 can be marked green only when:
 - the full selected golden fixture set emits JSON through the canonical ingest path
 - the evaluation pass is green for every selected fixture
 - the output directory covers the full canonical manifest without omissions
+
+## Immediate Handoff Plan
+
+1. Scaffold owner runs the canonical VPS command above against the latest `/srv/synapse/repo/data/ingest-golden` output set.
+2. If the payload shows `passed: false` because of `missing_document_ids`, fix the ingest sweep or output directory before touching thresholds or parser logic.
+3. If coverage is complete but one or more fixture reports are red, hand the failing fixture ids to the owning component lane with the emitted JSON and metric details.
+4. After each VPS verification pass, update this file and `docs/implementation-checklist.md` in the same change-set; do not leave verification state implicit in chat history.

@@ -8,6 +8,11 @@ Primary navigation:
 
 Принцип простой: идём строго сверху вниз. Пока незакрытые пункты текущей фазы не завершены, в следующую фазу не прыгаем.
 
+Agent rule:
+
+- после каждого scoped slice агент обязан сам обновить checklist и все затронутые verification/corpus/deploy/architecture docs в тот же проход
+- doc sync считается частью `done`, а не отдельной последующей задачей
+
 ## Phase 0. Repo And Runtime Foundation
 
 - [x] Полностью удалить старый landing/static-site код и заменить репо на новый Synapse scaffold.

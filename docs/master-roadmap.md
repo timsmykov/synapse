@@ -163,6 +163,7 @@ Use this operating model during the MVP:
 - Read `docs/implementation-checklist.md` before implementation.
 - Work top-down: do not skip phases.
 - After finishing a scoped task, update the relevant checkbox status in `docs/implementation-checklist.md`.
+- After finishing a scoped task, proactively update any touched verification, corpus, deploy, architecture, or roadmap docs before handing off the lane.
 - If a task changes the execution order, update this file first, then the checklist.
 - Keep entrypoints thin; put logic into `domain`, `services`, or the relevant layer package.
 - Treat the checklist as the progress ledger and this file as the strategic execution map.
