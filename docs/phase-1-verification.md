@@ -4,81 +4,105 @@ Date: 2026-04-09
 
 This document records the current Phase 1 verification state for Synapse on the testing VPS.
 
+## Canonical Server Flow
+
+Verified on `ssh root@194.163.181.122`:
+
+1. `./scripts/deploy_staging.sh`
+2. `./scripts/check_staging.sh`
+3. `./scripts/run_ingest_smoke.sh`
+4. `./scripts/run_golden_ingest.sh data/phase1-seq-full`
+5. `./scripts/evaluate_golden_ingest.sh data/phase1-seq-full test_corpus/corpus-manifest.json`
+
+The canonical server-side golden ingest helper now expands the fixture set on the host and runs one PDF at a time through the running `app` container. This avoids the earlier opaque full-batch path and keeps the emitted output set inspectable while the run is in flight.
+
 ## Verified Now
 
-- the canonical VPS cycle is working: `git pull` -> `./scripts/deploy_staging.sh` -> `./scripts/run_ingest_smoke.sh` -> `./scripts/check_staging.sh`
+- the canonical VPS cycle is working: deploy, check, smoke, full golden ingest, strict evaluation
 - the containerized `synapse ingest --source/--output` contract is green
-- the `GROBID optional` policy is green: ingest stays `succeeded` and surfaces GROBID failure as a warning
-- the canonical `app`-container canary for `01-ecommerce-meta-analysis.pdf` is green after a clean image rebuild
-- canary evaluation confirms `table_extraction_accuracy`, `formula_fidelity`, `provenance_correctness`, and `section_order_correctness`
+- the strict full-corpus evaluation gate is green on the selected five-document golden set
+- provenance correctness, section ordering, table extraction, and formula fidelity all pass on the full emitted output set
+- the selected Phase 1 fixture set is now verified end-to-end on the VPS against the repo-local manifest
 
-## Canary Evidence
+## Full Golden Sweep Evidence
 
-Canonical canary path:
+Canonical full run on 2026-04-09:
 
 ```bash
 cd /srv/synapse/repo
-./scripts/run_golden_ingest.sh data/phase1-canary '/srv/synapse/test_corpus/golden/01-ecommerce-meta-analysis.pdf'
-./scripts/evaluate_golden_ingest.sh data/phase1-canary test_corpus/corpus-manifest.json
+./scripts/run_golden_ingest.sh data/phase1-seq-full
 ```
 
-Observed canary result on 2026-04-09:
+Observed emitted output set:
 
-- emitted output: `/srv/synapse/repo/data/phase1-canary/01-ecommerce-meta-analysis.json`
-- evaluation detail: `minimum expected tables=2, actual tables=9; minimum expected table_cells=12, actual table_cells=449`
+- `/srv/synapse/repo/data/phase1-seq-full/01-ecommerce-meta-analysis.json`
+- `/srv/synapse/repo/data/phase1-seq-full/02-service-robot-study.json`
+- `/srv/synapse/repo/data/phase1-seq-full/03-anthropomorphism-meta-analysis.json`
+- `/srv/synapse/repo/data/phase1-seq-full/04-ai-systematic-review.json`
+- `/srv/synapse/repo/data/phase1-seq-full/05-ai-ethics-review.json`
 
-## Full Batch Evidence On The Current Server Corpus
+Observed ingest receipts:
 
-The currently installed five-document server corpus already has a full emitted output set:
+- `01-ecommerce-meta-analysis.pdf`: `artifact_count=427`, parser=`docling`, warnings=`[]`
+- `02-service-robot-study.pdf`: `artifact_count=508`, parser=`docling`, warning-only GROBID fallback
+- `03-anthropomorphism-meta-analysis.pdf`: `artifact_count=445`, parser=`docling`, warning-only GROBID fallback
+- `04-ai-systematic-review.pdf`: `artifact_count=464`, parser=`docling`, warning-only GROBID fallback
+- `05-ai-ethics-review.pdf`: `artifact_count=608`, parser=`docling`, warning-only GROBID fallback
 
-- `/srv/synapse/repo/data/phase1-batch`
+## Strict Evaluation Evidence
 
-Evaluating that output set against the server-side golden manifest is green:
+Strict evaluation was run from the branch checkout against the full emitted output set:
 
 ```bash
-cd /srv/synapse/repo
+cd /srv/synapse/worktrees/phase1-gate-hardening
 /srv/synapse/.venv/bin/python scripts/evaluate_ingest.py \
-  data/phase1-batch \
-  --manifest /srv/synapse/test_corpus/golden/corpus-manifest.json
+  /srv/synapse/repo/data/phase1-seq-full \
+  --manifest test_corpus/corpus-manifest.json
 ```
 
 Observed result on 2026-04-09:
 
 - `passed=true`
-- all five selected fixtures passed
-- `table_extraction_accuracy`, `formula_fidelity`, `provenance_correctness`, and `section_order_correctness` were green for all five outputs
+- all five selected fixtures matched the manifest and passed all Day 1 metrics
 
-## Current Blocker
+Per-fixture highlights:
 
-The remaining blocker is now corpus-contract drift, not parser/runtime stability.
+- `01-ecommerce-meta-analysis.pdf`: `tables=9`, `table_cells=449`
+- `02-service-robot-study.pdf`: `tables=7`, `table_cells=568`
+- `03-anthropomorphism-meta-analysis.pdf`: `tables=9`, `table_cells=1034`
+- `04-ai-systematic-review.pdf`: `tables=4`, `table_cells=284`
+- `05-ai-ethics-review.pdf`: `tables=14`, `table_cells=524`
 
-There is a mismatch between:
+All five passed:
 
-- `/srv/synapse/repo/test_corpus/corpus-manifest.json`
-- `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+- `table_extraction_accuracy`
+- `formula_fidelity`
+- `provenance_correctness`
+- `section_order_correctness`
 
-The repo-local manifest describes a newer fixture set with renamed files such as `02-jams-service-review.pdf`.
-The server golden corpus still describes the older installed fixture set with files such as `02-service-robot-study.pdf`.
+## Operational Note
 
-Because of that drift:
+The current testing-box baseline still shows intermittent `GROBID` hostname resolution failures from inside the `app` container:
 
-- evaluating `data/phase1-batch` against the repo-local manifest fails with a manifest mismatch
-- evaluating the same emitted JSON against the matching server manifest passes cleanly
+- `http://grobid:8070` occasionally resolves to a `NameResolutionError`
+- the current ingest contract treats this as a warning-only fallback
+- the full Phase 1 verification pass still succeeds because the baseline parser path is allowed to fall back to Docling-only output
+
+This is still an operational issue worth hardening, but it is not a blocker for Phase 1 closeout under the current fallback policy.
 
 ## Phase 1 Status
 
-Phase 1 is partially verified.
+Phase 1 is verified for the current selected corpus baseline.
 
 Closed:
 
 - canonical testing-box deploy/check/smoke path
 - stable ingest CLI contract
-- optional GROBID fallback behavior
-- green real-PDF canary on the canonical `app` path
-- green full-batch evaluation for the corpus currently installed on the server
+- strict full-corpus evaluation gate
+- canonical VPS full golden sweep on the selected five-document corpus
+- full green Day 1 metric pass on the emitted output set
 
-Still open:
+Open after Phase 1 closeout:
 
-- reconcile the repo-local manifest and the server golden-corpus manifest so the same fixture set is canonical in both places
-- rerun the agreed full-batch evaluation after that corpus contract is unified
-- only then close the Phase 1 checklist item
+- harden `GROBID` service discovery inside the testing-box `app` container
+- decide whether future verification should require hybrid Docling+GROBID output or keep the current Docling-first fallback baseline
