@@ -28,13 +28,29 @@ def main() -> int:
         help="Path to the corpus manifest JSON file",
     )
     args = parser.parse_args()
+    manifest_path = str(Path(args.manifest))
+    ingest_output = str(Path(args.ingest_output))
 
     try:
         reports = evaluate_ingest_outputs(args.manifest, args.ingest_output)
-    except (IngestCoverageError, KeyError) as exc:
+    except IngestCoverageError as exc:
         payload = {
             "reports": [],
             "passed": False,
+            "manifest_path": exc.manifest_path,
+            "ingest_output": exc.output_path,
+            "evaluated_document_ids": exc.evaluated_document_ids,
+            "missing_document_ids": exc.missing_document_ids,
+            "error": str(exc),
+        }
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 1
+    except KeyError as exc:
+        payload = {
+            "reports": [],
+            "passed": False,
+            "manifest_path": manifest_path,
+            "ingest_output": ingest_output,
             "error": str(exc),
         }
         print(json.dumps(payload, indent=2, sort_keys=True))
@@ -43,6 +59,10 @@ def main() -> int:
     payload = {
         "reports": [report.model_dump(mode="json") for report in reports],
         "passed": all(report.passed for report in reports),
+        "manifest_path": manifest_path,
+        "ingest_output": ingest_output,
+        "evaluated_document_ids": [report.document_id for report in reports],
+        "report_count": len(reports),
     }
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0 if payload["passed"] else 1
