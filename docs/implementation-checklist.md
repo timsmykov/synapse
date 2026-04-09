@@ -23,7 +23,7 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
-Phase 1 status: verified for the current selected corpus baseline. The canonical VPS `app`-container path now completes the full five-document golden sweep and passes the strict full-corpus evaluation gate. The remaining operational issue is intermittent `GROBID` DNS fallback inside the container, but that is warning-only under the current contract and does not block Phase 1 closeout. See `docs/phase-1-verification.md`.
+Phase 1 status: verified for the current selected corpus baseline. The canonical VPS `app`-container path now completes the full five-document golden sweep and passes the strict full-corpus evaluation gate. A separate testing-box hardening issue remains around intermittent `GROBID` DNS resolution inside the container, but that is warning-only under the current contract and does not block Phase 1 closeout. See `docs/phase-1-verification.md`.
 
 - [x] Реализовать `Docling` adapter в `src/synapse/ingest/`.
 - [x] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
@@ -103,9 +103,9 @@ Phase 1 status: verified for the current selected corpus baseline. The canonical
 
 1. Зафиксировать storage interfaces и persistence path в Postgres/MinIO.
 2. Добавить bootstrap/init path для server Postgres и MinIO contracts.
-3. Параллельно отдельно закрыть `GROBID` service discovery hardening на testing box, не откатывая Phase 1 closeout.
+3. Отдельным workstream закрыть `GROBID` service discovery hardening на testing box, не откатывая Phase 1 closeout.
 
-Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
+Пока эти 3 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 
 ## Environment Policy
 
