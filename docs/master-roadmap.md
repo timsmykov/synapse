@@ -106,19 +106,21 @@ Closed in this slice:
 Remaining:
 
 - complete the full VPS-backed golden ingest/evaluation sweep for the selected fixture set
+- treat partial emitted output as a hard evaluation failure, not as a partial closeout signal
 - close the Phase 1 checklist item only after the golden evaluation gate is green
 
 Current blocker on the testing box:
 
-- the scaffold path is now canonical and can evaluate real-PDF outputs on the VPS, but the current `app`-container canary still fails the table gate and the full fixture sweep has not finished yet
+- the scaffold path is now canonical and the first `app`-container canary is green again after a clean rebuild, but the full fixture sweep has not finished yet
 
 Current blocking gaps from the 2026-04-09 testing-box pass:
 
 - runtime baseline is green through the canonical container path for at least one real golden PDF
 - provenance truthfulness is now verified on the emitted real-PDF output
 - the scaffold confusion around evaluation paths is closed: the canonical evaluation path is the server repo checkout, not the `app` container image
-- the current canonical canary still fails the table gate with `actual tables=0` and `actual table_cells=0`
+- the current canonical canary is green again with `actual tables=9` and `actual table_cells=449`
 - the full selected fixture set still needs to clear the same VPS ingest/evaluation gate
+- the strict evaluation gate now rejects output directories that do not cover the full selected manifest fixture set
 - an isolated container using `http://localhost:8070` cannot reach GROBID, so hybrid Docling+GROBID verification still depends on container networking/configuration rather than code shape
 
 Success means:
@@ -179,12 +181,11 @@ Final step:
 
 The next execution slice is:
 
-1. restore table extraction on the canonical `app`-container path for the first canary
-2. finish the full `synapse ingest` pass across `/srv/synapse/test_corpus/golden`
-3. run `scripts/evaluate_ingest.py` across that full output set
-4. decide whether the canonical verification target is Docling-only fallback or a container-networked Docling+GROBID path
-5. close Phase 1 only after the golden evaluation gate is green for the selected fixture set
-6. only then open Phase 2 storage work
+1. finish the full `synapse ingest` pass across `/srv/synapse/test_corpus/golden`
+2. run `scripts/evaluate_ingest.py` across that full output set
+3. decide whether the canonical verification target is Docling-only fallback or a container-networked Docling+GROBID path
+4. close Phase 1 only after the golden evaluation gate is green for the selected fixture set
+5. only then open Phase 2 storage work
 
 Do not move to storage or retrieval until this slice is green.
 

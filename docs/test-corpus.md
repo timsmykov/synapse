@@ -58,7 +58,8 @@ That second corpus wave should be added after the first ingest pass is stable.
 
 ## Next Step
 
-1. Run the first server-side ingest pass on `/srv/synapse/test_corpus/golden`.
-2. Evaluate the resulting JSON with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py).
-3. Refine `expected_artifacts` from provisional lower bounds to measured thresholds.
-4. Add a second corpus wave for formula-heavy and non-marketing scientific PDFs.
+1. Run the full selected server-side ingest pass on `/srv/synapse/test_corpus/golden`.
+2. Evaluate the full resulting JSON set with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py).
+3. Treat any partial output directory as a hard failure, because the evaluator now requires coverage of the full selected manifest fixture set.
+4. Refine `expected_artifacts` from provisional lower bounds to measured thresholds.
+5. Add a second corpus wave for formula-heavy and non-marketing scientific PDFs.

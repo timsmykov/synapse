@@ -86,4 +86,4 @@ A document is not an active golden fixture until:
 2. it exists in the external source folder; and
 3. it has been mirrored into a server-side or local execution corpus directory under the canonical filename.
 
-Use [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.py) to perform that mirror step.
+Use [`/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh`](/Users/timsmykov/Desktop/Synapse/scripts/sync_test_corpus.sh) to perform that mirror step.
