@@ -36,6 +36,16 @@ HOST_RAPIDOCR_CACHE="${SYNAPSE_RAPIDOCR_MODEL_DIR:-/srv/synapse/model-cache/rapi
 
 mkdir -p "${ROOT_DIR}/${OUTPUT_DIR}"
 find "${ROOT_DIR}/${OUTPUT_DIR}" -maxdepth 1 -type f -name '*.json' -delete
+find "${ROOT_DIR}/${OUTPUT_DIR}" -maxdepth 1 -type f -name 'run-*.log' -delete
+
+shopt -s nullglob
+sources=(${SOURCE_PATTERN})
+shopt -u nullglob
+
+if [[ ${#sources[@]} -eq 0 ]]; then
+  echo "No sources matched: ${SOURCE_PATTERN}" >&2
+  exit 1
+fi
 
 if ! docker network inspect "${NETWORK_NAME}" >/dev/null 2>&1; then
   echo "Missing Docker network ${NETWORK_NAME}. Bring up the staging stack first." >&2
@@ -60,11 +70,21 @@ if [[ -d "${HOST_RAPIDOCR_CACHE}" ]]; then
   DOCKER_ARGS+=(-v "${HOST_RAPIDOCR_CACHE}:/usr/local/lib/python3.12/site-packages/rapidocr/models")
 fi
 
-docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+run_index=0
+for source_path in "${sources[@]}"; do
+  run_index=$((run_index + 1))
+  log_path="${ROOT_DIR}/${OUTPUT_DIR}/run-$(printf '%02d' "${run_index}").log"
+  current_container_name="${CONTAINER_NAME}-$(printf '%02d' "${run_index}")"
 
-docker run "${DOCKER_ARGS[@]}" \
-  "${IMAGE_NAME}" \
-  sh -lc "synapse ingest --source '${SOURCE_PATTERN}' --output '/workspace/${OUTPUT_DIR}'"
+  echo "Running isolated ingest for ${source_path}"
+  docker rm -f "${current_container_name}" >/dev/null 2>&1 || true
+
+  docker run "${DOCKER_ARGS[@]}" \
+    --name "${current_container_name}" \
+    "${IMAGE_NAME}" \
+    sh -lc "synapse ingest --source '${source_path}' --output '/workspace/${OUTPUT_DIR}'" \
+    | tee "${log_path}"
+done
 
 echo
 find "${ROOT_DIR}/${OUTPUT_DIR}" -maxdepth 1 -type f -name '*.json' | sort | sed -n '1,40p'

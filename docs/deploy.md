@@ -175,10 +175,11 @@ Use this helper when you need a one-shot container instead of `docker compose ex
 
 By default this:
 
-- runs a fresh `synapse-testing:latest` container on `${COMPOSE_PROJECT_NAME}_default`
+- runs one fresh `synapse-testing:latest` container per matched PDF on `${COMPOSE_PROJECT_NAME}_default`
 - uses `deploy/.env.staging` for `SYNAPSE_GROBID_URL` and the rest of the runtime env
 - mounts `${SYNAPSE_SERVER_CORPUS_DIR}` read-only at the same absolute path inside the container
 - writes JSON to `data/ingest-golden-isolated/`
+- writes per-file logs as `data/ingest-golden-isolated/run-01.log`, `run-02.log`, and so on
 
 Optional arguments:
 
@@ -190,6 +191,7 @@ Optional arguments:
 ```
 
 Do not use ad-hoc `docker run ... -e SYNAPSE_GROBID_URL=http://localhost:8070` for parser verification. Outside the compose network, `localhost` points at the isolated container itself, not at the `grobid` service.
+On the current VPS, this helper is the safer fallback for full-batch verification because each PDF runs in a fresh container instead of accumulating memory pressure inside the long-lived `app` container.
 
 ## Golden evaluation
 
