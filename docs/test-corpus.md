@@ -69,3 +69,5 @@ That second corpus wave should be added after the first ingest pass is stable.
 3. Treat any missing golden JSON output as a hard failure, not as a partial green.
 4. Refine `expected_artifacts` from provisional lower bounds to measured thresholds.
 5. Add a second corpus wave for formula-heavy and non-marketing scientific PDFs.
+
+For the exact VPS command shape and the canonical success/failure JSON examples, use [`/Users/timsmykov/Desktop/Synapse/docs/phase-1-verification.md`](/Users/timsmykov/Desktop/Synapse/docs/phase-1-verification.md).
