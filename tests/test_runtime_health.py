@@ -72,6 +72,30 @@ class RuntimeHealthReportTest(unittest.TestCase):
         checks = {item.name: item for item in report.checks}
         self.assertEqual(checks["ingest_concurrency"].status, "warn")
 
+    def test_remote_policy_warns_when_embedding_and_ocr_flags_break_mvp_baseline(self) -> None:
+        report = build_runtime_health_report(
+            Settings(
+                environment="testing",
+                deployment_target="testing",
+                public_base_url="https://synapse.example.com",
+                reverse_proxy="caddy",
+                database_url="postgresql+psycopg://synapse:synapse@postgres:5432/synapse",
+                redis_url="redis://redis:6379/0",
+                minio_endpoint="minio:9000",
+                grobid_url="http://grobid:8070",
+                llm_provider="minimax",
+                embedding_provider="custom",
+                parser_ocr_enabled=True,
+                colpali_enabled=True,
+            )
+        )
+
+        self.assertEqual(report.status, "warn")
+        checks = {item.name: item for item in report.checks}
+        self.assertEqual(checks["embedding_provider"].status, "warn")
+        self.assertEqual(checks["parser_ocr"].status, "warn")
+        self.assertEqual(checks["colpali"].status, "warn")
+
     def test_testing_target_uses_remote_server_checks(self) -> None:
         report = build_runtime_health_report(
             Settings(

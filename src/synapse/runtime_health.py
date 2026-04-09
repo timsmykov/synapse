@@ -159,6 +159,66 @@ def build_runtime_health_report(settings: Settings) -> RuntimeHealthReport:
                     detail=f"llm provider is {settings.llm_provider}",
                 )
             )
+
+        if settings.embedding_provider.lower() != "openrouter":
+            checks.append(
+                RuntimeHealthCheck(
+                    name="embedding_provider",
+                    status="warn",
+                    detail=(
+                        "current MVP policy expects embeddings to be routed through "
+                        "OpenRouter unless a later phase explicitly changes that baseline"
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                RuntimeHealthCheck(
+                    name="embedding_provider",
+                    status="ok",
+                    detail="embedding provider is openrouter",
+                )
+            )
+
+        if settings.parser_ocr_enabled:
+            checks.append(
+                RuntimeHealthCheck(
+                    name="parser_ocr",
+                    status="warn",
+                    detail=(
+                        "MVP ingest keeps OCR disabled by default; enable OCR only for "
+                        "scanned or image-only PDFs after the base Docling path is stable"
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                RuntimeHealthCheck(
+                    name="parser_ocr",
+                    status="ok",
+                    detail="OCR is disabled for the default MVP ingest path",
+                )
+            )
+
+        if settings.colpali_enabled:
+            checks.append(
+                RuntimeHealthCheck(
+                    name="colpali",
+                    status="warn",
+                    detail=(
+                        "ColPali is deferred from the current MVP baseline and should stay "
+                        "off until the retrieval phase explicitly adopts it"
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                RuntimeHealthCheck(
+                    name="colpali",
+                    status="ok",
+                    detail="ColPali is deferred and currently disabled",
+                )
+            )
     else:
         checks.extend(
             [
@@ -181,6 +241,27 @@ def build_runtime_health_report(settings: Settings) -> RuntimeHealthReport:
                     name="llm_provider",
                     status="ok",
                     detail=f"llm provider is {settings.llm_provider}",
+                ),
+                RuntimeHealthCheck(
+                    name="embedding_provider",
+                    status="ok",
+                    detail=f"embedding provider is {settings.embedding_provider}",
+                ),
+                RuntimeHealthCheck(
+                    name="parser_ocr",
+                    status="ok",
+                    detail=(
+                        "OCR flag is off" if not settings.parser_ocr_enabled else "OCR flag is on"
+                    ),
+                ),
+                RuntimeHealthCheck(
+                    name="colpali",
+                    status="ok",
+                    detail=(
+                        "ColPali is disabled"
+                        if not settings.colpali_enabled
+                        else "ColPali is enabled"
+                    ),
                 ),
             ]
         )

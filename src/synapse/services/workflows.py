@@ -151,12 +151,14 @@ def build_document_record(source_path: Path) -> tuple[DocumentRecord, list[str]]
             perf_counter() - grobid_started,
         )
     except GrobidDependencyError as exc:
-        warnings.append(str(exc))
+        hint = GrobidAdapter.runtime_hint(settings.grobid_url)
+        message = f"{exc}{hint or ''}"
+        warnings.append(message)
         logger.warning(
             "GROBID dependency unavailable for %s after %.2fs: %s",
             source_path.name,
             perf_counter() - grobid_started,
-            exc,
+            message,
         )
     except Exception as exc:
         warnings.append(

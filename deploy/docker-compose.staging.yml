@@ -17,6 +17,7 @@ services:
       args:
         SYNAPSE_INSTALL_EXTRAS: ${SYNAPSE_INSTALL_EXTRAS:-}
         SYNAPSE_PIP_EXTRA_INDEX_URL: ${SYNAPSE_PIP_EXTRA_INDEX_URL:-}
+        SYNAPSE_PYTORCH_INDEX_URL: ${SYNAPSE_PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
     image: synapse-testing:latest
     env_file:
       - ./.env.staging
@@ -29,12 +30,13 @@ services:
       minio:
         condition: service_started
       grobid:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "127.0.0.1:${SYNAPSE_APP_PORT:-18000}:8000"
     volumes:
       - ../data:/workspace/data
       - ../test_corpus:/workspace/test_corpus
+      - ${SYNAPSE_SERVER_CORPUS_DIR:-../test_corpus}:/srv/synapse/test_corpus:ro
     healthcheck:
       test:
         [
@@ -82,8 +84,17 @@ services:
     restart: unless-stopped
 
   grobid:
-    image: ${GROBID_IMAGE:-python:3.12-alpine}
-    command: ${GROBID_COMMAND:-python -m http.server 8070}
+    image: ${GROBID_IMAGE:-grobid/grobid:0.8.2-crf}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O - http://127.0.0.1:8070/api/isalive | grep -q true",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     restart: unless-stopped
 
 volumes:

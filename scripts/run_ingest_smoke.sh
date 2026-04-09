@@ -29,6 +29,7 @@ OUTPUT_DIR="$(read_env_value "SYNAPSE_SMOKE_OUTPUT_DIR" "data/ingest-smoke")"
 
 FIXTURE_PATH="${ROOT_DIR}/test_corpus/smoke-fixture.pdf"
 mkdir -p "$(dirname "${FIXTURE_PATH}")" "${ROOT_DIR}/${OUTPUT_DIR}"
+find "${ROOT_DIR}/${OUTPUT_DIR}" -maxdepth 1 -type f -name '*.json' -delete
 
 cat > "${FIXTURE_PATH}" <<'EOF'
 %PDF-1.4
