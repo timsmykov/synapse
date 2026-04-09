@@ -54,7 +54,6 @@ fi
 
 DOCKER_ARGS=(
   --rm
-  --name "${CONTAINER_NAME}"
   --network "${NETWORK_NAME}"
   --env-file "${ENV_FILE}"
   -e "SYNAPSE_GROBID_URL=${GROBID_URL}"

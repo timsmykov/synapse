@@ -105,19 +105,19 @@ Closed in this slice:
 
 Remaining:
 
-- complete the full-batch VPS ingest/evaluation sweep for the selected fixture set
-- close the Phase 1 checklist item only after that full-batch gate is green
+- reconcile the repo-local fixture manifest and the server golden-corpus manifest into one canonical selected set
+- rerun the full-batch evaluation on that unified corpus contract
 
 Current blocker on the testing box:
 
-- the updated sequential full-batch launcher now starts correctly, but the first real-PDF pass is OOM-killed on the current VPS before JSON is emitted
+- the current server corpus is green through the isolated per-document path, but repo and server still disagree about which fixture set is canonical
 
 Current blocking gaps from the 2026-04-09 testing-box pass:
 
 - the canonical `app`-container canary is green again with `actual tables=9` and `actual table_cells=449`
-- the updated sequential full-batch launcher is now deployed in the PR worktree on the server
-- the full-batch path is currently blocked by VPS memory pressure, not by canary correctness or stale launcher logic
-- `dmesg` on the server confirms an OOM kill for the `synapse ingest` process during the first document of the batch
+- the isolated per-document full-batch path is green for the current server corpus
+- the repo-local `test_corpus/corpus-manifest.json` still describes a different renamed fixture set than `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+- the remaining blocker is corpus-contract reconciliation, not parser/runtime stabilization on the current server corpus
 
 Success means:
 
@@ -177,9 +177,9 @@ Final step:
 
 The next execution slice is:
 
-1. remove the VPS OOM blocker from the full-batch ingest path
-2. rerun the full `synapse ingest` pass across the selected golden fixture set
-3. run evaluation across that full output set
+1. reconcile `test_corpus/corpus-manifest.json` with `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+2. keep exactly one canonical selected fixture set across repo and server
+3. rerun the agreed full-batch evaluation on that unified contract
 4. begin Phase 2 storage interfaces only after that golden gate is green
 
 Do not move to storage or retrieval until this slice is green.

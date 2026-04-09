@@ -11,6 +11,7 @@ This document records the current Phase 1 verification state for Synapse on the 
 - the `GROBID optional` policy is green: ingest stays `succeeded` and surfaces GROBID failure as a warning
 - the canonical `app`-container canary for `01-ecommerce-meta-analysis.pdf` is green after a clean image rebuild
 - canary evaluation confirms `table_extraction_accuracy`, `formula_fidelity`, `provenance_correctness`, and `section_order_correctness`
+- the full selected server corpus now passes through the isolated per-document launcher without OOM
 
 ## Canary Evidence
 
@@ -29,35 +30,51 @@ Observed canary result on 2026-04-09:
 
 ## Full Batch Evidence On The Current Server Corpus
 
-The current scaffold launcher for a full five-document pass is now the updated sequential helper:
+The stable full-batch path on the current VPS is now the isolated per-document launcher:
 
 ```bash
-cd /srv/synapse/worktrees/phase1-gate-hardening
-./scripts/run_golden_ingest.sh data/phase1-golden-full
+cd /srv/synapse/repo
+./scripts/run_golden_ingest_isolated.sh data/phase1-isolated-full
 ```
 
-This path now starts correctly and writes per-file logs such as:
+Observed result on 2026-04-09:
 
-- `/srv/synapse/worktrees/phase1-gate-hardening/data/phase1-golden-full/run-01.log`
+- `exit=0`
+- all five selected fixtures emitted JSON under `/srv/synapse/repo/data/phase1-isolated-full`
+- per-file logs were written as `run-01.log` through `run-05.log`
+- all five isolated runs completed with `warnings=[]`
 
-However, the first document in the batch still does not complete on the current VPS.
+Canonical evaluation command on the VPS:
+
+```bash
+cd /srv/synapse/repo
+/srv/synapse/.venv/bin/python scripts/evaluate_ingest.py \
+  data/phase1-isolated-full \
+  --manifest /srv/synapse/test_corpus/golden/corpus-manifest.json
+```
+
+Observed evaluation result on 2026-04-09:
+
+- `passed=true`
+- all five selected fixtures passed
+- `table_extraction_accuracy`, `formula_fidelity`, `provenance_correctness`, and `section_order_correctness` were green for all five outputs
 
 ## Current Blocker
 
-The remaining blocker is now VPS memory pressure during the full-batch path.
+The remaining blocker is now corpus-contract drift, not parser/runtime stability on the server corpus.
 
-Observed failure on 2026-04-09:
+There is a mismatch between:
 
-- the sequential full-batch launcher starts normally on the updated PR worktree
-- `run-01.log` is created for `01-ecommerce-meta-analysis.pdf`
-- the `synapse ingest` process inside `app` is OOM-killed before the first JSON is emitted
+- `/srv/synapse/repo/test_corpus/corpus-manifest.json`
+- `/srv/synapse/test_corpus/golden/corpus-manifest.json`
 
-Evidence from `dmesg` on the VPS:
+The repo-local manifest describes a newer renamed fixture set.
+The server golden corpus still describes the currently installed fixture set with files such as `02-service-robot-study.pdf`.
 
-- `Out of memory: Killed process 541264 (synapse) ... anon-rss:1489124kB`
+Because of that drift:
 
-This means the current blocker is no longer canary correctness or stale launcher logic.
-It is the memory envelope of the shared testing box when the full-batch path runs inside the long-lived `app` container.
+- evaluating the green server output sets against the repo-local manifest still fails with a manifest mismatch
+- evaluating the same emitted JSON against the matching server golden manifest passes cleanly
 
 ## Phase 1 Status
 
@@ -69,10 +86,10 @@ Closed:
 - stable ingest CLI contract
 - optional GROBID fallback behavior
 - green real-PDF canary on the canonical `app` path
-- working sequential full-batch launcher in the updated PR worktree
+- green full-batch isolated-per-document sweep for the current server corpus
 
 Still open:
 
-- complete the full-batch pass without OOM-killing the `synapse ingest` process on the VPS
-- rerun full-batch evaluation after the memory/runtime blocker is removed
+- reconcile the repo-local manifest and the server golden-corpus manifest so the same fixture set is canonical in both places
+- rerun the agreed full-batch evaluation after that corpus contract is unified
 - only then close the Phase 1 checklist item
