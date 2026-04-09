@@ -8,6 +8,11 @@ Primary navigation:
 
 Принцип простой: идём строго сверху вниз. Пока незакрытые пункты текущей фазы не завершены, в следующую фазу не прыгаем.
 
+Agent rule:
+
+- после каждого scoped slice агент обязан сам обновить checklist и все затронутые verification/corpus/deploy/architecture docs в тот же проход
+- doc sync считается частью `done`, а не отдельной последующей задачей
+
 ## Phase 0. Repo And Runtime Foundation
 
 - [x] Полностью удалить старый landing/static-site код и заменить репо на новый Synapse scaffold.
@@ -23,24 +28,18 @@ Primary navigation:
 
 ## Phase 1. Ingestion Contract And Parsing Pipeline
 
-Phase 1 status: partially verified. The canonical VPS `app`-container canary is green, and the full selected server corpus now passes through the isolated per-document launcher with a green full-batch evaluation. The remaining blocker is corpus-contract drift between the repo-local manifest and the server golden-corpus manifest. See `docs/phase-1-verification.md`.
-
-Execution rule for this phase:
-
-- one owner for `scaffold`
-- separate owners for `docling`, `grobid`, and `merge/eval`
-- no parallel edits to shared integration seams such as `services/`, `cli`, `config`, deploy scripts, or roadmap/checklist docs
+Phase 1 status: verified for the current selected corpus baseline. The canonical VPS `app`-container path now completes the full five-document golden sweep and passes the strict full-corpus evaluation gate. A separate testing-box hardening issue remains around intermittent `GROBID` DNS resolution inside the container, but that is warning-only under the current contract and does not block Phase 1 closeout. See `docs/phase-1-verification.md`.
 
 - [x] Реализовать `Docling` adapter в `src/synapse/ingest/`.
 - [x] Реализовать `GROBID` metadata/citation adapter в `src/synapse/ingest/`.
 - [x] Зафиксировать merge-contract: как `Docling` и `GROBID` собираются в один `DocumentRecord`.
 - [x] Сделать реальный `synapse ingest <path>` для одного PDF.
 - [x] Поддержать batch ingest для директории / glob.
-- [x] Обеспечить provenance envelope для каждого artifact: `source_document_id`, `page_number`, `parser`, а также parser-provided `bbox` / `confidence` там, где парсер реально их отдаёт.
+- [x] Обеспечить сохранение provenance для каждого artifact: `source_document_id`, `page_number`, `bbox`, `parser`, `confidence`.
 - [x] Писать structured JSON output из ingest до подключения БД, чтобы отладить shape без infra-chaos.
 - [x] Добавить contract tests на shape `DocumentRecord`, `Section`, `TableArtifact`, `FormulaArtifact`, `FigureArtifact`.
 - [x] Добавить golden fixtures на 3-5 научных PDF с таблицами, формулами и multi-column layout.
-- [ ] Свести repo-local fixture manifest и server golden-corpus manifest к одному canonical fixture set и зафиксировать `docs/phase-1-verification.md`.
+- [x] Прогнать canonical full golden sweep на VPS и зафиксировать `docs/phase-1-verification.md`.
 
 ## Phase 2. Storage And Persistence Layer
 
@@ -107,37 +106,11 @@ Execution rule for this phase:
 
 Следующий правильный execution slice:
 
-1. Свести `test_corpus/corpus-manifest.json` и `/srv/synapse/test_corpus/golden/corpus-manifest.json` к одному canonical fixture set.
-2. Повторно прогнать canonical full-batch evaluation на этом unified contract и обновить `docs/phase-1-verification.md`.
-3. После этого перейти к storage interfaces и persistence path в Postgres/MinIO.
+1. Зафиксировать storage interfaces и persistence path в Postgres/MinIO.
+2. Добавить bootstrap/init path для server Postgres и MinIO contracts.
+3. Отдельным workstream закрыть `GROBID` service discovery hardening на testing box, не откатывая Phase 1 closeout.
 
-Пока эти 4 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
-
-## Ownership model
-
-Scaffold owner:
-
-- `src/synapse/config.py`
-- `src/synapse/cli.py`
-- `src/synapse/server.py`
-- `src/synapse/domain/`
-- `src/synapse/services/`
-- `deploy/`
-- `scripts/deploy_staging.sh`
-- `scripts/check_staging.sh`
-- `scripts/run_ingest_smoke.sh`
-- roadmap/checklist/verification docs
-
-Component owners:
-
-- `Docling`: `src/synapse/ingest/docling_adapter.py` and Docling-specific tests
-- `GROBID`: `src/synapse/ingest/grobid_adapter.py` and GROBID-specific tests
-- `Merge/normalize`: `src/synapse/ingest/merge.py`, `src/synapse/ingest/models.py`, merge/domain contract tests
-- `Evaluation/golden`: evaluation logic, corpus manifest, metric thresholds, verification analysis
-
-Rule:
-
-- component owners do not edit scaffold files unless that write scope is explicitly reassigned for a narrow integration task
+Пока эти 3 пункта не закрыты, не стоит уходить глубже в retrieval или science primitives.
 
 ## Environment Policy
 
@@ -145,5 +118,3 @@ Rule:
 - Общий VPS является основной средой установки, тестов, runtime и testing/integration.
 - До отдельного production node допускается один VPS для testing и приватных demo-нагрузок, но без тяжёлого локального LLM inference на той же машине.
 - Текущий testing target: `ssh root@194.163.181.122`.
-- Локальный Mac не используется для project-local `.venv`, local compose stack, deploy smoke или acceptance tests по Synapse.
-- Если такие локальные runtime-артефакты появляются, их нужно удалять и продолжать работу только через сервер.

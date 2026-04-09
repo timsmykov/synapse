@@ -89,7 +89,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -q -O - http://127.0.0.1:8070/api/isalive | grep -q true",
+          "bash -lc \"exec 3<>/dev/tcp/127.0.0.1/8070; printf 'GET /api/isalive HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep -q true <&3\"",
         ]
       interval: 10s
       timeout: 5s

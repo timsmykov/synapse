@@ -16,6 +16,12 @@ This path is the operator-owned source folder on the Mac workstation.
 - `test_corpus/` in the repo is for manifests, mirrors, fixture metadata, and test-side artifacts only.
 - The actual research PDFs should be selected from `/Users/timsmykov/Desktop/Статьи для теста` and then synced to the server-side corpus location for execution.
 
+## Canonical Manifest
+
+- [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json) is the only canonical manifest for the active golden baseline.
+- [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.template.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.template.json) is historical scaffolding only and must not drive evaluation defaults or Phase 1 signoff.
+- [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py) must evaluate against the canonical manifest and fail when the output set does not cover every selected fixture.
+
 ## Server-First Policy
 
 - Mac stores the source PDFs.
@@ -27,9 +33,9 @@ This path is the operator-owned source folder on the Mac workstation.
 The first operational baseline uses these five source PDFs:
 
 - `Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf`
-- `Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf`
 - `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
-- `Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf`
+- `Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf`
+- `Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf`
 - `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
 
 These are mapped to stable mirrored names in [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json).
@@ -58,8 +64,10 @@ That second corpus wave should be added after the first ingest pass is stable.
 
 ## Next Step
 
-1. Run the full selected server-side ingest pass on `/srv/synapse/test_corpus/golden`.
-2. Evaluate the full resulting JSON set with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py).
-3. Treat any partial output directory as a hard failure, because the evaluator now requires coverage of the full selected manifest fixture set.
+1. Run the first server-side ingest pass on `/srv/synapse/test_corpus/golden`.
+2. Evaluate the resulting JSON with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py) against the canonical manifest.
+3. Treat any missing golden JSON output as a hard failure, not as a partial green.
 4. Refine `expected_artifacts` from provisional lower bounds to measured thresholds.
 5. Add a second corpus wave for formula-heavy and non-marketing scientific PDFs.
+
+For the exact VPS command shape and the canonical success/failure JSON examples, use [`/Users/timsmykov/Desktop/Synapse/docs/phase-1-verification.md`](/Users/timsmykov/Desktop/Synapse/docs/phase-1-verification.md).

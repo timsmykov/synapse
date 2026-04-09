@@ -20,10 +20,10 @@ from synapse.domain.common import SynapseModel
 
 CANONICAL_FIXTURE_NAMES = {
     "01-ecommerce-meta-analysis.pdf",
-    "02-service-robot-study.pdf",
-    "03-anthropomorphism-meta-analysis.pdf",
-    "04-ai-systematic-review.pdf",
-    "05-ai-ethics-review.pdf",
+    "02-jams-service-review.pdf",
+    "03-ebusiness-latent-topics.pdf",
+    "04-chatbot-customer-experience.pdf",
+    "05-ai-ethics-recommendation-systems.pdf",
 }
 
 ALLOWED_LAYOUT_FEATURES = {
@@ -54,7 +54,6 @@ class CorpusFixture(SynapseModel):
     document_id: str
     file_name: str
     domain: str
-    source_path: str | None = None
     source_file_name: str | None = None
     source_title: str | None = None
     page_count: int | None = Field(default=None, ge=1)
@@ -110,15 +109,25 @@ class IngestEvaluationReport(SynapseModel):
     passed: bool
 
 
-class IngestOutputCoverageReport(SynapseModel):
-    """Coverage audit for emitted ingest outputs against the golden manifest."""
+class IngestCoverageError(ValueError):
+    """Raised when an ingest output set does not cover the selected manifest."""
 
-    manifest_path: str
-    output_path: str
-    matched_fixture_file_names: list[str] = Field(default_factory=list)
-    missing_fixture_file_names: list[str] = Field(default_factory=list)
-    unexpected_document_ids: list[str] = Field(default_factory=list)
-    status: Literal["ok", "fail"] = "ok"
+    def __init__(
+        self,
+        *,
+        manifest_path: str | Path,
+        output_path: str | Path,
+        missing_document_ids: list[str],
+        evaluated_document_ids: list[str],
+    ) -> None:
+        self.manifest_path = str(manifest_path)
+        self.output_path = str(output_path)
+        self.missing_document_ids = missing_document_ids
+        self.evaluated_document_ids = evaluated_document_ids
+        super().__init__(
+            "ingest outputs do not cover the full corpus manifest; "
+            f"missing document_ids: {', '.join(missing_document_ids)}"
+        )
 
 
 def load_corpus_manifest(manifest_path: str | Path) -> list[CorpusFixture]:
@@ -224,8 +233,8 @@ def evaluate_document_record(
             target=1.0,
             passed=provenance_score >= 1.0,
             detail=(
-                "checks source_document_id, page_number, parser, optional confidence "
-                "range, and bbox page consistency"
+                "checks source_document_id, page_number, parser, confidence, "
+                "and bbox page consistency"
             ),
         ),
         MetricResult(
@@ -251,75 +260,31 @@ def evaluate_document_record(
 def evaluate_ingest_outputs(
     manifest_path: str | Path,
     output_path: str | Path,
-    *,
-    require_complete_fixture_set: bool = False,
 ) -> list[IngestEvaluationReport]:
     """Evaluate one or more ingest JSON outputs against the corpus manifest."""
 
     fixtures = load_corpus_manifest(manifest_path)
-    fixture_index = _build_fixture_index(fixtures)
-    records = load_document_records(output_path)
-    coverage = audit_ingest_outputs(
-        fixtures,
-        records,
-        manifest_path=manifest_path,
-        output_path=output_path,
-    )
-    if coverage.unexpected_document_ids:
-        formatted = ", ".join(coverage.unexpected_document_ids)
-        raise KeyError(f"ingest outputs do not match the corpus manifest: {formatted}")
-    if require_complete_fixture_set and coverage.missing_fixture_file_names:
-        formatted = ", ".join(coverage.missing_fixture_file_names)
-        raise ValueError(
-            "ingest output does not cover the full golden corpus fixture set; "
-            f"missing: {formatted}"
-        )
-
+    fixture_index = {fixture.document_id: fixture for fixture in fixtures}
     reports: list[IngestEvaluationReport] = []
-    for record in records:
-        fixture = fixture_index.get(record.document_id)
-        if fixture is None:  # pragma: no cover - guarded by audit_ingest_outputs above.
-            raise KeyError(f"document_id {record.document_id!r} is missing from the corpus manifest")
-        reports.append(evaluate_document_record(record, fixture))
-    return reports
-
-
-def audit_ingest_outputs(
-    fixtures: list[CorpusFixture],
-    records: list[DocumentRecord],
-    *,
-    manifest_path: str | Path,
-    output_path: str | Path,
-) -> IngestOutputCoverageReport:
-    """Audit which golden fixtures are covered by the emitted ingest JSON set."""
-
-    fixture_index = _build_fixture_index(fixtures)
-    matched_fixture_file_names: set[str] = set()
-    unexpected_document_ids: list[str] = []
-    for record in records:
+    evaluated_document_ids: set[str] = set()
+    for record in load_document_records(output_path):
         fixture = fixture_index.get(record.document_id)
         if fixture is None:
-            unexpected_document_ids.append(record.document_id)
-            continue
-        matched_fixture_file_names.add(fixture.file_name)
+            raise KeyError(
+                f"document_id {record.document_id!r} is missing from the corpus manifest"
+            )
+        evaluated_document_ids.add(record.document_id)
+        reports.append(evaluate_document_record(record, fixture))
 
-    missing_fixture_file_names = sorted(
-        fixture.file_name
-        for fixture in fixtures
-        if fixture.file_name not in matched_fixture_file_names
-    )
-    status: Literal["ok", "fail"] = "ok"
-    if missing_fixture_file_names or unexpected_document_ids:
-        status = "fail"
-
-    return IngestOutputCoverageReport(
-        manifest_path=str(Path(manifest_path)),
-        output_path=str(Path(output_path)),
-        matched_fixture_file_names=sorted(matched_fixture_file_names),
-        missing_fixture_file_names=missing_fixture_file_names,
-        unexpected_document_ids=sorted(unexpected_document_ids),
-        status=status,
-    )
+    missing_document_ids = sorted(set(fixture_index) - evaluated_document_ids)
+    if missing_document_ids:
+        raise IngestCoverageError(
+            manifest_path=manifest_path,
+            output_path=output_path,
+            missing_document_ids=missing_document_ids,
+            evaluated_document_ids=sorted(evaluated_document_ids),
+        )
+    return reports
 
 
 def _artifact_counts(record: DocumentRecord) -> dict[str, int]:
@@ -370,9 +335,8 @@ def _provenance_correctness(record: DocumentRecord) -> float:
             provenance.source_document_id == record.document_id
             and provenance.page_number >= 1
             and bool(provenance.parser)
+            and provenance.confidence is not None
         )
-        if provenance.confidence is not None:
-            is_valid = is_valid and 0.0 <= provenance.confidence <= 1.0
         if provenance.bbox is not None:
             is_valid = is_valid and provenance.bbox.page_number == provenance.page_number
         if is_valid:
@@ -406,39 +370,6 @@ def _count_similarity(actual: int, expected: int) -> float:
 
 def _average(*values: float) -> float:
     return sum(values) / len(values)
-
-
-def _build_fixture_index(fixtures: list[CorpusFixture]) -> dict[str, CorpusFixture]:
-    fixture_index: dict[str, CorpusFixture] = {}
-    conflicting_keys: set[str] = set()
-    for fixture in fixtures:
-        for key in _fixture_match_keys(fixture):
-            existing = fixture_index.get(key)
-            if existing is not None and existing.document_id != fixture.document_id:
-                conflicting_keys.add(key)
-                continue
-            fixture_index[key] = fixture
-
-    if conflicting_keys:
-        formatted = ", ".join(sorted(conflicting_keys))
-        raise ValueError(f"fixture matching keys must be unique, found conflicts for: {formatted}")
-    return fixture_index
-
-
-def _fixture_match_keys(fixture: CorpusFixture) -> set[str]:
-    keys = {fixture.document_id}
-    keys.update(_path_match_keys(fixture.file_name))
-    if fixture.source_file_name:
-        keys.update(_path_match_keys(fixture.source_file_name))
-    if fixture.source_path:
-        keys.update(_path_match_keys(fixture.source_path))
-    return {key for key in keys if key}
-
-
-def _path_match_keys(path_value: str) -> set[str]:
-    path = Path(path_value)
-    keys = {path.name, path.stem}
-    return {key for key in keys if key}
 
 
 def _duplicates(values: list[str]) -> set[str]:

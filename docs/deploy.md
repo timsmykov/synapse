@@ -60,7 +60,7 @@ Async worker containers are intentionally not part of this stack yet.
 The queue/worker contract belongs to a later phase and should not be faked now.
 
 The testing stack now uses a real lightweight `grobid` service on port `8070`.
-That is necessary because Phase 1 verification now includes real metadata/citation extraction, not just Docling-only fallback behavior.
+That is necessary because Phase 1 verification now includes real metadata and citation extraction, not just Docling-only fallback behavior.
 
 ## Port policy
 

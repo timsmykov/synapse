@@ -129,6 +129,7 @@ If a command is not implemented yet, add the smallest practical stub and documen
 - Treat `docs/implementation-checklist.md` as the progress ledger for checkbox status.
 - Before coding, identify which phase and which checklist items your task covers.
 - After completing a scoped task, update the relevant checklist items in the same pass.
+- After completing a scoped task, proactively update any roadmap, verification, corpus, deploy, repo-map, or architecture docs touched by that work in the same pass; do not wait for a separate reminder.
 - If a task spans multiple phases, mark only the items you actually closed and leave the rest open.
 - Do not invent new sequencing; follow the dependency order already recorded in the roadmap and checklist.
 
@@ -171,6 +172,7 @@ Do not let multiple agents edit the same integration seam in parallel.
 - Edit only the files needed for the task.
 - Do not revert unrelated user changes.
 - If a change affects provenance, storage, or CLI semantics, update the relevant docs in the same pass.
+- Every agent owns the doc sync for its own slice. Treat roadmap/checklist/verification updates as part of done, not as optional follow-up work.
 
 ## Subagent Operating Mode
 
