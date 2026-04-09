@@ -14,6 +14,8 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        SYNAPSE_INSTALL_EXTRAS: ${SYNAPSE_INSTALL_EXTRAS:-}
     image: synapse-testing:latest
     env_file:
       - ./.env.staging
@@ -29,6 +31,9 @@ services:
         condition: service_started
     ports:
       - "127.0.0.1:${SYNAPSE_APP_PORT:-18000}:8000"
+    volumes:
+      - ../data:/workspace/data
+      - ../test_corpus:/workspace/test_corpus
     healthcheck:
       test:
         [

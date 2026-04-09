@@ -27,6 +27,7 @@ The current goal is a single remote server that acts as the default install, tes
 - `deploy/Caddyfile`: reverse proxy config for the test stack
 - `scripts/deploy_staging.sh`: build and launch the stack
 - `scripts/check_staging.sh`: health and smoke verification
+- `scripts/run_ingest_smoke.sh`: create a tiny PDF fixture and run `synapse ingest`
 - `scripts/sync_test_corpus.sh`: sync selected golden PDFs from the external Mac source folder to the server corpus path
 
 ## Services in the testing stack
@@ -92,6 +93,21 @@ This checks:
 - `/ready`
 - `/info`
 - `python -m synapse doctor` inside the running app container
+
+## Real ingest smoke
+
+```bash
+./scripts/run_ingest_smoke.sh
+```
+
+This script:
+
+- creates `test_corpus/smoke-fixture.pdf` on the host
+- runs `python -m synapse ingest` inside the `app` container
+- writes JSON output to `data/ingest-smoke/`
+
+The testing image installs `research` extras by default so Docling is available for this smoke path.
+GROBID can stay lightweight on the shared box because the workflow already tolerates metadata failure and continues with Docling-only output.
 
 ## Optional SSH tunnel
 
