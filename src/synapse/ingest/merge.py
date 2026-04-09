@@ -33,6 +33,8 @@ def merge_document_record(
             reference_text=metadata.abstract,
         )
 
+    document_parser = "docling+grobid" if metadata is not None else "docling"
+
     document = DocumentRecord(
         document_id=structure.document_id,
         title=preferred_title,
@@ -46,7 +48,7 @@ def merge_document_record(
             source_document_id=structure.document_id,
             page_number=1,
             source_document_title=preferred_title,
-            parser="docling+grobid",
+            parser=document_parser,
             source_uri=structure.source_uri,
             citation=citation,
         ),
@@ -67,6 +69,7 @@ def merge_document_record(
                     bbox=section.bbox,
                     parser="docling",
                     extraction_stage="structure",
+                    confidence=section.confidence,
                     source_uri=structure.source_uri,
                     citation=citation,
                 ),
@@ -91,6 +94,7 @@ def merge_document_record(
                         bbox=cell.bbox,
                         parser="docling",
                         extraction_stage="table",
+                        confidence=cell.confidence,
                         source_uri=structure.source_uri,
                         citation=citation,
                     ),
@@ -111,6 +115,7 @@ def merge_document_record(
                         bbox=table.bbox,
                         parser="docling",
                         extraction_stage="table",
+                        confidence=table.confidence,
                         source_uri=structure.source_uri,
                         citation=citation,
                     ),
@@ -134,6 +139,7 @@ def merge_document_record(
                     bbox=formula.bbox,
                     parser="docling",
                     extraction_stage="formula",
+                    confidence=formula.confidence,
                     source_uri=structure.source_uri,
                     citation=citation,
                 ),
@@ -154,6 +160,7 @@ def merge_document_record(
                     bbox=figure.bbox,
                     parser="docling",
                     extraction_stage="figure",
+                    confidence=figure.confidence,
                     source_uri=structure.source_uri,
                     citation=citation,
                 ),

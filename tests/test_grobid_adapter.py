@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from synapse.ingest.grobid_adapter import (
     GrobidAdapter,
@@ -80,6 +83,11 @@ class _UnavailableFakeClient:
         raise RuntimeError("server unavailable")
 
 
+class _InitFailure:
+    def __call__(self) -> None:
+        raise RuntimeError("client bootstrap failed")
+
+
 class GrobidAdapterTest(unittest.TestCase):
     def test_missing_dependency_is_actionable(self) -> None:
         with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
@@ -119,6 +127,47 @@ class GrobidAdapterTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
             with self.assertRaisesRegex(GrobidDependencyError, "server unavailable"):
                 GrobidAdapter(client_factory=_UnavailableFakeClient).extract(handle.name)
+
+    def test_client_initialization_failure_becomes_actionable_dependency_error(self) -> None:
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
+            with self.assertRaisesRegex(GrobidDependencyError, "client bootstrap failed"):
+                GrobidAdapter(client_factory=_InitFailure()).extract(handle.name)
+
+    def test_adapter_uses_configured_grobid_server_when_loading_client(self) -> None:
+        captured: dict[str, object] = {}
+
+        class FakeClient:
+            def __init__(self, **kwargs: object) -> None:
+                captured.update(kwargs)
+
+        grobid_client_module = types.ModuleType("grobid_client")
+        grobid_client_impl = types.ModuleType("grobid_client.grobid_client")
+        grobid_client_impl.GrobidClient = FakeClient
+        grobid_client_module.grobid_client = grobid_client_impl
+
+        with patch.dict(
+            sys.modules,
+            {
+                "grobid_client": grobid_client_module,
+                "grobid_client.grobid_client": grobid_client_impl,
+            },
+        ):
+            with patch("synapse.ingest.grobid_adapter.get_settings", return_value=MagicMock(grobid_url="http://grobid:8070")):
+                GrobidAdapter()._load_client()
+
+        self.assertEqual(captured["grobid_server"], "http://grobid:8070")
+
+    def test_runtime_hint_is_empty_for_compose_service_url(self) -> None:
+        with patch("synapse.ingest.grobid_adapter.os.path.exists", return_value=True):
+            self.assertIsNone(GrobidAdapter.runtime_hint("http://grobid:8070"))
+
+    def test_runtime_hint_explains_localhost_inside_container(self) -> None:
+        with patch("synapse.ingest.grobid_adapter.os.path.exists", return_value=True):
+            hint = GrobidAdapter.runtime_hint("http://localhost:8070")
+
+        self.assertIsNotNone(hint)
+        self.assertIn("http://grobid:8070", hint)
+        self.assertIn("Compose `grobid` service", hint)
 
     def test_missing_file_raises(self) -> None:
         with self.assertRaises(FileNotFoundError):

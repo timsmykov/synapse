@@ -152,7 +152,9 @@ By default this:
 
 - runs inside the already running `app` container
 - reads from `${SYNAPSE_SERVER_CORPUS_DIR}/golden/*.pdf`
+- expands the source set on the host and runs one ingest per PDF in sequence
 - writes JSON to `data/ingest-golden/`
+- writes per-file logs as `data/ingest-golden/run-01.log`, `run-02.log`, and so on
 
 Optional arguments:
 
@@ -161,6 +163,7 @@ Optional arguments:
 ```
 
 Use this script instead of ad-hoc detached containers so the real-PDF path shares the same environment, networking, and `SYNAPSE_GROBID_URL` contract as the canonical `app` runtime.
+The sequential host-side loop is also the canonical batch mode for Phase 1 because it keeps per-document failures observable on the shared VPS.
 
 ## Isolated golden ingest
 

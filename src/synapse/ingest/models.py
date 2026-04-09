@@ -14,6 +14,7 @@ class ParsedSection(SynapseModel):
     text: str
     page_number: int = Field(default=1, ge=1)
     bbox: BoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class ParsedTableCell(SynapseModel):
@@ -22,6 +23,7 @@ class ParsedTableCell(SynapseModel):
     value: str | int | float | bool | None = None
     page_number: int = Field(default=1, ge=1)
     bbox: BoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class ParsedTable(SynapseModel):
@@ -31,6 +33,7 @@ class ParsedTable(SynapseModel):
     columns: int = Field(ge=1)
     page_number: int = Field(default=1, ge=1)
     bbox: BoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
     cells: list[ParsedTableCell] = Field(default_factory=list)
 
 
@@ -39,6 +42,7 @@ class ParsedFormula(SynapseModel):
     page_number: int = Field(default=1, ge=1)
     bbox: BoundingBox | None = None
     display_mode: bool = False
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class ParsedFigure(SynapseModel):
@@ -48,6 +52,7 @@ class ParsedFigure(SynapseModel):
     bbox: BoundingBox | None = None
     image_ref: str | None = None
     alt_text: str | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class DoclingParseResult(SynapseModel):

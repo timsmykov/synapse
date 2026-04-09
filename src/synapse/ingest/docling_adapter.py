@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -22,11 +23,20 @@ class DoclingDependencyError(RuntimeError):
     """Raised when Docling integration is requested without the dependency installed."""
 
 
+logger = logging.getLogger(__name__)
+
+
 class DoclingAdapter:
     """Convert a PDF into normalized structural artifacts using Docling."""
 
-    def __init__(self, converter_factory: Callable[[], Any] | None = None) -> None:
+    def __init__(
+        self,
+        converter_factory: Callable[[], Any] | None = None,
+        *,
+        ocr_enabled: bool = False,
+    ) -> None:
         self._converter_factory = converter_factory
+        self._ocr_enabled = ocr_enabled
 
     def convert(self, source_uri: str | Path) -> DoclingParseResult:
         source_path = Path(source_uri).expanduser()
@@ -56,13 +66,49 @@ class DoclingAdapter:
                 "Docling is not installed. Install `synapse[research]` or run "
                 "`pip install docling` to enable Synapse PDF ingestion."
             ) from exc
-        return document_converter.DocumentConverter()
+
+        input_format = self._import_input_format()
+        pdf_format_option = self._import_pdf_format_option()
+        pdf_pipeline_options = self._import_pdf_pipeline_options()
+
+        pipeline_options = pdf_pipeline_options.PdfPipelineOptions()
+        pipeline_options.do_ocr = self._ocr_enabled
+        logger.info(
+            "Initializing Docling converter with OCR %s",
+            "enabled" if self._ocr_enabled else "disabled",
+        )
+
+        return document_converter.DocumentConverter(
+            format_options={
+                input_format.InputFormat.PDF: pdf_format_option.PdfFormatOption(
+                    pipeline_options=pipeline_options
+                )
+            }
+        )
 
     @staticmethod
     def _import_document_converter() -> Any:
         from docling import document_converter
 
         return document_converter
+
+    @staticmethod
+    def _import_input_format() -> Any:
+        from docling.datamodel import base_models
+
+        return base_models
+
+    @staticmethod
+    def _import_pdf_format_option() -> Any:
+        from docling import document_converter
+
+        return document_converter
+
+    @staticmethod
+    def _import_pdf_pipeline_options() -> Any:
+        from docling.datamodel import pipeline_options
+
+        return pipeline_options
 
     @staticmethod
     def _extract_document(result: Any) -> Any:
@@ -101,6 +147,7 @@ class DoclingAdapter:
                     text=text,
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         if not sections and exported.get("markdown"):
@@ -112,33 +159,64 @@ class DoclingAdapter:
         tables: list[ParsedTable] = []
         for item in exported.get("tables", []):
             table_page_number = cls._page_number_from_item(item)
-            cells = [
-                ParsedTableCell(
-                    row=cell.get("row", 1),
-                    column=cell.get("column", 1),
-                    value=cell.get("value", cell.get("text")),
-                    page_number=cls._page_number_from_item(cell, default=table_page_number),
-                    bbox=cls._bbox_from_item(
-                        cell,
-                        cls._page_number_from_item(cell, default=table_page_number),
-                    ),
-                )
-                for cell in item.get("cells", [])
-            ]
+            cells = cls._extract_table_cells(item, table_page_number)
             if not cells:
                 continue
+            table_data = item.get("data")
+            rows = item.get("rows")
+            columns = item.get("columns")
+            if isinstance(table_data, dict):
+                rows = rows or table_data.get("num_rows")
+                columns = columns or table_data.get("num_cols")
             tables.append(
                 ParsedTable(
                     caption=item.get("caption"),
                     label=item.get("label"),
-                    rows=item.get("rows", max(cell.row for cell in cells)),
-                    columns=item.get("columns", max(cell.column for cell in cells)),
+                    rows=rows or max(cell.row for cell in cells),
+                    columns=columns or max(cell.column for cell in cells),
                     page_number=table_page_number,
                     bbox=cls._bbox_from_item(item, table_page_number),
+                    confidence=cls._confidence_from_item(item),
                     cells=cells,
                 )
             )
         return tables
+
+    @classmethod
+    def _extract_table_cells(
+        cls,
+        item: dict[str, Any],
+        table_page_number: int,
+    ) -> list[ParsedTableCell]:
+        raw_cells = item.get("cells")
+        if not raw_cells:
+            table_data = item.get("data")
+            if isinstance(table_data, dict):
+                raw_cells = table_data.get("table_cells") or []
+
+        cells: list[ParsedTableCell] = []
+        for cell in raw_cells or []:
+            page_number = cls._page_number_from_item(cell, default=table_page_number)
+            row = cell.get("row")
+            if row is None:
+                row = cell.get("start_row_offset_idx", 0) + 1
+            column = cell.get("column")
+            if column is None:
+                column = cell.get("start_col_offset_idx", 0) + 1
+            value = cell.get("value", cell.get("text"))
+            if value is None:
+                continue
+            cells.append(
+                ParsedTableCell(
+                    row=row,
+                    column=column,
+                    value=value,
+                    page_number=page_number,
+                    bbox=cls._bbox_from_item(cell, page_number),
+                    confidence=cls._confidence_from_item(cell),
+                )
+            )
+        return cells
 
     @classmethod
     def _extract_formulas(cls, exported: dict) -> list[ParsedFormula]:
@@ -154,6 +232,7 @@ class DoclingAdapter:
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
                     display_mode=item.get("display_mode", False),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         return formulas
@@ -172,9 +251,17 @@ class DoclingAdapter:
                     bbox=cls._bbox_from_item(item, page_number),
                     image_ref=item.get("image_ref"),
                     alt_text=item.get("alt_text"),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         return figures
+
+    @staticmethod
+    def _confidence_from_item(item: dict[str, Any]) -> float | None:
+        confidence = item.get("confidence")
+        if confidence is None:
+            return None
+        return float(confidence)
 
     @staticmethod
     def _page_number_from_item(item: dict[str, Any], default: int = 1) -> int:
