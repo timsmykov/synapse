@@ -312,6 +312,129 @@ class EvaluationTest(unittest.TestCase):
         self.assertEqual(payload["missing_document_ids"], ["doc-02"])
         self.assertIn("missing document_ids: doc-02", payload["error"])
 
+    def test_evaluate_ingest_script_reports_failed_document_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = root / "manifest.json"
+            outputs_dir = root / "outputs"
+            outputs_dir.mkdir()
+            manifest_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "document_id": "doc-01",
+                            "file_name": "01-ecommerce-meta-analysis.pdf",
+                            "domain": "medicine",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 1,
+                                "tables": 1,
+                                "table_cells": 1,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                        {
+                            "document_id": "doc-02",
+                            "file_name": "02-jams-service-review.pdf",
+                            "domain": "medicine",
+                            "layout_features": ["tables"],
+                            "expected_artifacts": {
+                                "sections": 1,
+                                "tables": 1,
+                                "table_cells": 1,
+                                "formulas": 0,
+                                "figures": 0,
+                                "citations": 0,
+                            },
+                            "notes": "fixture",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            passing_record = DocumentRecord(
+                document_id="doc-01",
+                title="Passing Study",
+                artifacts=[
+                    Section(
+                        artifact_id="sec-1",
+                        document_id="doc-01",
+                        provenance=Provenance(
+                            source_document_id="doc-01",
+                            page_number=1,
+                            parser="docling",
+                            confidence=1.0,
+                        ),
+                        heading="Intro",
+                        level=1,
+                        text="A",
+                        order=0,
+                    ),
+                    TableArtifact(
+                        artifact_id="tbl-1",
+                        document_id="doc-01",
+                        provenance=Provenance(
+                            source_document_id="doc-01",
+                            page_number=1,
+                            parser="docling",
+                            confidence=1.0,
+                        ),
+                        rows=1,
+                        columns=1,
+                        cells=[
+                            TableCell(
+                                artifact_id="cell-1",
+                                document_id="doc-01",
+                                provenance=Provenance(
+                                    source_document_id="doc-01",
+                                    page_number=1,
+                                    parser="docling",
+                                    confidence=1.0,
+                                ),
+                                row=1,
+                                column=1,
+                            )
+                        ],
+                    ),
+                ],
+            )
+            failing_record = DocumentRecord(document_id="doc-02", title="Failing Study")
+            (outputs_dir / "doc-01.json").write_text(
+                passing_record.model_dump_json(),
+                encoding="utf-8",
+            )
+            (outputs_dir / "doc-02.json").write_text(
+                failing_record.model_dump_json(),
+                encoding="utf-8",
+            )
+
+            env = os.environ.copy()
+            env["PYTHONPATH"] = str(Path(__file__).resolve().parents[1] / "src")
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/evaluate_ingest.py",
+                    str(outputs_dir),
+                    "--manifest",
+                    str(manifest_path),
+                ],
+                check=False,
+                capture_output=True,
+                cwd=Path(__file__).resolve().parents[1],
+                env=env,
+                text=True,
+            )
+
+        self.assertEqual(completed.returncode, 1)
+        payload = json.loads(completed.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertEqual(payload["evaluated_document_ids"], ["doc-01", "doc-02"])
+        self.assertEqual(payload["passed_document_ids"], ["doc-01"])
+        self.assertEqual(payload["failed_document_ids"], ["doc-02"])
+
     def test_minimum_expectations_allow_actual_counts_above_manifest_floor(self) -> None:
         entry = load_corpus_manifest_from_json(
             [

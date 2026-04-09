@@ -23,6 +23,7 @@ The evaluation CLI output should always surface:
 - `manifest_path`
 - `ingest_output`
 - `evaluated_document_ids`
+- `passed_document_ids` and `failed_document_ids` when coverage is complete
 - `missing_document_ids` when coverage is incomplete
 - keep Phase 1 open until the full selected fixture set clears the gate
 
@@ -37,9 +38,17 @@ Successful full-golden example:
     "nguyen-2023-chatbots-frontline",
     "masciari-2024-ai-ethics"
   ],
+  "failed_document_ids": [],
   "ingest_output": "/srv/synapse/repo/data/ingest-golden",
   "manifest_path": "/srv/synapse/repo/test_corpus/corpus-manifest.json",
   "passed": true,
+  "passed_document_ids": [
+    "handoyo-2024-meta-analysis",
+    "blut-2021-jams",
+    "oprea-bra-2025-ebusiness",
+    "nguyen-2023-chatbots-frontline",
+    "masciari-2024-ai-ethics"
+  ],
   "report_count": 5,
   "reports": [
     {

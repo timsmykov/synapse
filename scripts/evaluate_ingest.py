@@ -56,12 +56,16 @@ def main() -> int:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 1
 
+    passed_document_ids = sorted(report.document_id for report in reports if report.passed)
+    failed_document_ids = sorted(report.document_id for report in reports if not report.passed)
     payload = {
         "reports": [report.model_dump(mode="json") for report in reports],
         "passed": all(report.passed for report in reports),
         "manifest_path": manifest_path,
         "ingest_output": ingest_output,
         "evaluated_document_ids": [report.document_id for report in reports],
+        "passed_document_ids": passed_document_ids,
+        "failed_document_ids": failed_document_ids,
         "report_count": len(reports),
     }
     print(json.dumps(payload, indent=2, sort_keys=True))
