@@ -81,6 +81,8 @@ Closed with the current server verification pass:
 - strict full-corpus evaluation against the repo-local manifest
 - green Day 1 metric pass for all five emitted outputs
 
+This closes Phase 1 for the current selected five-document acceptance baseline; any future corpus expansion should be treated as a new acceptance wave, not as a reopening of this phase.
+
 Operational follow-up, but not a Phase 1 blocker:
 
 - harden `GROBID` service discovery inside the testing-box `app` container

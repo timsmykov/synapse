@@ -88,7 +88,7 @@ The current testing-box baseline still shows intermittent `GROBID` hostname reso
 - the current ingest contract treats this as a warning-only fallback
 - the full Phase 1 verification pass still succeeds because the baseline parser path is allowed to fall back to Docling-only output
 
-This is still an operational issue worth hardening, but it is not a blocker for Phase 1 closeout under the current fallback policy.
+This remains a separate testing-box hardening issue and does not reopen Phase 1 under the current warning-only fallback policy.
 
 ## Phase 1 Status
 
