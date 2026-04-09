@@ -16,6 +16,7 @@ services:
       dockerfile: Dockerfile
       args:
         SYNAPSE_INSTALL_EXTRAS: ${SYNAPSE_INSTALL_EXTRAS:-}
+        SYNAPSE_PIP_EXTRA_INDEX_URL: ${SYNAPSE_PIP_EXTRA_INDEX_URL:-}
     image: synapse-testing:latest
     env_file:
       - ./.env.staging

@@ -68,6 +68,7 @@ Then edit `deploy/.env.staging`:
 - set real credentials where needed
 - keep `SYNAPSE_LLM_PROVIDER=openai` or another API-backed provider
 - leave `OPENAI_API_KEY` empty only if the current task does not need model calls yet
+- keep `SYNAPSE_PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu` so the testing image resolves CPU-only PyTorch wheels for `docling`
 - keep the default `grobid` stub unless you explicitly need remote GROBID extraction on this box
 - change host port values only if they conflict with something already running
 
