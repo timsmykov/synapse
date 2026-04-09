@@ -33,60 +33,81 @@ cd /srv/synapse/repo
 ./scripts/run_golden_ingest.sh data/phase1-seq-full
 ```
 
-Observed emitted output set:
-
-- `/srv/synapse/repo/data/phase1-seq-full/01-ecommerce-meta-analysis.json`
-- `/srv/synapse/repo/data/phase1-seq-full/02-service-robot-study.json`
-- `/srv/synapse/repo/data/phase1-seq-full/03-anthropomorphism-meta-analysis.json`
-- `/srv/synapse/repo/data/phase1-seq-full/04-ai-systematic-review.json`
-- `/srv/synapse/repo/data/phase1-seq-full/05-ai-ethics-review.json`
-
-Observed ingest receipts:
-
-- `01-ecommerce-meta-analysis.pdf`: `artifact_count=427`, parser=`docling`, warnings=`[]`
-- `02-service-robot-study.pdf`: `artifact_count=508`, parser=`docling`, warning-only GROBID fallback
-- `03-anthropomorphism-meta-analysis.pdf`: `artifact_count=445`, parser=`docling`, warning-only GROBID fallback
-- `04-ai-systematic-review.pdf`: `artifact_count=464`, parser=`docling`, warning-only GROBID fallback
-- `05-ai-ethics-review.pdf`: `artifact_count=608`, parser=`docling`, warning-only GROBID fallback
-
-## Strict Evaluation Evidence
-
-Strict evaluation was run from the branch checkout against the full emitted output set:
+Canonical evaluation command:
 
 ```bash
-cd /srv/synapse/worktrees/phase1-gate-hardening
-/srv/synapse/.venv/bin/python scripts/evaluate_ingest.py \
+cd /srv/synapse/repo
+PYTHONPATH=src /srv/synapse/.venv/bin/python \
+  scripts/evaluate_ingest.py \
   /srv/synapse/repo/data/phase1-seq-full \
-  --manifest test_corpus/corpus-manifest.json
+  --manifest /srv/synapse/repo/test_corpus/corpus-manifest.json
 ```
 
-Observed result on 2026-04-09:
+The evaluation CLI output should always surface:
 
-- `passed=true`
-- all five selected fixtures matched the manifest and passed all Day 1 metrics
+- `manifest_path`
+- `ingest_output`
+- `evaluated_document_ids`
+- `passed_document_ids` and `failed_document_ids` when coverage is complete
+- `missing_document_ids` when coverage is incomplete
 
-Per-fixture highlights:
+Successful full-golden example:
 
-- `01-ecommerce-meta-analysis.pdf`: `tables=9`, `table_cells=449`
-- `02-service-robot-study.pdf`: `tables=7`, `table_cells=568`
-- `03-anthropomorphism-meta-analysis.pdf`: `tables=9`, `table_cells=1034`
-- `04-ai-systematic-review.pdf`: `tables=4`, `table_cells=284`
-- `05-ai-ethics-review.pdf`: `tables=14`, `table_cells=524`
+```json
+{
+  "evaluated_document_ids": [
+    "handoyo-2024-meta-analysis",
+    "blut-2021-jams",
+    "oprea-bra-2025-ebusiness",
+    "nguyen-2023-chatbots-frontline",
+    "masciari-2024-ai-ethics"
+  ],
+  "failed_document_ids": [],
+  "ingest_output": "/srv/synapse/repo/data/phase1-seq-full",
+  "manifest_path": "/srv/synapse/repo/test_corpus/corpus-manifest.json",
+  "passed": true,
+  "passed_document_ids": [
+    "handoyo-2024-meta-analysis",
+    "blut-2021-jams",
+    "oprea-bra-2025-ebusiness",
+    "nguyen-2023-chatbots-frontline",
+    "masciari-2024-ai-ethics"
+  ],
+  "report_count": 5,
+  "reports": [
+    {
+      "document_id": "handoyo-2024-meta-analysis",
+      "fixture_file_name": "01-ecommerce-meta-analysis.pdf",
+      "passed": true
+    }
+  ]
+}
+```
 
-All five passed:
+Coverage failure example:
 
-- `table_extraction_accuracy`
-- `formula_fidelity`
-- `provenance_correctness`
-- `section_order_correctness`
+```json
+{
+  "error": "ingest outputs do not cover the full corpus manifest; missing document_ids: masciari-2024-ai-ethics",
+  "evaluated_document_ids": [
+    "handoyo-2024-meta-analysis",
+    "blut-2021-jams",
+    "oprea-bra-2025-ebusiness",
+    "nguyen-2023-chatbots-frontline"
+  ],
+  "ingest_output": "/srv/synapse/repo/data/phase1-seq-full",
+  "manifest_path": "/srv/synapse/repo/test_corpus/corpus-manifest.json",
+  "missing_document_ids": [
+    "masciari-2024-ai-ethics"
+  ],
+  "passed": false,
+  "reports": []
+}
+```
 
-## Operational Note
+## Residual Hardening Note
 
-The current testing-box baseline still shows intermittent `GROBID` hostname resolution failures from inside the `app` container:
-
-- `http://grobid:8070` occasionally resolves to a `NameResolutionError`
-- the current ingest contract treats this as a warning-only fallback
-- the full Phase 1 verification pass still succeeds because the baseline parser path is allowed to fall back to Docling-only output
+The testing box still shows intermittent `GROBID` DNS resolution failures inside the `app` container during some runs. The full Phase 1 verification pass still succeeds because the baseline parser path is allowed to fall back to Docling-only output.
 
 This remains a separate testing-box hardening issue and does not reopen Phase 1 under the current warning-only fallback policy.
 
