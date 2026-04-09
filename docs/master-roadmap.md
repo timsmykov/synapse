@@ -77,7 +77,8 @@ Closed in this slice:
 
 Remaining:
 
-- add golden fixtures for tables, formulas, and multi-column layout
+- reconcile the repo-local fixture manifest and the server golden-corpus manifest into one canonical selected set
+- rerun the full-batch evaluation on that unified corpus contract
 
 Success means:
 
@@ -137,11 +138,10 @@ Final step:
 
 The next execution slice is:
 
-1. select the first golden PDFs from `/Users/timsmykov/Desktop/Статьи для теста`
-2. mirror or sync the chosen files into the server-side corpus location and describe them in the manifest
-3. run `synapse ingest` across those fixtures and capture shape and quality gaps
-4. lock the first acceptance expectations in `eval/contracts.md`
-5. begin Phase 2 storage interfaces only after the golden ingest pass is stable
+1. reconcile `test_corpus/corpus-manifest.json` with `/srv/synapse/test_corpus/golden/corpus-manifest.json`
+2. keep exactly one canonical selected fixture set across repo and server
+3. rerun the agreed full-batch evaluation on that unified contract
+4. begin Phase 2 storage interfaces only after that unified golden gate is green
 
 Do not move to storage or retrieval until this slice is green.
 
