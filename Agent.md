@@ -33,6 +33,7 @@ Use local repo docs as implementation mirrors, not as product invention:
 - `docs/deploy.md`
 - `docs/test-corpus.md`
 - `docs/phase-0-verification.md`
+- `docs/phase-1-verification.md`
 - `docs/repo-map.md`
 - `docs/agent-prompts.md`
 
