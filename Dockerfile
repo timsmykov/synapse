@@ -5,6 +5,17 @@ WORKDIR /workspace
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      libgl1 \
+      libglib2.0-0 \
+      libice6 \
+      libsm6 \
+      libx11-6 \
+      libxcb1 \
+      libxext6 && \
+    rm -rf /var/lib/apt/lists/*
+
 ARG SYNAPSE_INSTALL_EXTRAS=""
 ARG SYNAPSE_PIP_EXTRA_INDEX_URL=""
 

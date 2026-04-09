@@ -76,9 +76,9 @@ docker compose \
   --env-file "${ENV_FILE}" \
   -f "${COMPOSE_FILE}" \
   exec -T app \
-  python -m synapse ingest \
-  /workspace/test_corpus/smoke-fixture.pdf \
-  "/workspace/${OUTPUT_DIR}"
+  synapse ingest \
+  --source /workspace/test_corpus/smoke-fixture.pdf \
+  --output "/workspace/${OUTPUT_DIR}"
 
 echo
 find "${ROOT_DIR}/${OUTPUT_DIR}" -maxdepth 1 -type f -name '*.json' | sort | sed -n '1,20p'

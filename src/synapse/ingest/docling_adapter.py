@@ -101,6 +101,7 @@ class DoclingAdapter:
                     text=text,
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         if not sections and exported.get("markdown"):
@@ -122,6 +123,7 @@ class DoclingAdapter:
                         cell,
                         cls._page_number_from_item(cell, default=table_page_number),
                     ),
+                    confidence=cls._confidence_from_item(cell),
                 )
                 for cell in item.get("cells", [])
             ]
@@ -135,6 +137,7 @@ class DoclingAdapter:
                     columns=item.get("columns", max(cell.column for cell in cells)),
                     page_number=table_page_number,
                     bbox=cls._bbox_from_item(item, table_page_number),
+                    confidence=cls._confidence_from_item(item),
                     cells=cells,
                 )
             )
@@ -154,6 +157,7 @@ class DoclingAdapter:
                     page_number=page_number,
                     bbox=cls._bbox_from_item(item, page_number),
                     display_mode=item.get("display_mode", False),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         return formulas
@@ -172,9 +176,23 @@ class DoclingAdapter:
                     bbox=cls._bbox_from_item(item, page_number),
                     image_ref=item.get("image_ref"),
                     alt_text=item.get("alt_text"),
+                    confidence=cls._confidence_from_item(item),
                 )
             )
         return figures
+
+    @staticmethod
+    def _confidence_from_item(item: dict[str, Any]) -> float:
+        raw_value = item.get("confidence", item.get("score"))
+        if raw_value is None:
+            provenance = item.get("prov")
+            if isinstance(provenance, list) and provenance:
+                first = provenance[0]
+                if isinstance(first, dict):
+                    raw_value = first.get("confidence", first.get("score"))
+        if raw_value is None:
+            return 1.0
+        return max(0.0, min(1.0, float(raw_value)))
 
     @staticmethod
     def _page_number_from_item(item: dict[str, Any], default: int = 1) -> int:
@@ -208,19 +226,23 @@ class DoclingAdapter:
         if not raw_bbox:
             return None
         if {"l", "t", "r", "b"} <= raw_bbox.keys():
+            x0, x1 = sorted((float(raw_bbox["l"]), float(raw_bbox["r"])))
+            y0, y1 = sorted((float(raw_bbox["t"]), float(raw_bbox["b"])))
             return BoundingBox(
                 page=page_number,
-                x0=raw_bbox["l"],
-                y0=raw_bbox["t"],
-                x1=raw_bbox["r"],
-                y1=raw_bbox["b"],
+                x0=x0,
+                y0=y0,
+                x1=x1,
+                y1=y1,
             )
+        x0, x1 = sorted((float(raw_bbox["x0"]), float(raw_bbox["x1"])))
+        y0, y1 = sorted((float(raw_bbox["y0"]), float(raw_bbox["y1"])))
         return BoundingBox(
             page=page_number,
-            x0=raw_bbox["x0"],
-            y0=raw_bbox["y0"],
-            x1=raw_bbox["x1"],
-            y1=raw_bbox["y1"],
+            x0=x0,
+            y0=y0,
+            x1=x1,
+            y1=y1,
             page_width=raw_bbox.get("page_width"),
             page_height=raw_bbox.get("page_height"),
         )
