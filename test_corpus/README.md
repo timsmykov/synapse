@@ -11,10 +11,10 @@ The canonical source of the real PDFs is outside the repo and documented in [`/U
 The first operational baseline now uses five real papers from that source folder and maps them to stable mirrored names:
 
 - `01-ecommerce-meta-analysis.pdf` -> `Handoyo (2024) - Trust, Risk, Security in E-commerce Meta-analysis.pdf`
-- `02-service-robot-study.pdf` -> `Belanche et al. (2021) - Robots Physical Appearance in Frontline Services.pdf`
-- `03-anthropomorphism-meta-analysis.pdf` -> `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
-- `04-ai-systematic-review.pdf` -> `Hollebeek et al. (2024) - Engaging Consumers Through AI Technologies.pdf`
-- `05-ai-ethics-review.pdf` -> `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
+- `02-jams-service-review.pdf` -> `Blut, M., et al. (2021) - Journal of the Academy of Marketing Science.pdf`
+- `03-ebusiness-latent-topics.pdf` -> `Oprea & Bra (2025) - AI Game-Changer in E-Business.pdf`
+- `04-chatbot-customer-experience.pdf` -> `Nguyen et al. (2023) - Chatbots Anthropomorphism Customer Experience.pdf`
+- `05-ai-ethics-recommendation-systems.pdf` -> `Masciari et al. (2024) - AI Recommendation Systems and Ethics.pdf`
 
 This starter baseline is good enough for the first server-side ingest pass, corpus audit, and evaluation harness.
 It does not yet cover the full target shape for formula-heavy, biology-panel, or clinical-RCT-specific PDFs.
@@ -34,26 +34,26 @@ Longer term, the corpus should still include:
 When the selected PDFs are mirrored into a technical corpus directory, use these stable names:
 
 - `01-ecommerce-meta-analysis.pdf`
-- `02-service-robot-study.pdf`
-- `03-anthropomorphism-meta-analysis.pdf`
-- `04-ai-systematic-review.pdf`
-- `05-ai-ethics-review.pdf`
+- `02-jams-service-review.pdf`
+- `03-ebusiness-latent-topics.pdf`
+- `04-chatbot-customer-experience.pdf`
+- `05-ai-ethics-recommendation-systems.pdf`
 
 Do not rename files after they are accepted into the baseline.
 
 ## Required Sidecar Metadata
 
-Each entry in `corpus-manifest.json` should contain:
+Each entry in `corpus-manifest.json` should contain the fields used by the active golden baseline:
 
 - `document_id`
 - `file_name`
 - `domain`
-- `source_path`
-- `source_title`
-- `page_count`
+- `source_file_name`
 - `layout_features`
 - `expected_artifacts`
 - `notes`
+
+The historical `corpus-manifest.template.json` may include extra draft-only fields such as `source_path`, `source_title`, and `page_count`, but those are not part of the active evaluation contract.
 
 ## Required Layout Features
 
