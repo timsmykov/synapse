@@ -1,20 +1,45 @@
 # Phase 1 Verification
 
-Phase 1 is not closed yet.
+Date: 2026-04-09
 
-This verification surface is the closeout target for the ingest baseline:
+This document records the current Phase 1 verification state for Synapse on the testing VPS.
 
-- run the golden ingest sweep against `/srv/synapse/test_corpus/golden`
-- evaluate the emitted JSON with [`/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py`](/Users/timsmykov/Desktop/Synapse/scripts/evaluate_ingest.py)
-- use [`/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json`](/Users/timsmykov/Desktop/Synapse/test_corpus/corpus-manifest.json) as the only canonical manifest
-- treat any missing `document_id` from that manifest as a hard failure
+## Canonical Server Flow
 
-Canonical VPS evaluation command:
+Verified on `ssh root@194.163.181.122`:
+
+1. `./scripts/deploy_staging.sh`
+2. `./scripts/check_staging.sh`
+3. `./scripts/run_ingest_smoke.sh`
+4. `./scripts/run_golden_ingest.sh data/phase1-seq-full`
+5. `./scripts/evaluate_golden_ingest.sh data/phase1-seq-full test_corpus/corpus-manifest.json`
+
+The canonical server-side golden ingest helper now expands the fixture set on the host and runs one PDF at a time through the running `app` container. This avoids the earlier opaque full-batch path and keeps the emitted output set inspectable while the run is in flight.
+
+## Verified Now
+
+- the canonical VPS cycle is working: deploy, check, smoke, full golden ingest, strict evaluation
+- the containerized `synapse ingest --source/--output` contract is green
+- the strict full-corpus evaluation gate is green on the selected five-document golden set
+- provenance correctness, section ordering, table extraction, and formula fidelity all pass on the full emitted output set
+- the selected Phase 1 fixture set is now verified end-to-end on the VPS against the repo-local manifest
+
+## Full Golden Sweep Evidence
+
+Canonical full run on 2026-04-09:
 
 ```bash
-PYTHONPATH=src /Users/timsmykov/Desktop/Synapse/.venv/bin/python \
+cd /srv/synapse/repo
+./scripts/run_golden_ingest.sh data/phase1-seq-full
+```
+
+Canonical evaluation command:
+
+```bash
+cd /srv/synapse/repo
+PYTHONPATH=src /srv/synapse/.venv/bin/python \
   scripts/evaluate_ingest.py \
-  /srv/synapse/repo/data/ingest-golden \
+  /srv/synapse/repo/data/phase1-seq-full \
   --manifest /srv/synapse/repo/test_corpus/corpus-manifest.json
 ```
 
@@ -25,7 +50,6 @@ The evaluation CLI output should always surface:
 - `evaluated_document_ids`
 - `passed_document_ids` and `failed_document_ids` when coverage is complete
 - `missing_document_ids` when coverage is incomplete
-- keep Phase 1 open until the full selected fixture set clears the gate
 
 Successful full-golden example:
 
@@ -39,7 +63,7 @@ Successful full-golden example:
     "masciari-2024-ai-ethics"
   ],
   "failed_document_ids": [],
-  "ingest_output": "/srv/synapse/repo/data/ingest-golden",
+  "ingest_output": "/srv/synapse/repo/data/phase1-seq-full",
   "manifest_path": "/srv/synapse/repo/test_corpus/corpus-manifest.json",
   "passed": true,
   "passed_document_ids": [
@@ -71,7 +95,7 @@ Coverage failure example:
     "oprea-bra-2025-ebusiness",
     "nguyen-2023-chatbots-frontline"
   ],
-  "ingest_output": "/srv/synapse/repo/data/ingest-golden",
+  "ingest_output": "/srv/synapse/repo/data/phase1-seq-full",
   "manifest_path": "/srv/synapse/repo/test_corpus/corpus-manifest.json",
   "missing_document_ids": [
     "masciari-2024-ai-ethics"
@@ -81,15 +105,25 @@ Coverage failure example:
 }
 ```
 
-Phase 1 can be marked green only when:
+## Residual Hardening Note
 
-- the full selected golden fixture set emits JSON through the canonical ingest path
-- the evaluation pass is green for every selected fixture
-- the output directory covers the full canonical manifest without omissions
+The testing box still shows intermittent `GROBID` DNS resolution failures inside the `app` container during some runs. The full Phase 1 verification pass still succeeds because the baseline parser path is allowed to fall back to Docling-only output.
 
-## Immediate Handoff Plan
+This remains a separate testing-box hardening issue and does not reopen Phase 1 under the current warning-only fallback policy.
 
-1. Scaffold owner runs the canonical VPS command above against the latest `/srv/synapse/repo/data/ingest-golden` output set.
-2. If the payload shows `passed: false` because of `missing_document_ids`, fix the ingest sweep or output directory before touching thresholds or parser logic.
-3. If coverage is complete but one or more fixture reports are red, hand the failing fixture ids to the owning component lane with the emitted JSON and metric details.
-4. After each VPS verification pass, update this file and `docs/implementation-checklist.md` in the same change-set; do not leave verification state implicit in chat history.
+## Phase 1 Status
+
+Phase 1 is verified for the current selected corpus baseline.
+
+Closed:
+
+- canonical testing-box deploy/check/smoke path
+- stable ingest CLI contract
+- strict full-corpus evaluation gate
+- canonical VPS full golden sweep on the selected five-document corpus
+- full green Day 1 metric pass on the emitted output set
+
+Open after Phase 1 closeout:
+
+- harden `GROBID` service discovery inside the testing-box `app` container
+- decide whether future verification should require hybrid Docling+GROBID output or keep the current Docling-first fallback baseline

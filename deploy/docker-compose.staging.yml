@@ -29,7 +29,7 @@ services:
       minio:
         condition: service_started
       grobid:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "127.0.0.1:${SYNAPSE_APP_PORT:-18000}:8000"
     volumes:
@@ -82,8 +82,17 @@ services:
     restart: unless-stopped
 
   grobid:
-    image: ${GROBID_IMAGE:-python:3.12-alpine}
-    command: ${GROBID_COMMAND:-python -m http.server 8070}
+    image: ${GROBID_IMAGE:-grobid/grobid:0.8.2-crf}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -lc \"exec 3<>/dev/tcp/127.0.0.1/8070; printf 'GET /api/isalive HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep -q true <&3\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     restart: unless-stopped
 
 volumes:
