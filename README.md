@@ -15,6 +15,14 @@ This scaffold intentionally keeps heavyweight parsing and retrieval integrations
 
 The most important rule for future work is to keep workflow logic out of entrypoints. `cli.py` and `server.py` should call services; services should use domain models and adapters.
 
+## Model Policy
+
+- primary agent and base LLM provider: `MiniMax`
+- embeddings and other non-primary model calls: `OpenRouter`
+- default ingest baseline: `Docling + GROBID` without OCR
+- OCR stays off by default and should be enabled only for scanned or image-only PDFs
+- `ColPali` is explicitly deferred until the retrieval phase
+
 Current execution policy:
 
 - code can be edited from this Mac workspace
@@ -22,7 +30,9 @@ Current execution policy:
 - current bootstrap/provisioning access is `ssh root@194.163.181.122`
 - long-lived deploy commands should move to a dedicated non-root deploy user
 
-Do not treat the Mac as the default runtime environment for Synapse.
+Do not treat the Mac as the runtime environment for Synapse.
+The Mac is an editor and source-document workstation only.
+Do not create or keep project-local virtualenvs, local compose stacks, or local test/runtime installs for Synapse on this machine.
 
 ## Server-First Start
 
@@ -32,6 +42,13 @@ Use the remote server as the default execution environment. The canonical flow i
 2. push changes to GitHub
 3. pull and run them on the server
 4. run install/test/runtime commands on the server or inside the server containers
+
+Forbidden local workflow:
+
+- no `python -m pytest` as the project runtime baseline on the Mac
+- no local `pip install -e .` or project `.venv` as the canonical environment
+- no local `docker compose up` for Synapse verification
+- no local deploy verification on the Mac
 
 The concrete runbook lives in [`docs/deploy.md`](./docs/deploy.md).
 

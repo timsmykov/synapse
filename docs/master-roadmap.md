@@ -39,6 +39,9 @@ Current remote target assumption:
 - treat a 4 vCPU / 8 GB RAM / 100+ GB disk class machine as the minimum practical starter box
 - do not colocate heavy local LLM inference on that same node during the MVP phase
 - keep ingest concurrency conservative until parser memory profiles are measured on real PDFs
+- use `MiniMax` as the primary LLM path and `OpenRouter` for embeddings and other auxiliary model calls
+- keep OCR disabled in the default ingest baseline unless scanned-PDF evidence forces it on
+- defer `ColPali` until the retrieval phase instead of front-loading it into MVP ingest
 
 ## Execution Order
 
@@ -54,6 +57,24 @@ Current remote target assumption:
 10. Science primitives and orchestration
 11. Hardening and release baseline
 
+## Phase model vs workstreams
+
+Do not replace the phase model with component-only planning.
+
+The current phases are still correct because they encode dependency order:
+
+- Phase 1 must stabilize ingest contracts before persistence
+- Phase 2 must stabilize storage before retrieval
+- retrieval must stabilize before science primitives
+
+What should change is execution inside each phase:
+
+- one `scaffold` lane owns repo/runtime integration
+- multiple `component` lanes own isolated modules within the current phase
+- integration happens through the scaffold lane, not by letting all agents touch the same seams
+
+This means the project is still phased, but implemented through component workstreams.
+
 ## Phase Plan
 
 ### Phase 0. Foundation
@@ -66,6 +87,13 @@ The repo now has the structural baseline required for Day 1 work.
 
 Status: in progress.
 
+Recommended Phase 1 workstream split:
+
+- `scaffold`: testing-box cycle, CLI/service wiring, deploy path, verification docs, roadmap/checklist
+- `docling`: parser runtime options, section/table extraction, parser-specific tests
+- `grobid`: client bootstrap, container networking assumptions, metadata/citation extraction
+- `merge/eval`: canonical `DocumentRecord`, artifact merge rules, corpus thresholds, golden evaluation analysis
+
 Closed in this slice:
 
 - ingest IO contract for single PDF, directory, and glob sources
@@ -77,12 +105,26 @@ Closed in this slice:
 
 Remaining:
 
-- add golden fixtures for tables, formulas, and multi-column layout
+- complete the full VPS-backed golden ingest/evaluation sweep for the selected fixture set
+- close the Phase 1 checklist item only after the golden evaluation gate is green
+
+Current blocker on the testing box:
+
+- the scaffold path is now canonical and can evaluate real-PDF outputs on the VPS, but the current `app`-container canary still fails the table gate and the full fixture sweep has not finished yet
+
+Current blocking gaps from the 2026-04-09 testing-box pass:
+
+- runtime baseline is green through the canonical container path for at least one real golden PDF
+- provenance truthfulness is now verified on the emitted real-PDF output
+- the scaffold confusion around evaluation paths is closed: the canonical evaluation path is the server repo checkout, not the `app` container image
+- the current canonical canary still fails the table gate with `actual tables=0` and `actual table_cells=0`
+- the full selected fixture set still needs to clear the same VPS ingest/evaluation gate
+- an isolated container using `http://localhost:8070` cannot reach GROBID, so hybrid Docling+GROBID verification still depends on container networking/configuration rather than code shape
 
 Success means:
 
 - `synapse ingest <pdf>` produces structured JSON
-- provenance is preserved for sections, tables, cells, formulas, and figures
+- provenance is preserved for sections, tables, cells, formulas, and figures, with `bbox` and `confidence` carried through when the parser actually provides them
 - contract tests pass on canonical domain shapes
 
 ### Phase 2. Storage And Persistence Layer
@@ -137,11 +179,12 @@ Final step:
 
 The next execution slice is:
 
-1. select the first golden PDFs from `/Users/timsmykov/Desktop/Статьи для теста`
-2. mirror or sync the chosen files into the server-side corpus location and describe them in the manifest
-3. run `synapse ingest` across those fixtures and capture shape and quality gaps
-4. lock the first acceptance expectations in `eval/contracts.md`
-5. begin Phase 2 storage interfaces only after the golden ingest pass is stable
+1. restore table extraction on the canonical `app`-container path for the first canary
+2. finish the full `synapse ingest` pass across `/srv/synapse/test_corpus/golden`
+3. run `scripts/evaluate_ingest.py` across that full output set
+4. decide whether the canonical verification target is Docling-only fallback or a container-networked Docling+GROBID path
+5. close Phase 1 only after the golden evaluation gate is green for the selected fixture set
+6. only then open Phase 2 storage work
 
 Do not move to storage or retrieval until this slice is green.
 
@@ -154,6 +197,12 @@ Use this operating model during the MVP:
 3. Run installs, integrated parser/storage tests, and manual QA on the remote testing box.
 4. Treat production as a later isolation step, not as a prerequisite for Phase 1-3 delivery.
 
+Hard policy:
+
+- the Mac is not an approved Synapse runtime target
+- do not maintain local project environments or local compose verification on the Mac
+- when local runtime artifacts appear, delete them and continue from the server
+
 ## Operating Rules For Agents
 
 - Read this file before starting any technical work.
@@ -163,3 +212,5 @@ Use this operating model during the MVP:
 - If a task changes the execution order, update this file first, then the checklist.
 - Keep entrypoints thin; put logic into `domain`, `services`, or the relevant layer package.
 - Treat the checklist as the progress ledger and this file as the strategic execution map.
+- Prefer component ownership over free-form parallelism.
+- Keep `scaffold` ownership singular; do not let multiple agents edit the same integration seam in parallel.

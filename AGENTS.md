@@ -9,6 +9,7 @@ Before work:
 - if the task touches fixtures or ingest evaluation, read [docs/test-corpus.md](/Users/timsmykov/Desktop/Synapse/docs/test-corpus.md)
 - identify the exact phase and checklist items you own
 - if you use subagents, use only `gpt-5.4`; do not use mini variants
+- do not use the Mac as a Synapse runtime/install/test target; server only
 
 After work:
 - update the roadmap if sequencing changed

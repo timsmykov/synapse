@@ -38,6 +38,10 @@
 - `test_corpus/` - corpus manifests, mirrors, and test metadata; the real golden PDFs live outside the repo.
 - `eval/` - evaluation scripts and metrics.
 
+## Runtime rule
+- This repo may be edited on the Mac, but Synapse runtime/install/test/deploy execution belongs to the server.
+- Do not treat `.venv`, local compose state, or other local runtime artifacts as part of the accepted project workflow.
+
 ## Working rules
 - Do not move implementation logic into docs.
 - Keep CLI behavior visible and easy to test.
