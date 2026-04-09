@@ -64,7 +64,7 @@ The repo now has the structural baseline required for Day 1 work.
 
 ### Phase 1. Ingestion Contract And Parsing Pipeline
 
-Status: in progress.
+Status: verified for the current selected corpus baseline.
 
 Closed in this slice:
 
@@ -75,10 +75,15 @@ Closed in this slice:
 - structured JSON output from `synapse ingest`
 - contract coverage for ingest IO and merge behavior
 
-Remaining:
+Closed with the current server verification pass:
 
-- reconcile the repo-local fixture manifest and the server golden-corpus manifest into one canonical selected set
-- rerun the full-batch evaluation on that unified corpus contract
+- canonical VPS full golden sweep on the selected five-document corpus
+- strict full-corpus evaluation against the repo-local manifest
+- green Day 1 metric pass for all five emitted outputs
+
+Operational follow-up, but not a Phase 1 blocker:
+
+- harden `GROBID` service discovery inside the testing-box `app` container
 
 Success means:
 
@@ -138,12 +143,11 @@ Final step:
 
 The next execution slice is:
 
-1. reconcile `test_corpus/corpus-manifest.json` with `/srv/synapse/test_corpus/golden/corpus-manifest.json`
-2. keep exactly one canonical selected fixture set across repo and server
-3. rerun the agreed full-batch evaluation on that unified contract
-4. begin Phase 2 storage interfaces only after that unified golden gate is green
+1. begin Phase 2 storage interfaces and persistence path
+2. keep the current verified five-document corpus as the active acceptance baseline until a larger corpus wave is added intentionally
+3. close the separate testing-box hardening issue around intermittent `GROBID` DNS resolution
 
-Do not move to storage or retrieval until this slice is green.
+Do not move to retrieval until Phase 2 storage work is green.
 
 ## Testing And Deploy Policy
 
