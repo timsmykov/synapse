@@ -75,6 +75,11 @@ class _LegacyFakeClient:
         output_path.write_text(TEI_XML, encoding="utf-8")
 
 
+class _UnavailableFakeClient:
+    def process(self, **kwargs: object) -> None:
+        raise RuntimeError("server unavailable")
+
+
 class GrobidAdapterTest(unittest.TestCase):
     def test_missing_dependency_is_actionable(self) -> None:
         with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
@@ -109,6 +114,11 @@ class GrobidAdapterTest(unittest.TestCase):
         self.assertIn("teiCoordinates", client.calls[1])
         self.assertIn("output", client.calls[2])
         self.assertIn("tei_coordinates", client.calls[2])
+
+    def test_runtime_failure_becomes_actionable_dependency_error(self) -> None:
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
+            with self.assertRaisesRegex(GrobidDependencyError, "server unavailable"):
+                GrobidAdapter(client_factory=_UnavailableFakeClient).extract(handle.name)
 
     def test_missing_file_raises(self) -> None:
         with self.assertRaises(FileNotFoundError):

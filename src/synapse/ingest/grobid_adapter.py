@@ -27,8 +27,13 @@ class GrobidAdapter:
         if not source_path.exists():
             raise FileNotFoundError(source_uri)
 
-        client = self._client_factory() if self._client_factory else self._load_client()
-        tei_xml = self._run_grobid(client, source_path)
+        try:
+            client = self._client_factory() if self._client_factory else self._load_client()
+            tei_xml = self._run_grobid(client, source_path)
+        except GrobidDependencyError:
+            raise
+        except Exception as exc:
+            raise GrobidDependencyError(f"GROBID extraction is unavailable: {exc}") from exc
         return self._parse_tei(tei_xml, str(source_path))
 
     def _load_client(self) -> Any:
